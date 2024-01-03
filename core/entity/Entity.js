@@ -3,10 +3,10 @@ import EntityRegistry from "../EntityRegistry.js";
 
 class Entity {
   uuid = new SharedData("uuid", SharedData.STR_T, "uuid").makeImportant()
-  position = new SharedData("position", SharedData.POS_T, [0, 0])
+  position = new SharedData("position", SharedData.POS_T, [0, 0, 0])
   type = new SharedData("type", SharedData.STR_T, "default")
 
-  constructor(type = "default", position = [0,0]) {
+  constructor(type = "default", position = [0,0,0]) {
     this.type.setValue(type);
     this.position.setValue(position);
     this.uuid.setValue("UUID-RANDOM-" + Math.floor(Math.random() * 10000));

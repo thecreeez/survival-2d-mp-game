@@ -29,8 +29,8 @@ class Application {
     this.registerPackets();
 
     if (!this.isClient()) {
-      //this.spawnEntity(new EntityWithAI([0,0], 100))
-      //this.spawnEntity(new EntityWithAI([800, 800], 100, { target_class: "entity_with_ai"}))
+      //this.spawnEntity(new EntityWithAI([0,0,0], 100))
+      this.spawnEntity(new ItemEntity({pos: [5,5,5]}))
     }
 
     console.log(`Load app. Context: ${this.context.type}`);
@@ -55,6 +55,15 @@ class Application {
 
   spawnEntity(entity) {
     this._entities[entity.getUuid()] = entity;
+    
+    // Add to render
+    if (this.isClient()) {
+      if (entity.getType() == "player_entity" && this.context.username == entity.getName()) {
+        this.context.playerEntity = entity;
+      }
+      
+      this.context.addVisualization(entity);
+    }
 
     return entity;
   }
@@ -78,10 +87,19 @@ class Application {
 
     if (entity) {
       entity.load(sharedDatas);
+
+      if (this.isClient()) {
+        this.context.updateVisualization(entity);
+      }
     }
   }
 
   removeEntity(uuid) {
+    // Add to render
+    if (this.isClient()) {
+      this.context.removeVisualization(entity);
+    }
+
     delete this._entities[uuid];
   }
 
@@ -117,11 +135,26 @@ class Application {
   }
 
   updateClientTick() {
-    if (this.context.serverMousePos[0] != this.context.mousePos[0] || this.context.serverMousePos[1] != this.context.mousePos[1] || this.context.isMouseDown != this.context.isServerMouseDown) {
-      MovementUpdatePacket.clientSend(this.context.connectionHandler.getSocket(), this.context.isMouseDown, this.context.mousePos);
-      this.context.serverMousePos = [...this.context.mousePos];
-      this.context.isServerMouseDown = this.context.isMouseDown;
+    let move = [0,0,0]
+
+    if (this.context.keys["KeyW"]) {
+      move[0] += 0.01;
     }
+
+    if (this.context.keys["KeyS"]) {
+      move[0] -= 0.01;
+    }
+
+    if (this.context.keys["KeyA"]) {
+      move[1] -= 0.01;
+    }
+
+    if (this.context.keys["KeyD"]) {
+      move[1] += 0.01;
+    }
+
+    if (move[0] != 0 || move[1] != 0 || move[2] != 0)
+      MovementUpdatePacket.clientSend(this.context.connectionHandler.getSocket(), false, this.context.updatePlayerPosition(move));
   }
 
   isClient() {

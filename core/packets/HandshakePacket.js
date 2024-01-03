@@ -28,7 +28,7 @@ class HandshakePacket {
       return;
     }
     
-    let newPlayer = Application.instance.spawnEntity(new PlayerEntity(args[1], 100, [0,0]));
+    let newPlayer = Application.instance.spawnEntity(new PlayerEntity(args[1], 100, [0,0,0]));
 
     // Отсылать всем существующим игрокам новоприбывшего
     EntityRegisterPacket.serverSend(server.getPlayersConnections(), { context: EntityRegisterPacket.Contexts.playerJoin, data: newPlayer.serialize() });

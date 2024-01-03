@@ -17,7 +17,7 @@ class MovementUpdatePacket {
   static serverHandle(server, conn, data) {
     let args = data.split("/");
     let bSitting = args[1] == "true";
-    let pos = [Number(args[2]), Number(args[3])];
+    let pos = [Number(args[2]), Number(args[3]), Number(args[4])];
 
     let player = server.getPlayerByConnection(conn);
 

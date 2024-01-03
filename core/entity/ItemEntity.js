@@ -8,7 +8,7 @@ class ItemEntity extends Entity {
   // CLIENT-SIDE ONLY
   swingTime = 0.5
 
-  constructor(item_id = "air", count = 1, pos = [0,0]) {
+  constructor({ item_id = "air", count = 1, pos = [0,0,0] } = {}) {
     super("item_entity", pos)
     this.item_id.setValue(item_id);
     this.count.setValue(count);

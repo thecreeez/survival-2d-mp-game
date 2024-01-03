@@ -1,10 +1,14 @@
+import CLIENT_INSTANCE from "../init.js";
 import Client from "./Client.js";
-import EntityWithAIRender from "./EntityRender.js";
-import ItemRender from "./ItemRender.js";
-import PlayerRender from "./PlayerRender.js";
+
+import * as THREE from 'three';
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
 const canvas = document.querySelector("canvas");
-const ctx = canvas.getContext("2d");
 
 canvas.width = document.body.clientWidth;
 canvas.height = document.body.clientHeight;
@@ -17,8 +21,40 @@ window.onresize = (ev) => {
 class Screen {
   static lastFrame = Date.now();
 
-  static clear() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  static createScene() {
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.controls = new PointerLockControls(this.camera, document.body);
+    this.models = {};
+
+    this.controls.addEventListener('lock', function () {
+      // menu hide
+    });
+
+    this.controls.addEventListener('unlock', function () {
+      // menu show
+    });
+
+    canvas.onclick = (ev) => {
+      this.controls.lock();
+    }
+  }
+
+  // model: Mesh
+  static addModelOnScene(uuid, model) {
+    this.scene.add(model.getMesh());
+    this.models[uuid] = model;
+
+    console.log(this.models);
+  }
+
+  static removeModelFromScene(uuid) {
+    this.scene.remove(this.models[uuid].getMesh());
+    delete this.models[uuid];
+  }
+
+  static getModelByUuid(uuid) {
+    return this.models[uuid];
   }
 
   /**
@@ -26,19 +62,8 @@ class Screen {
    * @param {Client} client 
    */
   static renderFrame(client) {
-    this.clear();
-    this.renderLogs(client, Date.now() - this.lastFrame);
-
-    client.application.getEntities().forEach((entity) => {
-      if (entity.getType() == "player_entity") {
-        PlayerRender.render(ctx, entity);
-      } else if (entity.getType() == "entity_with_ai") {
-        EntityWithAIRender.render(ctx, entity);
-      } else if (entity.getType() == "item_entity") {
-        ItemRender.render(ctx, entity);
-      }
-    })
-
+    renderer.render(this.scene, this.camera);
+    //this.renderLogs(client, Date.now() - this.lastFrame);
     this.lastFrame = Date.now();
   }
 
