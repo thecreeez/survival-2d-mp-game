@@ -39,6 +39,10 @@ class Entity {
     return entityClass;
   }
 
+  static empty() {
+    return new this();
+  }
+
   logData() {
     console.log(`-----${this.type.getValue()}-${this.uuid.getValue() }-----`)
     this.getAllDatas().forEach((data) => {

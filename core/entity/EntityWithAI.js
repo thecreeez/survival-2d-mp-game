@@ -10,10 +10,11 @@ class EntityWithAI extends LivingEntity {
   target_type = new SharedData("target_type", SharedData.STR_T, "player_entity")
   target_vision_range = new SharedData("target_vision_range", SharedData.NUM_T, 500);
 
+  attack_range = new SharedData("attack_range", SharedData.NUM_T, 20);
   damage = new SharedData("damage", SharedData.NUM_T, 1);
 
-  constructor(pos = [0, 0], health = 100, { target_class = "player_entity" } = {}) {
-    super("entity_with_ai", health, pos)
+  constructor(id, pos = [0, 0], health = 100, { target_class = "player_entity" } = {}) {
+    super(id, health, pos)
 
     this.position.setValue(pos);
     this.target_type.setValue(target_class);
@@ -24,12 +25,24 @@ class EntityWithAI extends LivingEntity {
    * 
    * @param {Application} application 
    */
-  updateServerTick(application) {
-    super.updateServerTick();
+  updateServerTick(application, deltaTick) {
+    super.updateServerTick(application, deltaTick);
 
     this.updateTarget(application);
     this.updateMovement(application);
     this.updateAttack(application);
+
+    if (this.getTargetEntity(application) && this.distanceTo(this.getTargetEntity(application)) < this.attack_range.getValue() && this.getState() != "attack") {
+      this.state.setValue("attack");
+    }
+
+    if (!this.getTargetEntity(application) && this.getState() == "attack") {
+      this.state.setValue("idle");
+    }
+
+    if (this.getTargetEntity(application) && this.distanceTo(this.getTargetEntity(application)) > this.attack_range.getValue() && this.getState() == "attack") {
+      this.state.setValue("idle");
+    }
   }
 
   /**
@@ -86,7 +99,7 @@ class EntityWithAI extends LivingEntity {
    * @param {Application} application 
    */
   updateMovement(application) {
-    if (!this.wannaMove()) {
+    if (!this.wannaMove(application)) {
       return;
     }
 
@@ -122,6 +135,21 @@ class EntityWithAI extends LivingEntity {
       moving[1] /= 2;
     }
 
+    if (moving[0] == 0 && moving[1] == 0) {
+      return;
+    }
+
+    if (moving[0] >= 0 && moving[1] >= 0) {
+      this.rotation.setValue(0);
+    } else if (moving[0] < 0 && moving[1] >= 0) {
+      this.rotation.setValue(1);
+    } else if (moving[0] >= 0 && moving[1] < 0) {
+      this.rotation.setValue(2);
+    } else if (moving[0] < 0 && moving[1] < 0) {
+      this.rotation.setValue(3);
+    }
+
+    this.lastTimeMove = Date.now();
     this.position.setValue([entityPosition[0] + moving[0], entityPosition[1] + moving[1]]);
   }
 
@@ -135,6 +163,7 @@ class EntityWithAI extends LivingEntity {
     if (!this.canAttack(targetEntity)) {
       return;
     }
+
     targetEntity.handleDamage(this, this.damage.getValue());
   }
 
@@ -142,12 +171,16 @@ class EntityWithAI extends LivingEntity {
     return application.getEntity(this.target_uuid.getValue());
   }
 
-  wannaMove() {
+  wannaMove(application) {
+    if (this.target_exist.getValue() && this.distanceTo(this.getTargetEntity(application)) < this.attack_range.getValue()) {
+      return false;
+    }
+
     return this.target_exist.getValue() || (this.target_pos.getValue()[0] != this.position.getValue()[0] || this.target_pos.getValue()[1] != this.position.getValue()[1]);
   }
 
   canAttack(entity) {
-    if (this.distanceTo(entity) > 1) {
+    if (this.distanceTo(entity) > this.attack_range.getValue()) {
       return false
     }
 

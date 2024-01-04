@@ -1,7 +1,7 @@
 import EntityRegistry from "./EntityRegistry.js";
 import PacketRegistry from "./PacketRegistry.js";
 
-import EntityWithAI from "./entity/EntityWithAI.js";
+import OrcEntity from "./entity/OrcEntity.js";
 import ItemEntity from "./entity/ItemEntity.js";
 import PlayerEntity from "./entity/PlayerEntity.js";
 
@@ -15,6 +15,8 @@ import MovementUpdatePacket from "./packets/MovementUpdatePacket.js";
 import CommandInputPacket from "./packets/CommandInputPacket.js";
 
 import SharedData from "./SharedData.js";
+import ItemRegistry from "./ItemRegistry.js";
+import Item from "./Item.js";
 
 
 class Application {
@@ -25,11 +27,12 @@ class Application {
 
     Application.instance = this;
     this.context = context;
+    this.lastTickTime = Date.now();
     this.registerEntities();
     this.registerPackets();
 
     if (!this.isClient()) {
-      //this.spawnEntity(new EntityWithAI([0,0], 100))
+      this.spawnEntity(new OrcEntity([300,300]))
       //this.spawnEntity(new EntityWithAI([800, 800], 100, { target_class: "entity_with_ai"}))
     }
 
@@ -39,7 +42,14 @@ class Application {
   registerEntities() {
     EntityRegistry.register(ItemEntity);
     EntityRegistry.register(PlayerEntity);
-    EntityRegistry.register(EntityWithAI);
+    EntityRegistry.register(OrcEntity);
+  }
+
+  registerItems() {
+    ItemRegistry.register(new Item({
+      id: "log",
+      maxStack: 16
+    }));
   }
 
   registerPackets() {
@@ -112,15 +122,25 @@ class Application {
     }
 
     for (let uuid in this._entities) {
-      this._entities[uuid].updateServerTick(this);
+      this._entities[uuid].updateServerTick(this, startTick - this.lastTickTime);
     }
+
+    this.lastTickTime = Date.now();
   }
 
   updateClientTick() {
-    if (this.context.serverMousePos[0] != this.context.mousePos[0] || this.context.serverMousePos[1] != this.context.mousePos[1] || this.context.isMouseDown != this.context.isServerMouseDown) {
-      MovementUpdatePacket.clientSend(this.context.connectionHandler.getSocket(), this.context.isMouseDown, this.context.mousePos);
-      this.context.serverMousePos = [...this.context.mousePos];
-      this.context.isServerMouseDown = this.context.isMouseDown;
+    let controlsHandler = this.context.getControlsHandler();
+
+    if (!this.context.getPlayer())
+      return;
+
+    let player = this.context.getPlayer();
+
+    if (controlsHandler.horizontal != 0 || controlsHandler.vertical != 0 || this.context.getPlayer().b_sitting.getValue() != controlsHandler.bSitting) {
+      MovementUpdatePacket.clientSend(this.context.connectionHandler.getSocket(), controlsHandler.bSitting, [
+        controlsHandler.horizontal * 3,
+        -controlsHandler.vertical * 3,
+      ]);
     }
   }
 

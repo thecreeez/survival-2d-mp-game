@@ -1,22 +1,29 @@
 import Client from "./Client.js";
-import EntityWithAIRender from "./EntityRender.js";
-import ItemRender from "./ItemRender.js";
-import PlayerRender from "./PlayerRender.js";
+import EntityRendererRegistry from "./graphic/EntityRendererRegistry.js";
+import MapRenderer from "./graphic/MapRenderer.js";
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
 
 canvas.width = document.body.clientWidth;
 canvas.height = document.body.clientHeight;
+ctx['imageSmoothingEnabled'] = false;       /* standard */
+ctx['mozImageSmoothingEnabled'] = false;    /* Firefox */
+ctx['oImageSmoothingEnabled'] = false;      /* Opera */
+ctx['webkitImageSmoothingEnabled'] = false; /* Safari */
+ctx['msImageSmoothingEnabled'] = false;     /* IE */
 
 window.onresize = (ev) => {
   canvas.width = document.body.clientWidth;
   canvas.height = document.body.clientHeight;
+  ctx['imageSmoothingEnabled'] = false;       /* standard */
+  ctx['mozImageSmoothingEnabled'] = false;    /* Firefox */
+  ctx['oImageSmoothingEnabled'] = false;      /* Opera */
+  ctx['webkitImageSmoothingEnabled'] = false; /* Safari */
+  ctx['msImageSmoothingEnabled'] = false;     /* IE */
 }
 
 class Screen {
-  static lastFrame = Date.now();
-
   static clear() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
@@ -25,21 +32,33 @@ class Screen {
    * 
    * @param {Client} client 
    */
-  static renderFrame(client) {
+  static renderFrame(client, deltaTime) {
     this.clear();
-    this.renderLogs(client, Date.now() - this.lastFrame);
+    if (!client.getPlayer())
+      return;
+
+    ctx.save();
+    ctx.translate(canvas.width / 2 - client.getPlayer().getPosition()[0], canvas.height / 2 - client.getPlayer().getPosition()[1]);
+
+    this.renderWorld(client, deltaTime);
 
     client.application.getEntities().forEach((entity) => {
-      if (entity.getType() == "player_entity") {
-        PlayerRender.render(ctx, entity);
-      } else if (entity.getType() == "entity_with_ai") {
-        EntityWithAIRender.render(ctx, entity);
-      } else if (entity.getType() == "item_entity") {
-        ItemRender.render(ctx, entity);
+      if (EntityRendererRegistry[entity.getType()]) {
+        EntityRendererRegistry[entity.getType()].render(ctx, entity);
+        EntityRendererRegistry[entity.getType()].updateEntity(entity, deltaTime);
+        return;
       }
+
+      console.error(`Entity ${entity.getUuid()} ${entity.getType()} hasn't renderer.`);
     })
 
-    this.lastFrame = Date.now();
+    ctx.restore();
+    //MapRenderer.Tiles.draw(ctx);
+    //this.renderLogs(client, deltaTime);
+  }
+
+  static renderWorld(client, deltaTime) {
+    MapRenderer.render(canvas, ctx, client);
   }
 
   /**
@@ -47,9 +66,6 @@ class Screen {
    * @param {Client} client 
    */
   static renderLogs(client, deltaTime) {
-    ctx.fillStyle = `green`;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     let fontSize = 20;
     ctx.font = `${fontSize}px arial`;
 
@@ -79,6 +95,25 @@ class Screen {
     })
 
     client.logs = client.logs.filter((log) => log.lifeTime > 0)
+  }
+
+  static getMousePosOnWorld(client) {
+    let mousePosOnScreen = client.controlsHandler.mousePos;
+    return this.toWorldPos(client, mousePosOnScreen)
+  }
+
+  static getTilePos(pos) {
+    return [Math.floor(pos[0] / MapRenderer.cellSize), Math.floor(pos[1] / MapRenderer.cellSize)];
+  }
+
+  static toLocalPos(client, pos) {
+    let playerPos = client.getPlayer().getPosition();
+    return [pos[0] - playerPos[0] + canvas.width / 2, pos[1] - playerPos[1] + canvas.height / 2]
+  }
+
+  static toWorldPos(client, pos) {
+    let playerPos = client.getPlayer().getPosition();
+    return [pos[0] + playerPos[0] - canvas.width / 2, pos[1] + playerPos[1] - canvas.height / 2]
   }
 }
 
