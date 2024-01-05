@@ -1,4 +1,4 @@
-import OrcEntity from "/core/entity/OrcEntity.js";
+import OrcEntity from "/core/world/entity/OrcEntity.js";
 import LivingEntityRenderer from "./LivingEntityRenderer.js";
 import CLIENT_INSTANCE from "../../../init.js";
 

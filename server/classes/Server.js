@@ -22,6 +22,9 @@ class Server {
     this._initClientFiles();
     this.http.listen(3000);
 
+    // TO-DO: Сделать загрузку из файла
+    //this.application.fromJSON(fs.readFileSync("../saves/save_001.json"));
+
     setInterval(() => {
       Application.instance.updateTick();
       
@@ -31,6 +34,8 @@ class Server {
         EntityUpdatePacket.serverSend(this.getPlayersConnections(), { data: entity.serializeLazy() })
       })
     }, 1000 / this._TPS);
+
+    console.log(this.application.toJSON());
   }
 
   static _initClientFiles() {
@@ -123,6 +128,10 @@ class Server {
       name: playerName,
       entity
     });
+  }
+
+  static getWelcomeMessage() {
+    return "Welcome to the game, {player} (Version {version})";
   }
 }
 

@@ -1,0 +1,11 @@
+{
+  "welcomeMessage": "Welcome to the game, {player} (Version {version})",
+  "entities": [],
+  "tile-presets": {
+    "0": "EMPTY",
+    "1": ["default", 13, 2]
+  },
+  "tile-map": {
+    "-1:0": "0"
+  }
+}

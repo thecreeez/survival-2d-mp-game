@@ -1,5 +1,5 @@
 import LivingEntityRenderer from "./LivingEntityRenderer.js";
-import PlayerEntity from "/core/entity/PlayerEntity.js";
+import PlayerEntity from "/core/world/entity/PlayerEntity.js";
 
 class PlayerEntityRenderer extends LivingEntityRenderer {
   static Entity = PlayerEntity;

@@ -1,6 +1,7 @@
-import Client from "./Client.js";
-import EntityRendererRegistry from "./graphic/EntityRendererRegistry.js";
-import MapRenderer from "./graphic/MapRenderer.js";
+import Client from "../Client.js";
+import EntityRendererRegistry from "./EntityRendererRegistry.js";
+import MapRenderer from "./MapRenderer.js";
+import TileSetData from "./TileSetData.js";
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -40,7 +41,7 @@ class Screen {
     ctx.save();
     ctx.translate(canvas.width / 2 - client.getPlayer().getPosition()[0], canvas.height / 2 - client.getPlayer().getPosition()[1]);
 
-    this.renderWorld(client, deltaTime);
+    this.renderWorld(client, deltaTime, TileSetData.RenderSteps.floor);
 
     client.application.getEntities().forEach((entity) => {
       if (EntityRendererRegistry[entity.getType()]) {
@@ -49,16 +50,23 @@ class Screen {
         return;
       }
 
-      console.error(`Entity ${entity.getUuid()} ${entity.getType()} hasn't renderer.`);
+      console.error(`Entity ${entity.getUuid()} ${entity.getType()} can't be rendered. Renderer has not be set.`);
     })
 
+    this.renderWorld(client, deltaTime, TileSetData.RenderSteps.wall);
+    this.renderWorld(client, deltaTime, TileSetData.RenderSteps.top);
+
     ctx.restore();
-    //MapRenderer.Tiles.draw(ctx);
+
+    if (client.getMapBuilder().bEnabled) {
+      client.getMapBuilder().render(ctx, deltaTime);
+    }
+
     //this.renderLogs(client, deltaTime);
   }
 
-  static renderWorld(client, deltaTime) {
-    MapRenderer.render(canvas, ctx, client);
+  static renderWorld(client, deltaTime, type) {
+    MapRenderer.render(canvas, ctx, client, type);
   }
 
   /**
@@ -102,8 +110,13 @@ class Screen {
     return this.toWorldPos(client, mousePosOnScreen)
   }
 
-  static getTilePos(pos) {
+  static getLocalTilePos(pos) {
     return [Math.floor(pos[0] / MapRenderer.cellSize), Math.floor(pos[1] / MapRenderer.cellSize)];
+  }
+
+  static getGlobalTilePos(client, pos) {
+    let playerPos = client.getPlayer().getPosition();
+    return [Math.floor((pos[0] + playerPos[0] - canvas.width / 2) / MapRenderer.cellSize), Math.floor((pos[1] + playerPos[1] - canvas.height / 2) / MapRenderer.cellSize)];
   }
 
   static toLocalPos(client, pos) {

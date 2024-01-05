@@ -1,8 +1,9 @@
 import Application from "../Application.js";
-import PlayerEntity from "../entity/PlayerEntity.js";
+import PlayerEntity from "../world/entity/PlayerEntity.js";
 import EntityRegisterPacket from "./EntityRegisterPacket.js";
 import ClientErrorPacket from "./ClientErrorPacket.js";
 import WelcomePacket from "./WelcomePacket.js";
+import TilesRegisterPacket from "./TilesRegisterPacket.js";
 
 class HandshakePacket {
   static type = "handshake";
@@ -37,6 +38,16 @@ class HandshakePacket {
     Application.instance.getEntities().forEach((entity) => {
       EntityRegisterPacket.serverSend([conn], { context: EntityRegisterPacket.Contexts.loading, data: entity.serialize() });
     })
+
+    let tiles = [];
+
+    Application.instance.getTiles().forEach((tileLine) => {
+      tileLine.forEach((tile) => {
+        tiles.push(tile.serialize());
+      })
+    })
+
+    TilesRegisterPacket.serverSend([conn], tiles);
 
     server.addPlayerConnection(conn, args[1], newPlayer);
     WelcomePacket.serverSend([conn], { message: "Добро пожаловать, "+data.split("/")[1] });

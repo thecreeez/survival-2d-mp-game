@@ -1,4 +1,4 @@
-import SharedData from "../SharedData.js";
+import SharedData from "../../SharedData.js";
 import LivingEntity from "./LivingEntity.js";
 
 class PlayerEntity extends LivingEntity {

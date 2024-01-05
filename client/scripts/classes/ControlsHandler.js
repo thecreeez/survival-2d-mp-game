@@ -1,5 +1,3 @@
-import Screen from "./Screen.js";
-
 const canvas = document.querySelector("canvas");
 
 class ControlsHandler {
@@ -27,6 +25,11 @@ class ControlsHandler {
 
     window.onmouseup = (ev) => {
       this.isMouseDown = false;
+
+      let pos = [ev.clientX, ev.clientY];
+
+      if (this.client.mapBuilder.handleClick(pos))
+        return;
     }
 
     window.onmousedown = (ev) => {

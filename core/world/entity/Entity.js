@@ -1,5 +1,5 @@
-import SharedData from "../SharedData.js";
-import EntityRegistry from "../EntityRegistry.js";
+import SharedData from "../../SharedData.js";
+import EntityRegistry from "../../EntityRegistry.js";
 
 class Entity {
   uuid = new SharedData("uuid", SharedData.STR_T, "uuid").makeImportant()

@@ -1,62 +1,56 @@
-import Screen from "../Screen.js";
+import Screen from "./Screen.js";
 import SpriteSheet from "./SpriteSheet.js";
+import TileSetData from "./TileSetData.js";
 
 class MapRenderer {
   static cellSize = 40;
 
-  static Tiles = new SpriteSheet({ 
-    path: `/client/assets/textures/tiles/tileset.png`,
+  static defaultTiles = new SpriteSheet({ 
+    path: `/client/assets/default/tileset.png`,
     spriteSize: [8,8],
     sheetSize: [23, 14]
   })
 
-  /**
-   * spriteSheet: new SpriteSheet({
-        path: `/client/assets/textures/${entity.getType()}/${name}.png`,
-        sheetSize,
-        spriteSize
-      }),
-   */
+  static defaultTileSetData = new TileSetData(this.defaultTiles)
+    .setRenderStep(13, 5, TileSetData.RenderSteps.top)
+    .setRenderStep(14, 5, TileSetData.RenderSteps.top)
+    .setRenderStep(15, 5, TileSetData.RenderSteps.top)
 
-  static render(canvas, ctx, client) {
+  static render(canvas, ctx, client, type) {
     let cameraPos = client.getPlayer().getPosition();
 
     let size = [canvas.width / this.cellSize, canvas.height / this.cellSize]
     let startFrom = [Math.floor((cameraPos[0] - canvas.width / 2) / this.cellSize), Math.floor((cameraPos[1] - canvas.height / 2) / this.cellSize)]
 
-    ctx.strokeStyle = `black`;
+    if (type == TileSetData.RenderSteps.floor) {
+      this.renderFloor(ctx, size, startFrom)
+    }
+
     for (let y = startFrom[1]; y < startFrom[1] + size[1] + 1; y += 1) {
       for (let x = startFrom[0]; x < startFrom[0] + size[0] + 1; x += 1) {
         let cellPos = [x * this.cellSize, y * this.cellSize]
-        //ctx.strokeRect(cellPos[0], cellPos[1], this.cellSize, this.cellSize);
+        let tile = client.getTileAt(x, y);
 
-        
-
-        if (x % 2 == 0) {
-          ctx.drawImage(this.Tiles.get(15, 2), cellPos[0], cellPos[1], this.cellSize, this.cellSize)
-        } else {
-          ctx.drawImage(this.Tiles.get(13, 2), cellPos[0], cellPos[1], this.cellSize, this.cellSize)
+        if (tile && this[`${tile.pack}TileSetData`].getRenderStep(tile[0], tile[1]) == type) {
+          ctx.drawImage(this[`${tile.pack}Tiles`].get(tile[0], tile[1]), cellPos[0], cellPos[1], this.cellSize, this.cellSize)
         }
-
-        if (x == 4) {
-          ctx.drawImage(this.Tiles.get(6, 2), cellPos[0], cellPos[1], this.cellSize, this.cellSize)
-        }
-
-        if (x == 5) {
-          ctx.drawImage(this.Tiles.get(7, 2), cellPos[0], cellPos[1], this.cellSize, this.cellSize)
-        }
-
-        if (x == 6) {
-          ctx.drawImage(this.Tiles.get(8, 2), cellPos[0], cellPos[1], this.cellSize, this.cellSize)
-        }
-        //ctx.fillStyle = `black`;
-        //ctx.fillText(`${x},${y}`, cellPos[0] + 3, cellPos[1] + 10);
       }
     }
   }
 
-  static getPos(cameraPos, pos) {
-    return [cameraPos[0] - pos[0]]
+  static renderFloor(ctx, size, startFrom) {
+    ctx.strokeStyle = `black`;
+    for (let y = startFrom[1]; y < startFrom[1] + size[1] + 1; y += 1) {
+      for (let x = startFrom[0]; x < startFrom[0] + size[0] + 1; x += 1) {
+        let cellPos = [x * this.cellSize, y * this.cellSize]
+
+        ctx.strokeRect(cellPos[0], cellPos[1], this.cellSize, this.cellSize);
+
+        ctx.font = `10px arial`
+        ctx.fillStyle = `black`;
+        ctx.fillText(`${x},${y}`, cellPos[0] + 3, cellPos[1] + 10);
+      }
+    }
   }
 }
 

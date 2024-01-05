@@ -1,4 +1,4 @@
-import Entity from "../entity/Entity.js";
+import Entity from "../world/entity/Entity.js";
 
 class EntityRemovePacket {
   static type = "entity_remove_packet";
