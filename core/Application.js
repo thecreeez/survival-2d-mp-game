@@ -17,10 +17,12 @@ import MovementUpdatePacket from "./packets/MovementUpdatePacket.js";
 import CommandInputPacket from "./packets/CommandInputPacket.js";
 import TilesRegisterPacket from "./packets/TilesRegisterPacket.js";
 import TilePlacePacket from "./packets/TilePlacePacket.js";
+import SaveRequestPacket from "./packets/SaveRequestPacket.js";
 
 import SharedData from "./SharedData.js";
 import Item from "./world/Item.js";
 import Tile from "./world/Tile.js";
+import Entity from "./world/entity/Entity.js";
 
 
 
@@ -29,7 +31,7 @@ class Application {
 
   constructor(context) {
     this._entities = {};
-    this._tiles = [];
+    this._tiles = {};
 
     Application.instance = this;
     this.context = context;
@@ -37,29 +39,6 @@ class Application {
     this.registerEntities();
     this.registerPackets();
     this.registerItems();
-
-    if (!this.isClient()) {
-      this.spawnEntity(new OrcEntity({ pos: [300, 300] }))
-      this.spawnEntity(new EffectEntity({
-        effectType: "fire",
-        effectData: 0,
-        lifeTime: 60000,
-        pos: [100, 100]
-      }))
-
-      this.spawnEntity(new ItemEntity({ item: ItemRegistry["log"], count: 1, pos: [-50,-50] }))
-      //this.spawnEntity(new EntityWithAI([800, 800], 100, { target_class: "entity_with_ai"}))
-
-      this.setTile(new Tile({
-        sheetPos: [13, 2],
-        pos: [0, 0]
-      }))
-
-      this.setTile(new Tile({
-        sheetPos: [14, 3],
-        pos: [1, 2]
-      }))
-    }
 
     console.log(`Load app. Context: ${this.context.type}`);
   }
@@ -81,6 +60,7 @@ class Application {
 
   registerPackets() {
     PacketRegistry.register(HandshakePacket);
+    PacketRegistry.register(SaveRequestPacket);
 
     PacketRegistry.register(WelcomePacket);
     PacketRegistry.register(ClientErrorPacket);
@@ -186,22 +166,11 @@ class Application {
   }
 
   getTile(pos) {
-    if (!this._tiles[pos[1]])
-      return false;
-
-    if (!this._tiles[pos[1]][pos[0]]) {
-      return false;
-    }
-
-    return this._tiles[pos[1]][pos[0]];
+    return this._tiles[`${pos[0]}:${pos[1]}`];
   }
 
   setTile(tile) {
-    if (!this._tiles[tile.getPosition()[1]]) {
-      this._tiles[tile.getPosition()[1]] = []
-    }
-
-    this._tiles[tile.getPosition()[1]][tile.getPosition()[0]] = tile;
+    this._tiles[`${tile.getPosition()[0]}:${tile.getPosition()[1]}`] = tile;
   }
 
   getTiles() {
@@ -222,7 +191,7 @@ class Application {
     let tileMap = this.generateTileMap(tilePresets)
 
     return {
-      "welcomeMessage": this.context.getWelcomeMessage(),
+      "welcome-message": this.context.getWelcomeMessage(),
       "entities": entities,
       "tile-presets": tilePresets,
       "tile-map": tileMap
@@ -232,22 +201,20 @@ class Application {
   generateTilePresets() {
     let tilePresets = ["EMPTY"];
 
-    this.getTiles().forEach((tileLine, y) => {
-      tileLine.forEach((tile, x) => {
-        let tilePreset = null;
+    for (let tilePos in this.getTiles()) {
+      let tile = this.getTiles()[tilePos];
+      let tilePreset = null;
 
-        tilePresets.forEach((tilePresetCandidate, i) => {
-          if (tilePresetCandidate[0] == tile.pack.getValue() && tilePresetCandidate[1] == tile.sheetPos.getValue()[0] && tilePresetCandidate[2] == tile.sheetPos.getValue()[1]) {
-            tilePreset = i;
-          }
-        })
-
-        if (tilePreset)
-          return;
-
-        tilePresets.push([tile.pack.getValue(), ...tile.sheetPos.getValue()])
+      tilePresets.forEach((tilePresetCandidate, i) => {
+        if (tilePresetCandidate[0] == tile.pack.getValue() && tilePresetCandidate[1] == tile.sheetPos.getValue()[0] && tilePresetCandidate[2] == tile.sheetPos.getValue()[1]) {
+          tilePreset = i;
+        }
       })
-    })
+
+      if (!tilePreset) {
+        tilePresets.push([tile.pack.getValue(), ...tile.sheetPos.getValue()])
+      }
+    }
 
     return tilePresets;
   }
@@ -255,28 +222,54 @@ class Application {
   generateTileMap(tilePresets) {
     let tileMap = {};
 
-    this.getTiles().forEach((tileLine, y) => {
-      tileLine.forEach((tile, x) => {
-        let tilePreset = null;
+    for (let tilePos in this.getTiles()) {
+      let tile = this.getTiles()[tilePos];
+      let tilePreset = null;
 
-        tilePresets.forEach((tilePresetCandidate, i) => {
-          if (tilePresetCandidate[0] == tile.pack.getValue() && tilePresetCandidate[1] == tile.sheetPos.getValue()[0] && tilePresetCandidate[2] == tile.sheetPos.getValue()[1]) {
-            tilePreset = i;
-          }
-        })
-
-        if (tilePreset == null)
-          return;
-
-        tileMap[`${x}:${y}`] = tilePreset;
+      tilePresets.forEach((tilePresetCandidate, i) => {
+        if (tilePresetCandidate[0] == tile.pack.getValue() && tilePresetCandidate[1] == tile.sheetPos.getValue()[0] && tilePresetCandidate[2] == tile.sheetPos.getValue()[1]) {
+          tilePreset = i;
+        }
       })
-    })
+
+      if (tilePreset != null) {
+        tileMap[tilePos] = tilePreset;
+      }
+    }
 
     return tileMap;
   }
 
   fromJSON(json) {
+    if (this.isClient())
+      return false;
 
+    console.log(`Spawning entities... ${json.entities.length}`);
+    json.entities.forEach((entity) => {
+      this.spawnEntity(Entity.parse(entity));
+    })
+
+    console.log(`Loading tiles...`)
+    let presets = json["tile-presets"];
+    let tileMap = json["tile-map"];
+
+    console.log(`Tile presets... ${presets.length}`);
+
+    let i = 0;
+    for (let tilePos in tileMap) {
+      let [ x, y ] = tilePos.split(":");
+
+      let preset = presets[tileMap[tilePos]];
+
+      this.setTile(new Tile({
+        pack: preset[0],
+        sheetPos: [preset[1], preset[2]],
+        pos: [x,y]
+      }));
+
+      i++;
+    }
+    console.log(`Tiles... ${i}`);
   }
 }
 

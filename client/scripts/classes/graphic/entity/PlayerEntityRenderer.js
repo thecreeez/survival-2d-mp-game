@@ -11,9 +11,11 @@ class PlayerEntityRenderer extends LivingEntityRenderer {
 
   static renderMain(ctx, entity) {
     super.renderMain(ctx, entity);
+
     ctx.font = `15px arial`;
+    ctx.textAlign = `center`;
     ctx.fillStyle = `white`;
-    //ctx.fillText(entity.getState(), entity.getPosition()[0], entity.getPosition()[1] - this.size[1] / 2);
+    ctx.fillText(entity.getName(), entity.getPosition()[0], entity.getPosition()[1] - this.size[1] / 4 - 15)
   }
 }
 

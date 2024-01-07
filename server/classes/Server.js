@@ -15,6 +15,8 @@ class Server {
   static http = http.createServer();
   static application = new Application(this);
 
+  static welcomeMessage = `Welcome to the game, {player} (Version {version})`
+
   static players = [];
 
   static start() {
@@ -22,8 +24,7 @@ class Server {
     this._initClientFiles();
     this.http.listen(3000);
 
-    // TO-DO: Сделать загрузку из файла
-    //this.application.fromJSON(fs.readFileSync("../saves/save_001.json"));
+    this.loadSave("save_001.json");
 
     setInterval(() => {
       Application.instance.updateTick();
@@ -34,8 +35,21 @@ class Server {
         EntityUpdatePacket.serverSend(this.getPlayersConnections(), { data: entity.serializeLazy() })
       })
     }, 1000 / this._TPS);
+  }
 
-    console.log(this.application.toJSON());
+  static saveGame(file) {
+    let json = JSON.stringify(this.application.toJSON(),null, 2);
+
+    console.log(`Игра сохранена в ${file}`);
+    fs.writeFileSync("./saves/"+file, json);
+  }
+
+  static loadSave(file) {
+    let json = JSON.parse(fs.readFileSync("./saves/"+file));
+
+    this.welcomeMessage = json["welcome-message"];
+
+    this.application.fromJSON(json);
   }
 
   static _initClientFiles() {
@@ -131,7 +145,7 @@ class Server {
   }
 
   static getWelcomeMessage() {
-    return "Welcome to the game, {player} (Version {version})";
+    return this.welcomeMessage;
   }
 }
 

@@ -21,7 +21,7 @@ class MapBuilder {
     this.fontSize = 15;
     this.paddingButton = 10;
     this.marginButton = 10;
-    this.cellSize = 30;
+    this.cellSize = 20;
 
     this.packSelectorItems = [];
 
@@ -47,6 +47,7 @@ class MapBuilder {
   }
 
   renderPackSelector(ctx) {
+    ctx.textAlign = "left";
     ctx.font = `${this.fontSize}px arial`;
     let currentWidth = this.pos[0];
 
@@ -69,6 +70,7 @@ class MapBuilder {
   }
 
   generatePackSelectorItems() {
+    ctx.textAlign = "left";
     ctx.font = `${this.fontSize}px arial`;
     let currentWidth = this.pos[0];
 
@@ -95,17 +97,10 @@ class MapBuilder {
 
     ctx.fillStyle = `black`;
     ctx.fillRect(tilesetBackground[0], tilesetBackground[1], tilesetBackground[2], tilesetBackground[3])
+    ctx.drawImage(tileset.img, tilesetBackground[0], tilesetBackground[1], tilesetBackground[2], tilesetBackground[3])
 
-    for (let i = 0; i < tileset.sheetSize[0]; i++) {
-      for (let j = 0; j < tileset.sheetSize[1]; j++) {
-        ctx.drawImage(tileset.get(i, j), this.pos[0] + i * this.cellSize, offsetHeight + j * this.cellSize, this.cellSize, this.cellSize);
-
-        if (this.selectedPos[0] == i && this.selectedPos[1] == j) {
-          ctx.strokeStyle = `yellow`;
-          ctx.strokeRect(this.pos[0] + i * this.cellSize, offsetHeight + j * this.cellSize, this.cellSize, this.cellSize)
-        }
-      }
-    }
+    ctx.strokeStyle = `yellow`;
+    ctx.strokeRect(this.pos[0] + this.selectedPos[0] * this.cellSize, offsetHeight + this.selectedPos[1] * this.cellSize, this.cellSize, this.cellSize)
 
     let mousePos = this.client.controlsHandler.mousePos;
 
@@ -126,6 +121,9 @@ class MapBuilder {
   renderTileOnMouse(ctx) {
     if (this.getCurrentTileset()) {
       let tileTexture = this.getCurrentTileset().get(this.selectedPos[0], this.selectedPos[1]);
+
+      if (!tileTexture)
+        return console.error(this.selectedPos);
 
       let playerPos = this.client.getPlayer().getPosition();
       let mousePos = this.client.controlsHandler.mousePos;

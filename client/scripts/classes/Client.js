@@ -32,6 +32,8 @@ class Client {
       let deltaTime = Date.now() - this.lastTimeUpdate
       Application.instance.updateTick();
       this.controlsHandler.update(deltaTime);
+      Screen.SubtitleHandler.update(deltaTime);
+      
       Screen.renderFrame(this, deltaTime);
 
       this.lastTimeUpdate = Date.now();
@@ -65,6 +67,7 @@ class Client {
     EntityRendererRegistry.register(EffectEntityRenderer);
 
     this.mapBuilder.registerTileset("default");
+    this.mapBuilder.registerTileset("forest");
     this.mapBuilder.registerTileset("hide");
   }
 
@@ -84,6 +87,10 @@ class Client {
 
   getMapBuilder() {
     return this.mapBuilder;
+  }
+
+  getScreen() {
+    return Screen;
   }
 }
 

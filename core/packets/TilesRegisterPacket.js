@@ -24,7 +24,6 @@ class TilesRegisterPacket {
       let tile = new Tile().load(tileLine.split(";"));
 
       client.application.setTile(tile);
-      client.addLog(`INFO`, `Registered tile: ${tile.getPosition()}`);
     });
   }
 }

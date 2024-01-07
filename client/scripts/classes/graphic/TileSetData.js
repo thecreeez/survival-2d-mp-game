@@ -9,6 +9,7 @@ class TileSetData {
     this.tileset = tileset;
 
     this.tilesetStepSettings = [];
+    this.animatedTiles = {}
   }
   
   setRenderStep(x,y,renderStep) {

@@ -16,16 +16,7 @@ class OrcEntityRenderer extends LivingEntityRenderer {
   }
 
   static renderDebug(ctx, entity) {
-    //super.renderDebug(ctx, entity);
-
-    ctx.fillStyle = `yellow`
-    ctx.fillText(`${entity.getState()}`, entity.getPosition()[0], entity.getPosition()[1] - this.size[1] / 2)
-
-    ctx.strokeStyle = `black`;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(entity.getPosition()[0], entity.getPosition()[1], entity.target_vision_range.getValue(), 0, Math.PI * 2);
-    ctx.stroke();
+    super.renderDebug(ctx, entity);
 
     if (entity.wannaMove(CLIENT_INSTANCE.application)) {
       let targetPos = entity.target_pos.getValue();

@@ -28,11 +28,21 @@ class HandshakePacket {
       });
       return;
     }
-    
-    let newPlayer = Application.instance.spawnEntity(new PlayerEntity(args[1], 100, [50,50]));
 
-    // Отсылать всем существующим игрокам новоприбывшего
-    EntityRegisterPacket.serverSend(server.getPlayersConnections(), { context: EntityRegisterPacket.Contexts.playerJoin, data: newPlayer.serialize() });
+    let joinedPlayerEntity = null;
+
+    Application.instance.getEntities().forEach((entity) => {
+      if (entity.getType() == "player_entity" && entity.getName() == args[1]) {
+        joinedPlayerEntity = entity;
+      }
+    })
+    
+    if (!joinedPlayerEntity) {
+      joinedPlayerEntity = Application.instance.spawnEntity(new PlayerEntity(args[1], 100, [50, 50]));
+
+      // Отсылать всем существующим игрокам новоприбывшего
+      EntityRegisterPacket.serverSend(server.getPlayersConnections(), { context: EntityRegisterPacket.Contexts.playerJoin, data: joinedPlayerEntity.serialize() });
+    }
 
     // Отсылать новоприбывшему игроку все сущности
     Application.instance.getEntities().forEach((entity) => {
@@ -41,16 +51,22 @@ class HandshakePacket {
 
     let tiles = [];
 
-    Application.instance.getTiles().forEach((tileLine) => {
-      tileLine.forEach((tile) => {
-        tiles.push(tile.serialize());
-      })
-    })
+    for (let tilePos in Application.instance.getTiles()) {
+      let tile = Application.instance.getTiles()[tilePos];
+      tiles.push(tile.serialize());
+    }
 
     TilesRegisterPacket.serverSend([conn], tiles);
 
-    server.addPlayerConnection(conn, args[1], newPlayer);
-    WelcomePacket.serverSend([conn], { message: "Добро пожаловать, "+data.split("/")[1] });
+    server.addPlayerConnection(conn, args[1], joinedPlayerEntity);
+
+
+    let welcomeMessage = server.getWelcomeMessage();
+    welcomeMessage = welcomeMessage.replaceAll(`{player}`, args[1]);
+    welcomeMessage = welcomeMessage.replaceAll(`{version}`, args[2]);
+
+    WelcomePacket.serverSend([conn], { message: welcomeMessage });
+    server.saveGame(`save_001.json`);
   }
 }
 

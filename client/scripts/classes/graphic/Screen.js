@@ -1,6 +1,7 @@
 import Client from "../Client.js";
 import EntityRendererRegistry from "./EntityRendererRegistry.js";
 import MapRenderer from "./MapRenderer.js";
+import SubtitleHandler from "./SubtitleHandler.js";
 import TileSetData from "./TileSetData.js";
 
 const canvas = document.querySelector("canvas");
@@ -25,6 +26,8 @@ window.onresize = (ev) => {
 }
 
 class Screen {
+  static SubtitleHandler = SubtitleHandler;
+
   static clear() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
@@ -62,7 +65,8 @@ class Screen {
       client.getMapBuilder().render(ctx, deltaTime);
     }
 
-    //this.renderLogs(client, deltaTime);
+    this.renderLogs(client, deltaTime);
+    SubtitleHandler.render(canvas, ctx);
   }
 
   static renderWorld(client, deltaTime, type) {
@@ -75,6 +79,7 @@ class Screen {
    */
   static renderLogs(client, deltaTime) {
     let fontSize = 20;
+    ctx.textAlign = "left";
     ctx.font = `${fontSize}px arial`;
 
     let logsHeight = client.logs.length * fontSize + fontSize / 2;

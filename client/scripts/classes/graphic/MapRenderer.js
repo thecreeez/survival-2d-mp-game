@@ -16,6 +16,28 @@ class MapRenderer {
     .setRenderStep(14, 5, TileSetData.RenderSteps.top)
     .setRenderStep(15, 5, TileSetData.RenderSteps.top)
 
+  static forestTiles = new SpriteSheet({
+    path: `/client/assets/forest/tileset.png`,
+    spriteSize: [8, 8],
+    sheetSize: [69, 23]
+  })
+
+  static defaultTileSetData = new TileSetData(this.defaultTiles)
+    .setRenderStep(13, 5, TileSetData.RenderSteps.top)
+    .setRenderStep(14, 5, TileSetData.RenderSteps.top)
+    .setRenderStep(15, 5, TileSetData.RenderSteps.top)
+
+  static forestTileSetData = new TileSetData(this.forestTiles)
+    //.addAnimationFrame(25, 3, 29, 3)
+    //.addAnimationFrame(25, 4, 29, 4)
+    //.addAnimationFrame(25, 5, 29, 5)
+    //.addAnimationFrame(26, 3, 30, 3)
+    //.addAnimationFrame(26, 4, 30, 4)
+    //.addAnimationFrame(26, 5, 30, 5)
+    //.addAnimationFrame(27, 3, 31, 3)
+    //.addAnimationFrame(27, 4, 31, 4)
+    //.addAnimationFrame(27, 5, 31, 5)
+
   static render(canvas, ctx, client, type) {
     let cameraPos = client.getPlayer().getPosition();
 
@@ -48,6 +70,7 @@ class MapRenderer {
 
         ctx.font = `10px arial`
         ctx.fillStyle = `black`;
+        ctx.textAlign = "left";
         ctx.fillText(`${x},${y}`, cellPos[0] + 3, cellPos[1] + 10);
       }
     }
