@@ -23,8 +23,10 @@ class LivingEntity extends Entity {
   }
 
   updateServerTick(application, deltaTick) {
-    super.updateServerTick(application, deltaTick);
+    this.updateServerState(application, deltaTick);
+  }
 
+  updateServerState(application, deltaTick) {
     if (this.hurt_time.getValue() > 0) {
       this.hurt_time.setValue(this.hurt_time.getValue() - deltaTick);
     }
@@ -54,6 +56,17 @@ class LivingEntity extends Entity {
 
   getRotation() {
     return this.rotation.getValue();
+  }
+
+  getLookingSide() {
+    let side = `right`;
+
+    switch (this.getRotation()) {
+      case 1: side = `left`; break;
+      case 3: side = `left`; break;
+    }
+
+    return side;
   }
 
   getTimeAfterLastMove() {

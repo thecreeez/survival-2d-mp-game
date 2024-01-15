@@ -7,6 +7,7 @@ class ControlsHandler {
     this.keys = {};
     this.mousePos = [0, 0];
     this.isMouseDown = false;
+    this.bAttacking = false;
 
     this.vertical = 0;
     this.horizontal = 0;
@@ -39,7 +40,16 @@ class ControlsHandler {
 
   update(deltaTime) {
     this._updateAxis(deltaTime);
-    this._updateSitting();
+    this._updateSitting(); 
+    this._updateAttack();
+  }
+
+  _updateAttack() {
+    if (this.keys["Space"]) {
+      this.bAttacking = true;
+    } else {
+      this.bAttacking = false;
+    }
   }
 
   _updateSitting() {

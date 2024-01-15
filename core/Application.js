@@ -149,11 +149,15 @@ class Application {
 
     let player = this.context.getPlayer();
 
-    if (controlsHandler.horizontal != player.getDirection()[0] || controlsHandler.vertical != -player.getDirection()[1] || player.bSitting() != controlsHandler.bSitting) {
-      MovementUpdatePacket.clientSend(this.context.connectionHandler.getSocket(), controlsHandler.bSitting, [
-        controlsHandler.horizontal,
-        -controlsHandler.vertical,
-      ]);
+    if (controlsHandler.horizontal != player.getDirection()[0] || controlsHandler.vertical != -player.getDirection()[1] || player.bSitting() != controlsHandler.bSitting || player.bAttacking() != controlsHandler.bAttacking) {
+      MovementUpdatePacket.clientSend(this.context.connectionHandler.getSocket(), 
+        controlsHandler.bSitting, 
+        controlsHandler.bAttacking, 
+        [
+          controlsHandler.horizontal,
+          -controlsHandler.vertical,
+        ]
+      );
     }
   }
 

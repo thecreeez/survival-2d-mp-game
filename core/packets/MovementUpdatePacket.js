@@ -3,8 +3,8 @@ import ClientErrorPacket from "./ClientErrorPacket.js";
 class MovementUpdatePacket {
   static type = "update_movement";
 
-  static clientSend(socket, bSitting, direction) {
-    socket.send(`${this.type}/${bSitting}/${direction.join("/")}`);
+  static clientSend(socket, bSitting, bAttacking, direction) {
+    socket.send(`${this.type}/${bSitting}/${bAttacking}/${direction.join("/")}`);
   }
 
   /**
@@ -16,7 +16,8 @@ class MovementUpdatePacket {
   static serverHandle(server, conn, data) {
     let args = data.split("/");
     let bSitting = args[1] == "true";
-    let direction = [Number(args[2]), Number(args[3])];
+    let bAttacking = args[2] == "true";
+    let direction = [Number(args[3]), Number(args[4])];
 
     let player = server.getPlayerByConnection(conn);
 
@@ -27,7 +28,7 @@ class MovementUpdatePacket {
 
     player.entity.direction.setValue(direction);
     player.entity.b_sitting.setValue(bSitting);
-    //EntityUpdatePacket.serverSend(server.getPlayersConnections(), { data: player.entity.serializeLazy() });
+    player.entity.bWantAttack = bAttacking;
   }
 }
 
