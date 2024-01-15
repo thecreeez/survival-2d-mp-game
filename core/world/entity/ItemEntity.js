@@ -11,8 +11,8 @@ class ItemEntity extends Entity {
   maxSpriteUp = 10;
   bSpriteUp = true;
 
-  constructor({ item = ItemRegistry["air"], count = 1, pos = [0,0] } = {}) {
-    super("item_entity", pos)
+  constructor({ item = ItemRegistry["air"], count = 1, pos: position = [0,0] } = {}) {
+    super({ type: "item_entity", position });
 
     this.item_id.setValue(item.getId());
     this.count.setValue(count);

@@ -9,6 +9,9 @@ class LivingEntity extends Entity {
   state = new SharedData("state", SharedData.STR_T, "idle");
   rotation = new SharedData("rotation", SharedData.NUM_T, 0);
 
+  attack_range = new SharedData("attack_range", SharedData.NUM_T, 20);
+  damage = new SharedData("damage", SharedData.NUM_T, 1);
+
   // SERVER
   lastTimeMove = 0;
 
@@ -16,10 +19,12 @@ class LivingEntity extends Entity {
   currentSprite = 0;
   currentSpriteTime = 0;
 
-  constructor(id, health = 100, pos = [0, 0], moveSpeed = 1) {
-    super(id, pos)
+  constructor({ id, health = 100, position = [0, 0], moveSpeed = 1, attackRange = 20, damage = 1 } = {}) {
+    super({ type: id, position })
     this.health.setValue(health);
     this.move_speed.setValue(moveSpeed);
+    this.attack_range.setValue(attackRange);
+    this.damage.setValue(damage);
   }
 
   updateServerTick(application, deltaTick) {
@@ -48,6 +53,8 @@ class LivingEntity extends Entity {
     this.hurt_time.setValue(400);
     this.state.setValue("hurt");
     this.health.setValue(this.health.getValue() - damage);
+
+    console.log(entity.getUuid()+" hurted "+this.getUuid()+" on "+damage+" damage");
   }
 
   getState() {

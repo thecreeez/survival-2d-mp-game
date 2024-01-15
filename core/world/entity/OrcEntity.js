@@ -1,10 +1,17 @@
 import EntityWithAI from "./EntityWithAI.js";
 
 class OrcEntity extends EntityWithAI {
-  constructor({pos = [0, 0]} = {}) {
-    super("orc_entity", pos, 100, { target_class: "player_entity" });
-
-    this.target_vision_range.setValue(100);
+  constructor({position = [0, 0]} = {}) {
+    super({
+      id: "orc_entity",
+      position,
+      visionRange: 100,
+      health: 100,
+      target_class: "player_entity",
+      damage: 3,
+      attackRange: 50,
+      moveSpeed: 2
+    });
   }
 }
 

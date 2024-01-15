@@ -13,8 +13,8 @@ class EffectEntity extends Entity {
   currentSpriteTime = 0;
   currentSprite = 0;
 
-  constructor({ effectType = "cloud", effectData = 0, pos = [0, 0], lifeTime = 1000} = {}) {
-    super("effect_entity", pos);
+  constructor({ effectType = "cloud", effectData = 0, position = [0, 0], lifeTime = 1000} = {}) {
+    super({ type: "effect_entity", position });
     this.effect_type.setValue(effectType);
     this.effect_data.setValue(effectData);
     

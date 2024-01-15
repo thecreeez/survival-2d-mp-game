@@ -24,8 +24,6 @@ import Item from "./world/Item.js";
 import Tile from "./world/Tile.js";
 import Entity from "./world/entity/Entity.js";
 
-
-
 class Application {
   static version = 1;
 

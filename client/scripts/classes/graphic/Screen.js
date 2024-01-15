@@ -38,6 +38,7 @@ class Screen {
    */
   static renderFrame(client, deltaTime) {
     this.clear();
+
     if (!client.getPlayer())
       return;
 

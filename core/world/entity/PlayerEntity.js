@@ -6,13 +6,20 @@ class PlayerEntity extends LivingEntity {
   b_sitting = new SharedData("b_sitting", SharedData.BUL_T, false).makeImportant();
   b_attacking = new SharedData("b_attacking", SharedData.BUL_T, false);
   direction = new SharedData("direction", SharedData.POS_T, [0, 0]).makeImportant();
-  attack_range = new SharedData("attack_range", SharedData.NUM_T, 50);
 
-  // server
+  // from client
   bWantAttack = false;
 
-  constructor(name = "user", health = 100, pos = [0, 0]) {
-    super("player_entity", health, pos, 5)
+  constructor({name = "user", health = 100, position = [0, 0]} = {}) {
+    super({
+      id: "player_entity",
+      attackRange: 50,
+      damage: 10,
+      moveSpeed: 5,
+      position,
+      health
+    });
+    
     this.name.setValue(name);
     this.b_sitting.setValue(false);
     this.direction.setValue([0,0]);
@@ -31,7 +38,13 @@ class PlayerEntity extends LivingEntity {
       this.updateServerRotation(application, deltaTick);
     }
 
-    this.updateServerState(application, deltaTick)
+    this.updateServerState(application, deltaTick);
+
+    if (this.getState() == "attack") {
+      this.getAttackablEntitiesInAttackRange(application).forEach((entity) => {
+        entity.handleDamage(this, this.damage.getValue());
+      })
+    }
   }
 
   updateServerMovement(application, deltaTick) {
@@ -70,6 +83,44 @@ class PlayerEntity extends LivingEntity {
     if (this.getState() == "attack" && (!this.bAttacking() || !this.canAttack())) {
       this.state.setValue("idle");
     }
+  }
+
+  getAttackablEntitiesInAttackRange(application) {
+    let pos = [this.getPosition()[0], this.getPosition()[1] - this.getAttackRange()];
+    let size = [this.getAttackRange(), this.getAttackRange() * 2];
+
+    if (this.getLookingSide() == `left`) {
+      pos[0] -= this.getAttackRange();
+    }
+
+    let entityInAttackRange = (entity) => {
+      if (entity == this)
+        return false;
+
+      if (!entity.health)
+        return false;
+
+      if (entity.hurt_time.getValue() > 0)
+        return false;
+      
+      let entityPos = entity.getPosition();
+
+      if (entityPos[0] < pos[0])
+        return false;
+
+      if (entityPos[0] > pos[0] + size[0])
+        return false;
+
+      if (entityPos[1] < pos[1])
+        return false;
+
+      if (entityPos[1] > pos[1] + size[1])
+        return false;
+
+      return true;
+    }
+
+    return application.getEntities().filter(entityInAttackRange);
   }
 
   getName() {

@@ -38,7 +38,7 @@ class HandshakePacket {
     })
     
     if (!joinedPlayerEntity) {
-      joinedPlayerEntity = Application.instance.spawnEntity(new PlayerEntity(args[1], 100, [50, 50]));
+      joinedPlayerEntity = Application.instance.spawnEntity(new PlayerEntity({ name: args[1] }));
 
       // Отсылать всем существующим игрокам новоприбывшего
       EntityRegisterPacket.serverSend(server.getPlayersConnections(), { context: EntityRegisterPacket.Contexts.playerJoin, data: joinedPlayerEntity.serialize() });
