@@ -66,7 +66,7 @@ class HandshakePacket {
     welcomeMessage = welcomeMessage.replaceAll(`{version}`, args[2]);
 
     WelcomePacket.serverSend([conn], { message: welcomeMessage });
-    server.saveGame(`save_001.json`);
+    //server.saveGame(`save_001.json`);
   }
 }
 

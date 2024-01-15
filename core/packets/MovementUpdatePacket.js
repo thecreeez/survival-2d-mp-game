@@ -1,11 +1,10 @@
 import ClientErrorPacket from "./ClientErrorPacket.js";
-import EntityUpdatePacket from "./EntityUpdatePacket.js";
 
 class MovementUpdatePacket {
   static type = "update_movement";
 
-  static clientSend(socket, bSitting, position) {
-    socket.send(`${this.type}/${bSitting}/${position.join("/")}`);
+  static clientSend(socket, bSitting, direction) {
+    socket.send(`${this.type}/${bSitting}/${direction.join("/")}`);
   }
 
   /**
@@ -26,23 +25,9 @@ class MovementUpdatePacket {
       return;
     }
 
-    let oldPos = player.entity.getPosition();
-
-    if (direction[0] >= 0 && direction[1] >= 0) {
-      player.entity.rotation.setValue(0);
-    } else if (direction[0] < 0 && direction[1] >= 0) {
-      player.entity.rotation.setValue(1);
-    } else if (direction[0] >= 0 && direction[1] < 0) {
-      player.entity.rotation.setValue(2);
-    } else if (direction[0] < 0 && direction[1] < 0) {
-      player.entity.rotation.setValue(3);
-    }
-
-    player.entity.lastTimeMove = Date.now();
-    player.entity.position.setValue([oldPos[0] + direction[0], oldPos[1] + direction[1]])
+    player.entity.direction.setValue(direction);
     player.entity.b_sitting.setValue(bSitting);
-    EntityUpdatePacket.serverSend(server.getPlayersConnections(), { data: player.entity.serializeLazy() });
-    //server.getPlayersConnections().filter(connCandidate => connCandidate != conn)
+    //EntityUpdatePacket.serverSend(server.getPlayersConnections(), { data: player.entity.serializeLazy() });
   }
 }
 

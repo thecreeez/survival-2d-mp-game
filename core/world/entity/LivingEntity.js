@@ -4,6 +4,7 @@ import Entity from "./Entity.js";
 class LivingEntity extends Entity {
   health = new SharedData("health", SharedData.NUM_T, 100);
   hurt_time = new SharedData("hurt_time", SharedData.NUM_T, 0);
+  move_speed = new SharedData("move_speed", SharedData.NUM_T, 1);
 
   state = new SharedData("state", SharedData.STR_T, "idle");
   rotation = new SharedData("rotation", SharedData.NUM_T, 0);
@@ -15,9 +16,10 @@ class LivingEntity extends Entity {
   currentSprite = 0;
   currentSpriteTime = 0;
 
-  constructor(id, health = 100, pos = [0, 0]) {
+  constructor(id, health = 100, pos = [0, 0], moveSpeed = 1) {
     super(id, pos)
     this.health.setValue(health);
+    this.move_speed.setValue(moveSpeed);
   }
 
   updateServerTick(application, deltaTick) {
@@ -56,6 +58,10 @@ class LivingEntity extends Entity {
 
   getTimeAfterLastMove() {
     return Date.now() - this.lastTimeMove;
+  }
+
+  canMove(application) {
+    return true;
   }
 }
 

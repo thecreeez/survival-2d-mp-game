@@ -1,10 +1,6 @@
 {
   "welcome-message": "Welcome to the game, {player} (Version {version})",
   "entities": [
-    "STR_T|uuid|UUID-RANDOM-4941;POS_T|position|-217:-220;STR_T|type|orc_entity;NUM_T|health|100;NUM_T|hurt_time|0;STR_T|state|idle;NUM_T|rotation|0;NUM_T|move_speed|1;STR_T|target_uuid|no_target;POS_T|target_pos|-217:-220;BUL_T|target_exist|0;STR_T|target_type|player_entity;NUM_T|target_vision_range|100;NUM_T|attack_range|20;NUM_T|damage|1",
-    "STR_T|uuid|UUID-RANDOM-4351;POS_T|position|-50:-50;STR_T|type|item_entity;STR_T|item_id|log;NUM_T|count|1",
-    "STR_T|uuid|UUID-RANDOM-2503;POS_T|position|50:50;STR_T|type|player_entity;NUM_T|health|100;NUM_T|hurt_time|0;STR_T|state|idle;NUM_T|rotation|0;STR_T|name|Player;BUL_T|b_sitting|0",
-    "STR_T|uuid|UUID-RANDOM-2833;POS_T|position|50:50;STR_T|type|player_entity;NUM_T|health|100;NUM_T|hurt_time|0;STR_T|state|idle;NUM_T|rotation|0;STR_T|name|user1;BUL_T|b_sitting|0"
   ],
   "tile-presets": [
     "EMPTY",
@@ -1518,6 +1514,7 @@
     "19:-7": 95,
     "20:-7": 95,
     "19:-8": 5,
-    "20:-8": 5
+    "20:-8": 5,
+    "NaN:NaN": 22
   }
 }

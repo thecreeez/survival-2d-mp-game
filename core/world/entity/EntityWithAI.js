@@ -2,8 +2,6 @@ import SharedData from "../../SharedData.js";
 import LivingEntity from "./LivingEntity.js";
 
 class EntityWithAI extends LivingEntity {
-  move_speed = new SharedData("move_speed", SharedData.NUM_T, 1);
-
   target_uuid = new SharedData("target_uuid", SharedData.STR_T, "no_target")
   target_pos = new SharedData("target_pos", SharedData.POS_T, [0,0])
   target_exist = new SharedData("target_exist", SharedData.BUL_T, false)
@@ -14,7 +12,7 @@ class EntityWithAI extends LivingEntity {
   damage = new SharedData("damage", SharedData.NUM_T, 1);
 
   constructor(id, pos = [0, 0], health = 100, { target_class = "player_entity" } = {}) {
-    super(id, health, pos)
+    super(id, health, pos, 15)
 
     this.position.setValue(pos);
     this.target_type.setValue(target_class);
@@ -99,6 +97,10 @@ class EntityWithAI extends LivingEntity {
    * @param {Application} application 
    */
   updateMovement(application) {
+    if (!this.canMove(application)) {
+      return;
+    }
+
     if (!this.wannaMove(application)) {
       return;
     }
