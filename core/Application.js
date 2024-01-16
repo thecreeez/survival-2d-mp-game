@@ -69,7 +69,7 @@ class Application {
       ]
     })
 
-    this.loadPacks()
+    this.loadPacks(); // Передвинуть это в сервере/клиенте, чтоб можно было просунуть логику подгрузки
 
     Application.instance = this;
     console.log(`Load app. Context: ${this.context.type}`);
@@ -98,6 +98,13 @@ class Application {
         console.log(`Entity ${entityClass.id} registering...`)
         EntityRegistry.register(packId, entityClass.id, entityClass);
         entityClass.pack = `${packId}`;
+
+        entityClass.onRegister(this);
+
+        if (this.isClient()) {
+          // TO-DO: this...
+          //this.context.Registries.EntityRendererRegistry.register(packId, entityClass.id, entityClass)
+        }
       })
 
       this._packs[packId].packetsClasses.forEach((packetClass) => {
@@ -113,31 +120,6 @@ class Application {
       })
       console.log(`Pack ${packId} loaded.`)
     }
-  }
-
-  registerEntities() {
-    EntityRegistry.register();
-    EntityRegistry.register();
-    EntityRegistry.register();
-    EntityRegistry.register();
-  }
-
-  registerPackets() {
-    PacketRegistry.register(HandshakePacket);
-    PacketRegistry.register(SaveRequestPacket);
-
-    PacketRegistry.register(WelcomePacket);
-    PacketRegistry.register(ClientErrorPacket);
-
-    PacketRegistry.register(EntityRegisterPacket);
-    PacketRegistry.register(EntityUpdatePacket);
-    PacketRegistry.register(EntityRemovePacket);
-
-    PacketRegistry.register(TilesRegisterPacket);
-    PacketRegistry.register(TilePlacePacket);
-
-    PacketRegistry.register(MovementUpdatePacket);
-    PacketRegistry.register(CommandInputPacket);
   }
 
   setWorld(world) {

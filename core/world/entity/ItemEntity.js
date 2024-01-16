@@ -1,4 +1,4 @@
-import ItemRegistry from "../../ItemRegistry.js";
+import ItemRegistry from "../../registry/ItemRegistry.js";
 import SharedData from "../../SharedData.js";
 import Entity from "./Entity.js";
 
@@ -13,7 +13,7 @@ class ItemEntity extends Entity {
   maxSpriteUp = 10;
   bSpriteUp = true;
 
-  constructor({ item = ItemRegistry["air"], count = 1, pos: position = [0,0] } = {}) {
+  constructor({ item = ItemRegistry["core:air"], count = 1, pos: position = [0,0] } = {}) {
     super({ position });
 
     this.item_id.setValue(item.getId());

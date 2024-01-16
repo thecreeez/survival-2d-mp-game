@@ -28,6 +28,10 @@ class Entity {
     return new parsedEntityClass().load(dataFragments);
   }
 
+  static onRegister(application) {
+
+  }
+
   static empty() {
     return new this();
   }
