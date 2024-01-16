@@ -1,4 +1,4 @@
-import EntityRegistry from "../EntityRegistry.js";
+import EntityRegistry from "../registry/EntityRegistry.js";
 import ClientErrorPacket from "./ClientErrorPacket.js";
 import EntityRegisterPacket from "./EntityRegisterPacket.js";
 

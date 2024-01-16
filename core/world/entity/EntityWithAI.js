@@ -8,9 +8,8 @@ class EntityWithAI extends LivingEntity {
   target_type = new SharedData("target_type", SharedData.STR_T, "player_entity")
   target_vision_range = new SharedData("target_vision_range", SharedData.NUM_T, 500);
 
-  constructor({ id, position = [0, 0], health = 100, damage = 5, moveSpeed = 2, attackRange = 50, visionRange = 100, target_class = "player_entity" } = {}) {
+  constructor({ position = [0, 0], health = 100, damage = 5, moveSpeed = 2, attackRange = 50, visionRange = 100, target_class = "player_entity" } = {}) {
     super({
-      id,
       position,
       health,
       damage,

@@ -19,8 +19,8 @@ class LivingEntity extends Entity {
   currentSprite = 0;
   currentSpriteTime = 0;
 
-  constructor({ id, health = 100, position = [0, 0], moveSpeed = 1, attackRange = 20, damage = 1 } = {}) {
-    super({ type: id, position })
+  constructor({ health = 100, position = [0, 0], moveSpeed = 1, attackRange = 20, damage = 1 } = {}) {
+    super({ position })
     this.health.setValue(health);
     this.move_speed.setValue(moveSpeed);
     this.attack_range.setValue(attackRange);

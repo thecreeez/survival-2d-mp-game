@@ -3,6 +3,8 @@ import SharedData from "../../SharedData.js";
 import EntityRemovePacket from "../../packets/EntityRemovePacket.js";
 
 class EffectEntity extends Entity {
+  static id = `effect_entity`;
+
   effect_type = new SharedData("effect_type", SharedData.STR_T, "cloud");
   effect_data = new SharedData("effect_data", SharedData.NUM_T, 0)
 
@@ -14,7 +16,7 @@ class EffectEntity extends Entity {
   currentSprite = 0;
 
   constructor({ effectType = "cloud", effectData = 0, position = [0, 0], lifeTime = 1000} = {}) {
-    super({ type: "effect_entity", position });
+    super({ id: "effect_entity", position });
     this.effect_type.setValue(effectType);
     this.effect_data.setValue(effectData);
     

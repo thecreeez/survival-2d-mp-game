@@ -49,7 +49,7 @@ class LivingEntityRenderer extends EntityRenderer {
 
     this[`${name}State`] = {
       spriteSheet: new SpriteSheet({
-        path: `/client/assets/default/${entity.getType()}/${name}.png`,
+        path: `/client/assets/default/${entity.getId()}/${name}.png`,
         sheetSize,
         spriteSize
       }),

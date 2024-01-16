@@ -48,13 +48,13 @@ class Screen {
     this.renderWorld(client, deltaTime, TileSetData.RenderSteps.floor);
 
     client.application.getEntities().forEach((entity) => {
-      if (EntityRendererRegistry[entity.getType()]) {
-        EntityRendererRegistry[entity.getType()].render(ctx, entity);
-        EntityRendererRegistry[entity.getType()].updateEntity(entity, deltaTime);
+      if (EntityRendererRegistry[entity.getId()]) {
+        EntityRendererRegistry[entity.getId()].render(ctx, entity);
+        EntityRendererRegistry[entity.getId()].updateEntity(entity, deltaTime);
         return;
       }
 
-      console.error(`Entity ${entity.getUuid()} ${entity.getType()} can't be rendered. Renderer has not be set.`);
+      console.error(`Entity ${entity.getUuid()} ${entity.getId()} can't be rendered. Renderer has not be set.`);
     })
 
     this.renderWorld(client, deltaTime, TileSetData.RenderSteps.wall);

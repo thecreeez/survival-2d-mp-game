@@ -1,5 +1,5 @@
 import Application from "../../core/Application.js";
-import PacketRegistry from "../../core/PacketRegistry.js";
+import PacketRegistry from "../../core/registry/PacketRegistry.js";
 
 import EntityRemovePacket from "../../core/packets/EntityRemovePacket.js";
 import EntityUpdatePacket from "../../core/packets/EntityUpdatePacket.js";

@@ -8,7 +8,7 @@ class EffectEntityRenderer extends EntityRenderer {
   static size = [MapRenderer.cellSize, MapRenderer.cellSize];
 
   static FireSpriteSheet = new SpriteSheet({
-    path: `/client/assets/default/${this.Entity.empty().getType()}/fire/loop_blue.png`,
+    path: `/client/assets/default/${this.Entity.empty().getId()}/fire/loop_blue.png`,
     sheetSize: [4,1],
     spriteSize: [8,8]
   })

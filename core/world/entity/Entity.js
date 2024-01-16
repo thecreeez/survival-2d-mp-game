@@ -1,14 +1,15 @@
 import SharedData from "../../SharedData.js";
-import EntityRegistry from "../../EntityRegistry.js";
+import EntityRegistry from "../../registry/EntityRegistry.js";
 
 class Entity {
+  static id = `undefined_entity`;
+  static pack = `undefined_pack`;
+
   uuid = new SharedData("uuid", SharedData.STR_T, "uuid").makeImportant();
   world = new SharedData("world", SharedData.STR_T, "none");
   position = new SharedData("position", SharedData.POS_T, [0, 0]);
-  type = new SharedData("type", SharedData.STR_T, "default");
 
-  constructor({ type = "default", position = [0,0], world = "core:spawn" } = {}) {
-    this.type.setValue(type);
+  constructor({ position = [0,0], world = "core:spawn" } = {}) {
     this.position.setValue(position);
     this.world.setValue(world);
     this.uuid.setValue("UUID-RANDOM-" + Math.floor(Math.random() * 10000));
@@ -17,7 +18,7 @@ class Entity {
   static parse(data) {
     let dataFragments = data.split(";");
 
-    let parsedEntityClass = this.getEntityClass(dataFragments);
+    let parsedEntityClass = EntityRegistry[dataFragments[0]];
 
     if (!parsedEntityClass) {
       console.error(`Unknown entity class...`, data);
@@ -25,20 +26,6 @@ class Entity {
     }
 
     return new parsedEntityClass().load(dataFragments);
-  }
-
-  static getEntityClass(serializedDatas) {
-    let entityClass = null;
-
-    serializedDatas.forEach((serializedData) => {
-      let data = SharedData.parse(serializedData);
-
-      if (data && data.getId() == "type" && EntityRegistry[data.getValue()]) {
-        entityClass = EntityRegistry[data.getValue()];
-      }
-    })
-
-    return entityClass;
   }
 
   static empty() {
@@ -94,6 +81,8 @@ class Entity {
 
   serialize() {
     let entityData = [];
+
+    entityData.push(`${this.getFullId()}`);
 
     for (let property in this) {
       if (this[property] && this[property].needToSerialize) {
@@ -158,8 +147,12 @@ class Entity {
     return Math.sqrt(sum)
   }
 
-  getType() {
-    return this.type.getValue();
+  getFullId() {
+    return `${this.constructor.pack}:${this.getId()}`;
+  }
+
+  getId() {
+    return this.constructor.id;
   }
 
   getUuid() {

@@ -2,6 +2,8 @@ import SharedData from "../../SharedData.js";
 import LivingEntity from "./LivingEntity.js";
 
 class PlayerEntity extends LivingEntity {
+  static id = `player_entity`;
+
   name = new SharedData("name", SharedData.STR_T, "Player");
   b_sitting = new SharedData("b_sitting", SharedData.BUL_T, false).makeImportant();
   b_attacking = new SharedData("b_attacking", SharedData.BUL_T, false);
@@ -12,7 +14,6 @@ class PlayerEntity extends LivingEntity {
 
   constructor({ name = "user", health = 100, position = [0, 0]} = {}) {
     super({
-      id: "player_entity",
       attackRange: 50,
       damage: 10,
       moveSpeed: 5,

@@ -1,6 +1,6 @@
-import EntityRegistry from "./EntityRegistry.js";
-import PacketRegistry from "./PacketRegistry.js";
-import ItemRegistry from "./ItemRegistry.js";
+import EntityRegistry from "./registry/EntityRegistry.js";
+import PacketRegistry from "./registry/PacketRegistry.js";
+import ItemRegistry from "./registry/ItemRegistry.js";
 
 import World from "./world/World.js";
 
@@ -31,31 +31,95 @@ class Application {
     this._entities = {};
     this._worlds = {};
 
+    this._packs = {};
+    this.state = 0;
+
     this.setWorld(new World({ id: "spawn" }))
 
     this.context = context;
     this.lastTickTime = Date.now();
-    this.registerEntities();
-    this.registerPackets();
-    this.registerItems();
+    
+    this.registerPack({
+      pack: `core`,
+      entitiesClasses: [
+        ItemEntity,
+        PlayerEntity,
+        OrcEntity,
+        EffectEntity
+      ],
+      packetsClasses: [
+        HandshakePacket,
+        SaveRequestPacket,
+        WelcomePacket,
+        ClientErrorPacket,
+        EntityRegisterPacket,
+        EntityUpdatePacket,
+        EntityRemovePacket,
+        TilesRegisterPacket,
+        TilePlacePacket,
+        MovementUpdatePacket,
+        CommandInputPacket
+      ],
+      items: [
+        new Item({
+          id: "log",
+          maxStack: 16,
+          spritePos: [0, 0]
+        })
+      ]
+    })
+
+    this.loadPacks()
 
     Application.instance = this;
     console.log(`Load app. Context: ${this.context.type}`);
   }
 
-  registerEntities() {
-    EntityRegistry.register(ItemEntity);
-    EntityRegistry.register(PlayerEntity);
-    EntityRegistry.register(OrcEntity);
-    EntityRegistry.register(EffectEntity);
+  registerPack({ pack, entitiesClasses = [], packetsClasses = [], items = [] }) {
+    if (this.state != 0) {
+      console.error(`Packs cannot be registered on this state.`)
+      return;
+    }
+
+    this._packs[pack] = {
+      entitiesClasses,
+      packetsClasses,
+      items
+    };
   }
 
-  registerItems() {
-    ItemRegistry.register(new Item({
-      id: "log",
-      maxStack: 16,
-      spritePos: [0, 0]
-    }));
+  loadPacks() {
+    this.state = 1;
+
+    console.log(`Loading packs...`)
+    for (let packId in this._packs) {
+      console.log(`Pack ${packId} loading...`)
+      this._packs[packId].entitiesClasses.forEach((entityClass) => {
+        console.log(`Entity ${entityClass.id} registering...`)
+        EntityRegistry.register(packId, entityClass.id, entityClass);
+        entityClass.pack = `${packId}`;
+      })
+
+      this._packs[packId].packetsClasses.forEach((packetClass) => {
+        console.log(`Packet ${packetClass.type} registering...`);
+        PacketRegistry.register(packId, packetClass.type, packetClass);
+        packetClass.type = `${packId}:${packetClass.type}`;
+      })
+
+      this._packs[packId].items.forEach((item) => {
+        console.log(`Item ${item.id} registering...`);
+        ItemRegistry.register(packId, item.id, item);
+        item.id = `${packId}:${item.id}`;
+      })
+      console.log(`Pack ${packId} loaded.`)
+    }
+  }
+
+  registerEntities() {
+    EntityRegistry.register();
+    EntityRegistry.register();
+    EntityRegistry.register();
+    EntityRegistry.register();
   }
 
   registerPackets() {

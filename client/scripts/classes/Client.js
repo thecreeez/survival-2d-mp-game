@@ -52,7 +52,7 @@ class Client {
     let player = null;
 
     this.application.getEntities().forEach((entity) => {
-      if (entity.getType() == "player_entity" && entity.getName() == this.username) {
+      if (entity.getId() == "player_entity" && entity.getName() == this.username) {
         player = entity;
       }
     })
