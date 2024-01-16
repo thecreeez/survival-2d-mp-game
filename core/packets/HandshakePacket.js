@@ -43,16 +43,16 @@ class HandshakePacket {
       // Отсылать всем существующим игрокам новоприбывшего
       EntityRegisterPacket.serverSend(server.getPlayersConnections(), { context: EntityRegisterPacket.Contexts.playerJoin, data: joinedPlayerEntity.serialize() });
     }
-
+ 
     // Отсылать новоприбывшему игроку все сущности
-    Application.instance.getEntities().forEach((entity) => {
+    Application.instance.getEntities().filter(entity => entity.getWorld() == joinedPlayerEntity.getWorld()).forEach((entity) => {
       EntityRegisterPacket.serverSend([conn], { context: EntityRegisterPacket.Contexts.loading, data: entity.serialize() });
     })
 
     let tiles = [];
 
-    for (let tilePos in Application.instance.getTiles()) {
-      let tile = Application.instance.getTiles()[tilePos];
+    for (let tilePos in joinedPlayerEntity.getWorld().getTiles()) {
+      let tile = joinedPlayerEntity.getWorld().getTiles()[tilePos];
       tiles.push(tile.serialize());
     }
 

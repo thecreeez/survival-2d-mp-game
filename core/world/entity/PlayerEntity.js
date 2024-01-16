@@ -10,7 +10,7 @@ class PlayerEntity extends LivingEntity {
   // from client
   bWantAttack = false;
 
-  constructor({name = "user", health = 100, position = [0, 0]} = {}) {
+  constructor({ name = "user", health = 100, position = [0, 0]} = {}) {
     super({
       id: "player_entity",
       attackRange: 50,

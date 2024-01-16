@@ -2,6 +2,8 @@ import EntityRegistry from "./EntityRegistry.js";
 import PacketRegistry from "./PacketRegistry.js";
 import ItemRegistry from "./ItemRegistry.js";
 
+import World from "./world/World.js";
+
 import OrcEntity from "./world/entity/OrcEntity.js";
 import ItemEntity from "./world/entity/ItemEntity.js";
 import PlayerEntity from "./world/entity/PlayerEntity.js";
@@ -21,23 +23,23 @@ import SaveRequestPacket from "./packets/SaveRequestPacket.js";
 
 import SharedData from "./SharedData.js";
 import Item from "./world/Item.js";
-import Tile from "./world/Tile.js";
-import Entity from "./world/entity/Entity.js";
 
 class Application {
-  static version = 1;
+  static version = 2;
 
   constructor(context) {
     this._entities = {};
-    this._tiles = {};
+    this._worlds = {};
 
-    Application.instance = this;
+    this.setWorld(new World({ id: "spawn" }))
+
     this.context = context;
     this.lastTickTime = Date.now();
     this.registerEntities();
     this.registerPackets();
     this.registerItems();
 
+    Application.instance = this;
     console.log(`Load app. Context: ${this.context.type}`);
   }
 
@@ -52,7 +54,7 @@ class Application {
     ItemRegistry.register(new Item({
       id: "log",
       maxStack: 16,
-      spritePos: [0,0]
+      spritePos: [0, 0]
     }));
   }
 
@@ -74,8 +76,29 @@ class Application {
     PacketRegistry.register(CommandInputPacket);
   }
 
+  setWorld(world) {
+    this._worlds[world.getId()] = world;
+
+    return this._worlds[world.getId()];
+  }
+
+  getWorld(worldId) {
+    return this._worlds[worldId];
+  }
+
+  getWorlds() {
+    let worlds = [];
+
+    for (let worldId in this._worlds) {
+      worlds.push(this._worlds[worldId]);
+    }
+
+    return worlds;
+  }
+
   spawnEntity(entity) {
     this._entities[entity.getUuid()] = entity;
+    entity.application = this;
 
     return entity;
   }
@@ -167,111 +190,8 @@ class Application {
     return Application.version;
   }
 
-  getTile(pos) {
-    return this._tiles[`${pos[0]}:${pos[1]}`];
-  }
-
-  setTile(tile) {
-    this._tiles[`${tile.getPosition()[0]}:${tile.getPosition()[1]}`] = tile;
-  }
-
-  getTiles() {
-    return this._tiles;
-  }
-
-  toJSON() {
-    if (this.isClient())
-      return false;
-
-    let entities = [];
-
-    this.getEntities().forEach(entity => {
-      entities.push(entity.serialize());
-    })
-
-    let tilePresets = this.generateTilePresets();
-    let tileMap = this.generateTileMap(tilePresets)
-
-    return {
-      "welcome-message": this.context.getWelcomeMessage(),
-      "entities": entities,
-      "tile-presets": tilePresets,
-      "tile-map": tileMap
-    }
-  }
-
-  generateTilePresets() {
-    let tilePresets = ["EMPTY"];
-
-    for (let tilePos in this.getTiles()) {
-      let tile = this.getTiles()[tilePos];
-      let tilePreset = null;
-
-      tilePresets.forEach((tilePresetCandidate, i) => {
-        if (tilePresetCandidate[0] == tile.pack.getValue() && tilePresetCandidate[1] == tile.sheetPos.getValue()[0] && tilePresetCandidate[2] == tile.sheetPos.getValue()[1]) {
-          tilePreset = i;
-        }
-      })
-
-      if (!tilePreset) {
-        tilePresets.push([tile.pack.getValue(), ...tile.sheetPos.getValue()])
-      }
-    }
-
-    return tilePresets;
-  }
-
-  generateTileMap(tilePresets) {
-    let tileMap = {};
-
-    for (let tilePos in this.getTiles()) {
-      let tile = this.getTiles()[tilePos];
-      let tilePreset = null;
-
-      tilePresets.forEach((tilePresetCandidate, i) => {
-        if (tilePresetCandidate[0] == tile.pack.getValue() && tilePresetCandidate[1] == tile.sheetPos.getValue()[0] && tilePresetCandidate[2] == tile.sheetPos.getValue()[1]) {
-          tilePreset = i;
-        }
-      })
-
-      if (tilePreset != null) {
-        tileMap[tilePos] = tilePreset;
-      }
-    }
-
-    return tileMap;
-  }
-
-  fromJSON(json) {
-    if (this.isClient())
-      return false;
-
-    console.log(`Spawning entities... ${json.entities.length}`);
-    json.entities.forEach((entity) => {
-      this.spawnEntity(Entity.parse(entity));
-    })
-
-    console.log(`Loading tiles...`)
-    let presets = json["tile-presets"];
-    let tileMap = json["tile-map"];
-
-    console.log(`Tile presets... ${presets.length}`);
-
-    let i = 0;
-    for (let tilePos in tileMap) {
-      let [ x, y ] = tilePos.split(":");
-
-      let preset = presets[tileMap[tilePos]];
-
-      this.setTile(new Tile({
-        pack: preset[0],
-        sheetPos: [preset[1], preset[2]],
-        pos: [x,y]
-      }));
-
-      i++;
-    }
-    console.log(`Tiles... ${i}`);
+  getDefaultWorld() {
+    return this.getWorld("core:spawn");
   }
 }
 

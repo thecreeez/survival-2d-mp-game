@@ -2,13 +2,15 @@ import SharedData from "../../SharedData.js";
 import EntityRegistry from "../../EntityRegistry.js";
 
 class Entity {
-  uuid = new SharedData("uuid", SharedData.STR_T, "uuid").makeImportant()
-  position = new SharedData("position", SharedData.POS_T, [0, 0])
-  type = new SharedData("type", SharedData.STR_T, "default")
+  uuid = new SharedData("uuid", SharedData.STR_T, "uuid").makeImportant();
+  world = new SharedData("world", SharedData.STR_T, "none");
+  position = new SharedData("position", SharedData.POS_T, [0, 0]);
+  type = new SharedData("type", SharedData.STR_T, "default");
 
-  constructor({type = "default", position = [0,0]} = {}) {
+  constructor({ type = "default", position = [0,0], world = "core:spawn" } = {}) {
     this.type.setValue(type);
     this.position.setValue(position);
+    this.world.setValue(world);
     this.uuid.setValue("UUID-RANDOM-" + Math.floor(Math.random() * 10000));
   }
 
@@ -61,6 +63,24 @@ class Entity {
     
   }
 
+  teleport({ world = this.getWorld(), position = this.getPosition() }) {
+    if (world != this.getWorld()) {
+      this.setWorld(world);
+    }
+
+    if (position != this.getPosition()) {
+      this.position.setValue(position);
+    }
+  }
+
+  getWorld() {
+    return this.application.getWorld(this.world.getValue());
+  }
+
+  setWorld(world) {
+    this.world.setValue(world.getId());
+  }
+
   load(datas) {
     datas.forEach((serializedData) => {
       let data = SharedData.parse(serializedData);
@@ -76,7 +96,7 @@ class Entity {
     let entityData = [];
 
     for (let property in this) {
-      if (this[property].needToSerialize) {
+      if (this[property] && this[property].needToSerialize) {
         entityData.push(this[property].serialize());
       }
     }
@@ -100,7 +120,7 @@ class Entity {
     let sharedDataUpdated = 0;
 
     for (let property in this) {
-      if (this[property].bUpdated) {
+      if (this[property] && this[property].bUpdated) {
         sharedDataUpdated++;
       }
     }
@@ -111,7 +131,7 @@ class Entity {
   getAllDatas() {
     let datas = []
     for (let property in this) {
-      if (this[property].needToSerialize) {
+      if (this[property] && this[property].needToSerialize) {
         datas.push(this[property])
       }
     }

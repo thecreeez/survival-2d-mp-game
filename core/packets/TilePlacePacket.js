@@ -14,17 +14,20 @@ class TilePlacePacket {
     let pack = args[3];
     let sheetPos = [args[4], args[5]];
 
-    server.application.setTile(new Tile({
+    let invoker = server.getPlayerByConnection(conn).entity;
+    let world = invoker.getWorld();
+
+    invoker.getWorld().setTile(new Tile({
       pack,
       pos,
       sheetPos
     }));
-    TilePlacePacket.serverSend(server, server.getPlayersConnections(), { pos, pack, sheetPos, entity: server.getPlayerByConnection(conn).entity });
+    TilePlacePacket.serverSend(server, server.getPlayersConnections(), { world, pos, pack, sheetPos, entity: server.getPlayerByConnection(conn).entity });
   }
 
-  static serverSend(server, users, { pos, pack, sheetPos, entity }) {
+  static serverSend(server, users, { world, pos, pack, sheetPos, entity }) {
     users.forEach((user) => {
-      user.write(`${this.type}/${entity.getUuid()}/${pos[0]}/${pos[1]}/${pack}/${sheetPos[0]}/${sheetPos[1]}`);
+      user.write(`${this.type}/${entity.getUuid()}/${world.getId()}/${pos[0]}/${pos[1]}/${pack}/${sheetPos[0]}/${sheetPos[1]}`);
     })
   }
 
@@ -32,11 +35,12 @@ class TilePlacePacket {
     let args = data.split("/")
 
     let entityUuid = args[1];
-    let pos = [args[2], args[3]];
-    let pack = args[4];
-    let sheetPos = [args[5], args[6]];
+    let worldId = args[2];
+    let pos = [args[3], args[4]];
+    let pack = args[5];
+    let sheetPos = [args[6], args[7]];
 
-    client.application.setTile(new Tile({
+    client.application.getWorld(worldId).setTile(new Tile({
       pack,
       pos,
       sheetPos

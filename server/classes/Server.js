@@ -1,11 +1,12 @@
 import Application from "../../core/Application.js";
 import PacketRegistry from "../../core/PacketRegistry.js";
 
+import EntityRemovePacket from "../../core/packets/EntityRemovePacket.js";
+import EntityUpdatePacket from "../../core/packets/EntityUpdatePacket.js";
+
 import sockjs from "sockjs";
 import http from 'http';
 import fs from 'fs';
-import EntityRemovePacket from "../../core/packets/EntityRemovePacket.js";
-import EntityUpdatePacket from "../../core/packets/EntityUpdatePacket.js";
 
 class Server {
   static type = "server"
@@ -23,8 +24,6 @@ class Server {
     this._initSocketEvents();
     this._initClientFiles();
     this.http.listen(3000);
-
-    this.loadSave("save_001.json");
 
     setInterval(() => {
       Application.instance.updateTick();

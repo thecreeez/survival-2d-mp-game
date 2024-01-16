@@ -23,7 +23,7 @@ class TilesRegisterPacket {
 
       let tile = new Tile().load(tileLine.split(";"));
 
-      client.application.setTile(tile);
+      client.getPlayer().getWorld().setTile(tile);
     });
   }
 }

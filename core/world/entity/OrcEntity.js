@@ -1,7 +1,7 @@
 import EntityWithAI from "./EntityWithAI.js";
 
 class OrcEntity extends EntityWithAI {
-  constructor({position = [0, 0]} = {}) {
+  constructor({ position = [0, 0]} = {}) {
     super({
       id: "orc_entity",
       position,
