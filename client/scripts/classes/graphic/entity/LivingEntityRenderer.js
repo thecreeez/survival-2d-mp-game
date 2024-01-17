@@ -27,13 +27,14 @@ class LivingEntityRenderer extends EntityRenderer {
     super.updateEntity(entity, deltaTime);
     entity.currentSpriteTime += deltaTime;
 
-    let state = this.getState(entity);
+    let spriteSheet = this.getSpriteSheet(entity);
+    let frameDuration = this[`${entity.getState()}Speed`] ? this[`${entity.getState()}Speed`] : 100;
 
-    if (state.frameDuration < entity.currentSpriteTime) {
+    if (frameDuration < entity.currentSpriteTime) {
       entity.currentSprite++;
       entity.currentSpriteTime = 0;
 
-      if (entity.currentSprite >= state.spriteSheet.sheetSize[0]) {
+      if (entity.currentSprite >= spriteSheet.sheetSize[0]) {
         entity.currentSprite = 0;
       }
     }
@@ -60,22 +61,12 @@ class LivingEntityRenderer extends EntityRenderer {
   }
 
   static getCurrentSprite(entity) {
-    let state = this.getState(entity);
-    if (entity.currentSprite >= state.spriteSheet.sheetSize[0]) {
+    let spriteSheet = this.getSpriteSheet(entity);
+    if (entity.currentSprite >= spriteSheet.sheetSize[0]) {
       entity.currentSprite = 0;
     }
 
-    return state.spriteSheet.get(entity.currentSprite, entity.getRotation());
-  }
-
-  static getState(entity) {
-    let state = this[`${entity.getState()}State`];
-
-    if (!state) {
-      state = this[`idleState`];
-    }
-
-    return state;
+    return spriteSheet.get(entity.currentSprite, entity.getRotation());
   }
 }
 

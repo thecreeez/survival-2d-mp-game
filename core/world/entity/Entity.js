@@ -166,6 +166,10 @@ class Entity {
   getPosition() {
     return this.position.getValue();
   }
+
+  getPackId() {
+    return this.constructor.pack;
+  }
 }
 
 export default Entity;

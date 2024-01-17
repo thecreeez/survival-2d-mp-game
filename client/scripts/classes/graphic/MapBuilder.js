@@ -1,4 +1,5 @@
 import TilePlacePacket from "../../../../core/packets/TilePlacePacket.js";
+import PackAssetsRegistry from "../registry/PackAssetsRegistry.js";
 import MapRenderer from "./MapRenderer.js";
 import Screen from "./Screen.js";
 
@@ -10,8 +11,8 @@ class MapBuilder {
     this.client = client;
 
     this.selectedTilesetIndex = 0;
-    this.selectedPos = [13, 3];
-    this.tilesets = [];
+    this.selectedPos = [0,0];
+    this.tilesets = PackAssetsRegistry.getPacksId();
 
     this.bEnabled = true;
 
@@ -23,19 +24,13 @@ class MapBuilder {
     this.marginButton = 10;
     this.cellSize = 20;
 
-    this.packSelectorItems = [];
+    this.pos = [10, 10];
 
-    this.pos = [10,10];
-  }
-
-  registerTileset(name) {
-    this.tilesets.push(name);
-
-    this.generatePackSelectorItems()
+    this.packSelectorItems = this.generatePackSelectorItems();
   }
 
   getCurrentTileset() {
-    return MapRenderer[`${this.tilesets[this.selectedTilesetIndex]}Tiles`];
+    return PackAssetsRegistry.packs[this.tilesets[this.selectedTilesetIndex]].textures.tileset;
   }
 
   render(ctx, deltaTime) {
@@ -145,6 +140,10 @@ class MapBuilder {
     }
 
     let bOnButton = false;
+
+    if (!this.packSelectorItems) {
+      this.generatePackSelectorItems()
+    }
 
     this.packSelectorItems.forEach((itemCandidate, i) => {
       if (bOnButton)

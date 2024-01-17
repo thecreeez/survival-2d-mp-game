@@ -19,6 +19,12 @@ class EffectEntity extends Entity {
     super({ id: "effect_entity", position });
     this.effect_type.setValue(effectType);
     this.effect_data.setValue(effectData);
+
+    this.states = [
+      "loop",
+      "start",
+      "end"
+    ]
     
     this.lifeTime = lifeTime;
   }

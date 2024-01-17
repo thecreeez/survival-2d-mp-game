@@ -1,3 +1,5 @@
+import PackAssetsRegistry from "../../registry/PackAssetsRegistry.js";
+
 class EntityRenderer {
   static Entity = null;
 
@@ -16,6 +18,14 @@ class EntityRenderer {
 
   static updateEntity(entity, deltaTime) {
     
+  }
+
+  static getSpriteSheet(entity) {
+    if (!entity.states) {
+      return PackAssetsRegistry.packs[entity.getPackId()].textures.entities[entity.getId()].default
+    }
+
+    return PackAssetsRegistry.packs[entity.getPackId()].textures.entities[entity.getId()][entity.getState()];
   }
 }
 

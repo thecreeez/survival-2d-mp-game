@@ -66,7 +66,7 @@ class Screen {
       client.getMapBuilder().render(ctx, deltaTime);
     }
 
-    this.renderLogs(client, deltaTime);
+    //this.renderLogs(client, deltaTime);
     SubtitleHandler.render(canvas, ctx);
   }
 

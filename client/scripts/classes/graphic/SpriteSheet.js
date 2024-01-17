@@ -1,15 +1,19 @@
 class SpriteSheet {
-  constructor({ path, spriteSize = [32,32], sheetSize = [4,4] }) {
-    this.img = document.createElement("img");
+  constructor({ path, spriteSize = [32,32] }) {
+    this.img = new Image();
     this.img.src = path;
     this.spriteSize = spriteSize;
-    this.sheetSize = sheetSize;
+    this.sheetSize = false;
+
+    this.loaded = false;
 
     this.canvases = [];
 
     this.img.onload = () => {
-      for (let x = 0; x < sheetSize[0]; x++) {
-        for (let y = 0; y < sheetSize[1]; y++) {
+      this.sheetSize = [Math.floor(this.img.width / this.spriteSize[0]), Math.floor(this.img.height / this.spriteSize[1])]
+
+      for (let x = 0; x < this.sheetSize[0]; x++) {
+        for (let y = 0; y < this.sheetSize[1]; y++) {
           let canvas = document.createElement("canvas");
           canvas.width = this.spriteSize[0];
           canvas.height = this.spriteSize[1];
@@ -30,10 +34,16 @@ class SpriteSheet {
           this.canvases[y][x] = canvas;
         }
       }
+
+      this.loaded = true;
     }
   }
 
   get(x,y) {
+    if (!this.loaded) {
+      return false;
+    }
+
     if (x > this.sheetSize[0] || y > this.sheetSize[1]) {
       console.error(`x or y out of bounds of spritesheet`);
       return this.canvas;

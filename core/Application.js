@@ -69,7 +69,13 @@ class Application {
       ]
     })
 
+    this.registerPack({
+      pack: `forest`
+    });
+
     this.loadPacks(); // Передвинуть это в сервере/клиенте, чтоб можно было просунуть логику подгрузки
+
+    console.log(this._packs);
 
     Application.instance = this;
     console.log(`Load app. Context: ${this.context.type}`);
@@ -100,11 +106,6 @@ class Application {
         entityClass.pack = `${packId}`;
 
         entityClass.onRegister(this);
-
-        if (this.isClient()) {
-          // TO-DO: this...
-          //this.context.Registries.EntityRendererRegistry.register(packId, entityClass.id, entityClass)
-        }
       })
 
       this._packs[packId].packetsClasses.forEach((packetClass) => {
@@ -118,6 +119,12 @@ class Application {
         ItemRegistry.register(packId, item.id, item);
         item.id = `${packId}:${item.id}`;
       })
+
+      if (this.isClient()) {
+        console.log(`Registering assets...`);
+        this.context.registerAssetPack(packId, this._packs[packId]);
+      }
+
       console.log(`Pack ${packId} loaded.`)
     }
   }

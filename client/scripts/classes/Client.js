@@ -9,6 +9,7 @@ import PlayerEntityRenderer from "./graphic/entity/PlayerEntityRenderer.js";
 import ItemEntityRenderer from "./graphic/entity/ItemEntityRenderer.js";
 import OrcEntityRenderer from "./graphic/entity/OrcEntityRenderer.js";
 import EffectEntityRenderer from "./graphic/entity/EffectEntityRenderer.js";
+import PackAssetsRegistry from "./registry/PackAssetsRegistry.js";
 
 class Client {
   constructor(username, ip) {
@@ -25,8 +26,6 @@ class Client {
     this.mapBuilder.bEnabled = true;
 
     this.register();
-
-    this.isServerMouseDown = false;
 
     setInterval(() => {
       let deltaTime = Date.now() - this.lastTimeUpdate
@@ -60,15 +59,15 @@ class Client {
     return player;
   }
 
+  registerAssetPack(packId, packData) {
+    PackAssetsRegistry.register(packId, packData);
+  }
+
   register() {
     EntityRendererRegistry.register(PlayerEntityRenderer);
     EntityRendererRegistry.register(ItemEntityRenderer);
     EntityRendererRegistry.register(OrcEntityRenderer);
     EntityRendererRegistry.register(EffectEntityRenderer);
-
-    this.mapBuilder.registerTileset("default");
-    this.mapBuilder.registerTileset("forest");
-    this.mapBuilder.registerTileset("hide");
   }
 
   getControlsHandler() {

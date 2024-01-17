@@ -5,10 +5,10 @@ class PlayerEntityRenderer extends LivingEntityRenderer {
   static Entity = PlayerEntity;
   static size = [150, 150];
   
-  static idleAnimation = this.registerState("idle", [32,32], [16,4], 200);
-  static walkAnimation = this.registerState("walk", [32,32], [4,4], 200);
-  static hurtAnimation = this.registerState("hurt", [32, 32], [4,4], 100);
-  static attackAnimation = this.registerState("attack", [32, 32], [4, 4], 50);
+  static idleSpeed = 200;
+  static walkSpeed = 200;
+  static hurtSpeed = 100;
+  static attackSpeed = 50;
 
   static renderMain(ctx, entity) {
     super.renderMain(ctx, entity);

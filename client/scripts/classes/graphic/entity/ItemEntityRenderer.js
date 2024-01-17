@@ -7,12 +7,6 @@ class ItemEntityRenderer extends EntityRenderer {
   static Entity = ItemEntity;
   static size = [MapRenderer.cellSize, MapRenderer.cellSize];
 
-  static ItemSpriteSheet = new SpriteSheet({
-    path: `/client/assets/default/items.png`,
-    sheetSize: [11, 11],
-    spriteSize: [24, 24]
-  })
-
   static showed = false;
 
   static renderMain(ctx, entity) {

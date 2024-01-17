@@ -25,6 +25,14 @@ class LivingEntity extends Entity {
     this.move_speed.setValue(moveSpeed);
     this.attack_range.setValue(attackRange);
     this.damage.setValue(damage);
+
+    // Move all attack logic to this class
+    this.states = [
+      "idle",
+      "walk",
+      "hurt",
+      "attack"
+    ]
   }
 
   updateServerTick(application, deltaTick) {
