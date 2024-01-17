@@ -1,6 +1,5 @@
 import EffectEntity from "/core/world/entity/EffectEntity.js";
 import EntityRenderer from "./EntityRenderer.js";
-import SpriteSheet from "../SpriteSheet.js";
 import MapRenderer from "../MapRenderer.js";
 
 class EffectEntityRenderer extends EntityRenderer {

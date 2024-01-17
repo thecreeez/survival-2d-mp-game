@@ -9,9 +9,9 @@ class EntityRegisterPacket {
     world: "world"
   }
 
-  static serverSend(users, { context, data }) {
+  static serverSend(users, { context, serializedEntity }) {
     users.forEach((user) => {
-      user.write(`${this.type}/${context}/${data}`);
+      user.write(`${this.type}/${context}/${serializedEntity}`);
     })
   }
 

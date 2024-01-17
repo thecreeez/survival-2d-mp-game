@@ -2,7 +2,6 @@ import Client from "../Client.js";
 import EntityRendererRegistry from "./EntityRendererRegistry.js";
 import MapRenderer from "./MapRenderer.js";
 import SubtitleHandler from "./SubtitleHandler.js";
-import TileSetData from "./TileSetData.js";
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -45,9 +44,9 @@ class Screen {
     ctx.save();
     ctx.translate(canvas.width / 2 - client.getPlayer().getPosition()[0], canvas.height / 2 - client.getPlayer().getPosition()[1]);
 
-    this.renderWorld(client, deltaTime, TileSetData.RenderSteps.floor);
+    this.renderWorld(client, deltaTime, MapRenderer.RenderSteps.floor);
 
-    client.application.getEntities().forEach((entity) => {
+    client.application.getEntities().sort((a,b) => a.getPosition()[1] > b.getPosition()[1] ? 1 : -1).forEach((entity) => {
       if (EntityRendererRegistry[entity.getId()]) {
         EntityRendererRegistry[entity.getId()].render(ctx, entity);
         EntityRendererRegistry[entity.getId()].updateEntity(entity, deltaTime);
@@ -57,8 +56,8 @@ class Screen {
       console.error(`Entity ${entity.getUuid()} ${entity.getId()} can't be rendered. Renderer has not be set.`);
     })
 
-    this.renderWorld(client, deltaTime, TileSetData.RenderSteps.wall);
-    this.renderWorld(client, deltaTime, TileSetData.RenderSteps.top);
+    this.renderWorld(client, deltaTime, MapRenderer.RenderSteps.wall);
+    this.renderWorld(client, deltaTime, MapRenderer.RenderSteps.top);
 
     ctx.restore();
 

@@ -1,5 +1,4 @@
 import EntityRenderer from "./EntityRenderer.js";
-import SpriteSheet from "../SpriteSheet.js";
 
 class LivingEntityRenderer extends EntityRenderer {
   static Entity = null;
@@ -38,26 +37,6 @@ class LivingEntityRenderer extends EntityRenderer {
         entity.currentSprite = 0;
       }
     }
-  }
-
-  static registerState(name, spriteSize, sheetSize, frameDuration) {
-    if (!this.Entity) {
-      console.error(`Entity renderer doesnt have entity.`)
-      return false;
-    }
-
-    let entity = this.Entity.empty();
-
-    this[`${name}State`] = {
-      spriteSheet: new SpriteSheet({
-        path: `/client/assets/default/${entity.getId()}/${name}.png`,
-        sheetSize,
-        spriteSize
-      }),
-      frameDuration
-    }
-
-    return this[`${name}State`];
   }
 
   static getCurrentSprite(entity) {

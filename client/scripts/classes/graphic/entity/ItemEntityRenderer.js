@@ -1,6 +1,5 @@
 import ItemEntity from "/core/world/entity/ItemEntity.js";
 import EntityRenderer from "./EntityRenderer.js";
-import SpriteSheet from "../SpriteSheet.js";
 import MapRenderer from "../MapRenderer.js";
 
 class ItemEntityRenderer extends EntityRenderer {

@@ -25,6 +25,11 @@ class EntityRenderer {
       return PackAssetsRegistry.packs[entity.getPackId()].textures.entities[entity.getId()].default
     }
 
+    if (!PackAssetsRegistry.packs[entity.getPackId()].textures.entities[entity.getId()][entity.getState()]) {
+      console.error(`Can't find state ${entity.getState()}`)
+      return false;
+    }
+
     return PackAssetsRegistry.packs[entity.getPackId()].textures.entities[entity.getId()][entity.getState()];
   }
 }

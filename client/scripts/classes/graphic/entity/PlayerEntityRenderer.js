@@ -30,8 +30,8 @@ class PlayerEntityRenderer extends LivingEntityRenderer {
       pos[0] -= entity.getAttackRange();
     }
     
-    ctx.strokeRect(pos[0], pos[1], size[0], size[1])
-    ctx.fillText(entity.getState(), entity.getPosition()[0], entity.getPosition()[1] - this.size[1] / 4 - 30)
+    //ctx.strokeRect(pos[0], pos[1], size[0], size[1])
+    //ctx.fillText(entity.getState() +"/"+ entity.getHealth(), entity.getPosition()[0], entity.getPosition()[1] - this.size[1] / 4 - 30)
   }
 }
 

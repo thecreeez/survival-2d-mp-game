@@ -8,7 +8,7 @@ class OrcEntity extends EntityWithAI {
       position,
       visionRange: 100,
       health: 100,
-      target_class: "player_entity",
+      target_class: "core:player_entity",
       damage: 3,
       attackRange: 50,
       moveSpeed: 2

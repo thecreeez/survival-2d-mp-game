@@ -66,7 +66,21 @@ class Application {
           maxStack: 16,
           spritePos: [0, 0]
         })
-      ]
+      ],
+      tilesetData: {
+        "1:3": 1,
+        "1:7": 1,
+        "1:7": 1,
+        "1:8": 1,
+        "1:9": 1,
+        "1:10": 1,
+        "6:2": 2,
+        "7:2": 2,
+        "8:2": 2,
+        "13:5": 2,
+        "14:5": 2,
+        "15:5": 2
+      }
     })
 
     this.registerPack({
@@ -75,13 +89,15 @@ class Application {
 
     this.loadPacks(); // Передвинуть это в сервере/клиенте, чтоб можно было просунуть логику подгрузки
 
-    console.log(this._packs);
+    if (!this.isClient()) {
+      this.spawnEntity(new OrcEntity({ position: [500, 500]}));
+    }
 
     Application.instance = this;
     console.log(`Load app. Context: ${this.context.type}`);
   }
 
-  registerPack({ pack, entitiesClasses = [], packetsClasses = [], items = [] }) {
+  registerPack({ pack, entitiesClasses = [], packetsClasses = [], items = [], tilesetData = {} }) {
     if (this.state != 0) {
       console.error(`Packs cannot be registered on this state.`)
       return;
@@ -90,7 +106,8 @@ class Application {
     this._packs[pack] = {
       entitiesClasses,
       packetsClasses,
-      items
+      items,
+      tilesetData
     };
   }
 
@@ -127,6 +144,12 @@ class Application {
 
       console.log(`Pack ${packId} loaded.`)
     }
+
+    console.log(this._packs);
+  }
+
+  getPack(packId) {
+    return this._packs[packId];
   }
 
   setWorld(world) {
@@ -179,6 +202,17 @@ class Application {
   }
 
   removeEntity(uuid) {
+    if (!this.isClient()) {
+      EntityRemovePacket.serverSend(this.context.getPlayersConnections(), uuid);
+
+      if (this._entities[uuid].getFullId() === "core:player_entity" && this.context.getPlayerByName(this._entities[uuid].getName())) {
+        let newEntity = this.spawnEntity(new PlayerEntity({ name: this._entities[uuid].getName() }));
+
+        this.context.getPlayerByName(newEntity.getName()).entity = newEntity;
+        EntityRegisterPacket.serverSend(this.context.getPlayersConnections(), { context: EntityRegisterPacket.Contexts.world, serializedEntity: newEntity.serialize() });
+      }
+    }
+
     delete this._entities[uuid];
   }
 

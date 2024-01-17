@@ -149,7 +149,7 @@ class PlayerEntity extends LivingEntity {
   }
 
   canAttack() {
-    return true;
+    return this.b_alive.getValue();
   }
 
   canMove(application) {
@@ -157,7 +157,7 @@ class PlayerEntity extends LivingEntity {
   }
 
   canRotate(application) {
-    return true;
+    return this.b_alive.getValue();
   }
 }
 

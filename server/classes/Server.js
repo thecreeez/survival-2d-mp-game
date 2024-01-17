@@ -108,7 +108,7 @@ class Server {
 
     this.players = this.players.filter(playerCandidate => playerCandidate != player);
     Application.instance.removeEntity(player.entity.getUuid());
-    EntityRemovePacket.serverSend(this.getPlayersConnections(), player.entity);
+    EntityRemovePacket.serverSend(this.getPlayersConnections(), player.entity.getUuid(), EntityRemovePacket.Contexts.playerDisconnect);
   }
 
   static getPlayerByConnection(conn) {

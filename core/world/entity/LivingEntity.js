@@ -11,9 +11,11 @@ class LivingEntity extends Entity {
 
   attack_range = new SharedData("attack_range", SharedData.NUM_T, 20);
   damage = new SharedData("damage", SharedData.NUM_T, 1);
+  b_alive = new SharedData("b_alive", SharedData.BUL_T, true);
 
   // SERVER
   lastTimeMove = 0;
+  timeToDead = 1000;
 
   // Client
   currentSprite = 0;
@@ -31,7 +33,8 @@ class LivingEntity extends Entity {
       "idle",
       "walk",
       "hurt",
-      "attack"
+      "attack",
+      "dead"
     ]
   }
 
@@ -40,6 +43,20 @@ class LivingEntity extends Entity {
   }
 
   updateServerState(application, deltaTick) {
+    if (this.getState() != "dead" && this.b_alive.getValue() == false) {
+      this.state.setValue("dead");
+      this.timeToDead = 1000;
+    }
+
+    if (this.getState() == "dead") {
+      this.timeToDead -= deltaTick;
+
+      if (this.timeToDead < 0) {
+        application.removeEntity(this.getUuid());
+      }
+      return;
+    }
+
     if (this.hurt_time.getValue() > 0) {
       this.hurt_time.setValue(this.hurt_time.getValue() - deltaTick);
     }
@@ -62,11 +79,20 @@ class LivingEntity extends Entity {
     this.state.setValue("hurt");
     this.health.setValue(this.health.getValue() - damage);
 
+    if (this.getHealth() <= 0) {
+      this.b_alive.setValue(false);
+      this.health.setValue(0);
+    }
+
     console.log(entity.getUuid()+" hurted "+this.getUuid()+" on "+damage+" damage");
   }
 
   getState() {
     return this.state.getValue();
+  }
+
+  getHealth() {
+    return this.health.getValue();
   }
 
   getRotation() {
@@ -89,7 +115,7 @@ class LivingEntity extends Entity {
   }
 
   canMove(application) {
-    return true;
+    return this.b_alive.getValue();
   }
 }
 

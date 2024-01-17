@@ -8,7 +8,7 @@ class EntityWithAI extends LivingEntity {
   target_type = new SharedData("target_type", SharedData.STR_T, "player_entity")
   target_vision_range = new SharedData("target_vision_range", SharedData.NUM_T, 500);
 
-  constructor({ position = [0, 0], health = 100, damage = 5, moveSpeed = 2, attackRange = 50, visionRange = 100, target_class = "player_entity" } = {}) {
+  constructor({ position = [0, 0], health = 100, damage = 5, moveSpeed = 2, attackRange = 50, visionRange = 100, target_class = "core:player_entity" } = {}) {
     super({
       position,
       health,
@@ -19,7 +19,7 @@ class EntityWithAI extends LivingEntity {
 
     this.target_type.setValue(target_class);
     this.target_pos.setValue([...position]);
-    this.target_vision_range = visionRange;
+    this.target_vision_range.setValue(visionRange);
   }
 
   /**
@@ -28,6 +28,10 @@ class EntityWithAI extends LivingEntity {
    */
   updateServerTick(application, deltaTick) {
     super.updateServerTick(application, deltaTick);
+
+    if (!this.b_alive.getValue()) {
+      return;
+    }
 
     this.updateTarget(application);
     this.updateMovement(application);
@@ -60,7 +64,7 @@ class EntityWithAI extends LivingEntity {
           return;
 
         // Если сущность не того типа
-        if (this.target_type.getValue() != otherEntity.getType())
+        if (this.target_type.getValue() != otherEntity.getFullId())
           return;
 
         // Если сущность слишком далеко
@@ -177,6 +181,10 @@ class EntityWithAI extends LivingEntity {
   }
 
   wannaMove(application) {
+    if (!this.getTargetEntity(application)) {
+      return false;
+    }
+
     if (this.target_exist.getValue() && this.distanceTo(this.getTargetEntity(application)) < this.attack_range.getValue()) {
       return false;
     }
@@ -185,6 +193,10 @@ class EntityWithAI extends LivingEntity {
   }
 
   canAttack(entity) {
+    if (!this.b_alive.getValue()) {
+      return false;
+    }
+
     if (this.distanceTo(entity) > this.attack_range.getValue()) {
       return false
     }

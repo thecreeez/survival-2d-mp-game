@@ -44,9 +44,14 @@ class SpriteSheet {
       return false;
     }
 
-    if (x > this.sheetSize[0] || y > this.sheetSize[1]) {
-      console.error(`x or y out of bounds of spritesheet`);
-      return this.canvas;
+    if (x >= this.sheetSize[0]) {
+      console.error(`x out of bounds of spritesheet`);
+      x = this.sheetSize[0] - 1;
+    }
+
+    if (y >= this.sheetSize[1]) {
+      console.error(`y out of bounds of spritesheet`);
+      y = this.sheetSize[1] - 1;
     }
 
     return this.canvases[y][x];

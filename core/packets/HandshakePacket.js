@@ -32,7 +32,7 @@ class HandshakePacket {
     let joinedPlayerEntity = null;
 
     Application.instance.getEntities().forEach((entity) => {
-      if (entity.getType() == "player_entity" && entity.getName() == args[1]) {
+      if (entity.getFullId() == "core:player_entity" && entity.getName() == args[1]) {
         joinedPlayerEntity = entity;
       }
     })
@@ -41,12 +41,12 @@ class HandshakePacket {
       joinedPlayerEntity = Application.instance.spawnEntity(new PlayerEntity({ name: args[1] }));
 
       // Отсылать всем существующим игрокам новоприбывшего
-      EntityRegisterPacket.serverSend(server.getPlayersConnections(), { context: EntityRegisterPacket.Contexts.playerJoin, data: joinedPlayerEntity.serialize() });
+      EntityRegisterPacket.serverSend(server.getPlayersConnections(), { context: EntityRegisterPacket.Contexts.playerJoin, serializedEntity: joinedPlayerEntity.serialize() });
     }
  
     // Отсылать новоприбывшему игроку все сущности
     Application.instance.getEntities().filter(entity => entity.getWorld() == joinedPlayerEntity.getWorld()).forEach((entity) => {
-      EntityRegisterPacket.serverSend([conn], { context: EntityRegisterPacket.Contexts.loading, data: entity.serialize() });
+      EntityRegisterPacket.serverSend([conn], { context: EntityRegisterPacket.Contexts.loading, serializedEntity: entity.serialize() });
     })
 
     let tiles = [];

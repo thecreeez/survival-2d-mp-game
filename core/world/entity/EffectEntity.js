@@ -36,7 +36,7 @@ class EffectEntity extends Entity {
 
     if (this.lifeTime <= 0) {
       application.removeEntity(this.getUuid());
-      EntityRemovePacket.serverSend(application.context.getPlayersConnections(), this);      
+      EntityRemovePacket.serverSend(application.context.getPlayersConnections(), this.getUuid());      
     }
   }
 }
