@@ -47,8 +47,13 @@ class LivingEntity extends Entity {
 
   updateServerMovement(application, deltaTick) {
     if (this.canMove(application) && (this.getDirection()[0] != 0 || this.getDirection()[1] != 0)) {
-      this.position.setValue([this.getPosition()[0] + this.getDirection()[0] * this.move_speed.getValue(), this.getPosition()[1] + this.getDirection()[1] * this.move_speed.getValue()]);
+      let newPosition = [this.getPosition()[0] + this.getDirection()[0] * this.move_speed.getValue(), this.getPosition()[1] + this.getDirection()[1] * this.move_speed.getValue()];
 
+      if (!this.canBeMovedTo(newPosition)) {
+        return;
+      }
+
+      this.position.setValue(newPosition);
       this.lastTimeMove = Date.now();
     }
   }

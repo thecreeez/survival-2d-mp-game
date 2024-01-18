@@ -72,6 +72,16 @@ class Entity {
     this.world.setValue(world.getId());
   }
 
+  canBeMovedTo(position) {
+    let tile = this.getWorld().getTileByWorldPos(position);
+
+    if (tile && tile.haveCollision()) {
+      return false;
+    }
+
+    return true;
+  }
+
   load(datas) {
     datas.forEach((serializedData) => {
       let data = SharedData.parse(serializedData);

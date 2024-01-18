@@ -73,7 +73,12 @@ class World {
   }
 
   getTile(pos) {
-    return this._tiles[`${pos[0]}:${pos[1]}`];
+    return this._tiles[`${Math.floor(pos[0])}:${Math.floor(pos[1])}`];
+  }
+
+  getTileByWorldPos(pos) {
+    let tileSize = 40;
+    return this._tiles[`${Math.floor(pos[0] / tileSize)}:${Math.floor(pos[1] / tileSize)}`];
   }
 
   setTile(tile) {
