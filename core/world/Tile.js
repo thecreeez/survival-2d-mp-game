@@ -9,6 +9,9 @@ class Tile {
     this.pack.setValue(pack);
     this.sheetPos.setValue(sheetPos);
     this.position.setValue(pos);
+
+    // Автоматически устанавливается при установке в мир
+    this.world = false;
   }
 
   getSpriteData() {
@@ -56,6 +59,28 @@ class Tile {
 
   getPosition() {
     return this.position.getValue();
+  }
+
+  haveCollision() {
+    if (!this.world) {
+      return false;
+    }
+
+    if (!this.world.application) {
+      return false;
+    }
+
+    let pack = this.world.application.getPack(this.pack.getValue());
+
+    if (!pack) {
+      return false;
+    }
+
+    if (!pack.tilesetData) {
+      return false;
+    }
+
+    return pack.tilesetData[this.sheetPos.getValue().join(":")] && pack.tilesetData[this.sheetPos.getValue().join(":")] > 0;
   }
 }
 

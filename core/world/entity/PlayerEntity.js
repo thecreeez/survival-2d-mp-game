@@ -7,7 +7,6 @@ class PlayerEntity extends LivingEntity {
   name = new SharedData("name", SharedData.STR_T, "Player");
   b_sitting = new SharedData("b_sitting", SharedData.BUL_T, false).makeImportant();
   b_attacking = new SharedData("b_attacking", SharedData.BUL_T, false);
-  direction = new SharedData("direction", SharedData.POS_T, [0, 0]).makeImportant();
 
   // from client
   bWantAttack = false;
@@ -27,50 +26,19 @@ class PlayerEntity extends LivingEntity {
   }
 
   updateServerTick(application, deltaTick) {
+    super.updateServerTick(application, deltaTick);
     if (this.bWantAttack != this.b_attacking.getValue()) {
       this.b_attacking.setValue(this.bWantAttack);
-    }
-
-    if (this.canMove(application)) {
-      this.updateServerMovement(application, deltaTick);
     }
 
     if (this.canRotate(application)) {
       this.updateServerRotation(application, deltaTick);
     }
 
-    this.updateServerState(application, deltaTick);
-
     if (this.getState() == "attack") {
-      this.getAttackablEntitiesInAttackRange(application).forEach((entity) => {
+      this.getAttackableEntitiesInAttackRange(application).forEach((entity) => {
         entity.handleDamage(this, this.damage.getValue());
       })
-    }
-  }
-
-  updateServerMovement(application, deltaTick) {
-    if (this.getDirection()[0] != 0 || this.getDirection()[1] != 0) {
-      this.position.setValue([this.getPosition()[0] + this.getDirection()[0] * this.move_speed.getValue(), this.getPosition()[1] + this.getDirection()[1] * this.move_speed.getValue()]);
-
-      this.lastTimeMove = Date.now();
-    }
-  }
-
-  updateServerRotation(application, deltaTick) {
-    if (this.getDirection()[0] != 0) {
-      if (this.getDirection()[0] >= 0 && this.getDirection()[1] >= 0) {
-        this.rotation.setValue(0);
-      } else if (this.getDirection()[0] < 0 && this.getDirection()[1] >= 0) {
-        this.rotation.setValue(1);
-      }
-    }
-
-    if (this.getDirection()[1] != 0) {
-      if (this.getDirection()[0] >= 0 && this.getDirection()[1] < 0) {
-        this.rotation.setValue(2);
-      } else if (this.getDirection()[0] < 0 && this.getDirection()[1] < 0) {
-        this.rotation.setValue(3);
-      }
     }
   }
 
@@ -86,7 +54,7 @@ class PlayerEntity extends LivingEntity {
     }
   }
 
-  getAttackablEntitiesInAttackRange(application) {
+  getAttackableEntitiesInAttackRange(application) {
     let pos = [this.getPosition()[0], this.getPosition()[1] - this.getAttackRange()];
     let size = [this.getAttackRange(), this.getAttackRange() * 2];
 
@@ -128,14 +96,6 @@ class PlayerEntity extends LivingEntity {
     return this.name.getValue();
   }
 
-  getDirection() {
-    return this.direction.getValue();
-  }
-
-  setDirection(x, y) {
-    this.direction.setValue([x, y]);
-  }
-
   getAttackRange() {
     return this.attack_range.getValue();
   }
@@ -149,15 +109,11 @@ class PlayerEntity extends LivingEntity {
   }
 
   canAttack() {
-    return this.b_alive.getValue();
+    return super.canAttack() && this.b_alive.getValue();
   }
 
   canMove(application) {
     return super.canMove(application) && !this.bAttacking();
-  }
-
-  canRotate(application) {
-    return this.b_alive.getValue();
   }
 }
 

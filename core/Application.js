@@ -90,7 +90,7 @@ class Application {
     this.loadPacks(); // Передвинуть это в сервере/клиенте, чтоб можно было просунуть логику подгрузки
 
     if (!this.isClient()) {
-      this.spawnEntity(new OrcEntity({ position: [500, 500]}));
+      this.spawnEntity(new OrcEntity({ position: [300, 300]}));
     }
 
     Application.instance = this;
@@ -154,6 +154,7 @@ class Application {
 
   setWorld(world) {
     this._worlds[world.getId()] = world;
+    world.application = this;
 
     return this._worlds[world.getId()];
   }

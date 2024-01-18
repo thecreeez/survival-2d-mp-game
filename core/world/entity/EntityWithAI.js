@@ -34,8 +34,8 @@ class EntityWithAI extends LivingEntity {
     }
 
     this.updateTarget(application);
-    this.updateMovement(application);
     this.updateAttack(application);
+    this.updateDirection(application);
 
     if (this.getTargetEntity(application) && this.distanceTo(this.getTargetEntity(application)) < this.attack_range.getValue() && this.getState() != "attack") {
       this.state.setValue("attack");
@@ -103,13 +103,10 @@ class EntityWithAI extends LivingEntity {
    * 
    * @param {Application} application 
    */
-  updateMovement(application) {
-    if (!this.canMove(application)) {
-      return;
-    }
-
+  updateDirection(application) {
     if (!this.wannaMove(application)) {
-      return;
+      this.setDirection(0,0);
+      return;sd
     }
 
     let targetEntity = this.getTargetEntity(application);
@@ -144,22 +141,11 @@ class EntityWithAI extends LivingEntity {
       moving[1] /= 2;
     }
 
-    if (moving[0] == 0 && moving[1] == 0) {
+    if (moving[0] == this.direction.getValue()[0] && moving[1] == this.direction.getValue()[1]) {
       return;
     }
 
-    if (moving[0] >= 0 && moving[1] >= 0) {
-      this.rotation.setValue(0);
-    } else if (moving[0] < 0 && moving[1] >= 0) {
-      this.rotation.setValue(1);
-    } else if (moving[0] >= 0 && moving[1] < 0) {
-      this.rotation.setValue(2);
-    } else if (moving[0] < 0 && moving[1] < 0) {
-      this.rotation.setValue(3);
-    }
-
-    this.lastTimeMove = Date.now();
-    this.position.setValue([entityPosition[0] + moving[0], entityPosition[1] + moving[1]]);
+    this.direction.setValue(moving);
   }
 
   updateAttack(application) {

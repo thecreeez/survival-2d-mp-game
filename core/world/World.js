@@ -5,6 +5,8 @@ class World {
     this.pack = pack;
     this.id = id;
 
+    this.application = false;
+
     this._tiles = {};
   }
 
@@ -76,6 +78,7 @@ class World {
 
   setTile(tile) {
     this._tiles[`${tile.getPosition()[0]}:${tile.getPosition()[1]}`] = tile;
+    tile.world = this;
   }
 
   getTiles() {

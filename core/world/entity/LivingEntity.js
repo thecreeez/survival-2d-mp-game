@@ -8,6 +8,7 @@ class LivingEntity extends Entity {
 
   state = new SharedData("state", SharedData.STR_T, "idle");
   rotation = new SharedData("rotation", SharedData.NUM_T, 0);
+  direction = new SharedData("direction", SharedData.POS_T, [0, 0]).makeImportant();
 
   attack_range = new SharedData("attack_range", SharedData.NUM_T, 20);
   damage = new SharedData("damage", SharedData.NUM_T, 1);
@@ -40,6 +41,38 @@ class LivingEntity extends Entity {
 
   updateServerTick(application, deltaTick) {
     this.updateServerState(application, deltaTick);
+    this.updateServerMovement(application, deltaTick);
+    this.updateServerRotation(application, deltaTick);
+  }
+
+  updateServerMovement(application, deltaTick) {
+    if (this.canMove(application) && (this.getDirection()[0] != 0 || this.getDirection()[1] != 0)) {
+      this.position.setValue([this.getPosition()[0] + this.getDirection()[0] * this.move_speed.getValue(), this.getPosition()[1] + this.getDirection()[1] * this.move_speed.getValue()]);
+
+      this.lastTimeMove = Date.now();
+    }
+  }
+
+  updateServerRotation(application, deltaTick) {
+    if (!this.canRotate(application)) {
+      return;
+    }
+
+    if (this.getDirection()[0] != 0) {
+      if (this.getDirection()[0] >= 0 && this.getDirection()[1] >= 0) {
+        this.rotation.setValue(0);
+      } else if (this.getDirection()[0] < 0 && this.getDirection()[1] >= 0) {
+        this.rotation.setValue(1);
+      }
+    }
+
+    if (this.getDirection()[1] != 0) {
+      if (this.getDirection()[0] >= 0 && this.getDirection()[1] < 0) {
+        this.rotation.setValue(2);
+      } else if (this.getDirection()[0] < 0 && this.getDirection()[1] < 0) {
+        this.rotation.setValue(3);
+      }
+    }
   }
 
   updateServerState(application, deltaTick) {
@@ -95,6 +128,14 @@ class LivingEntity extends Entity {
     return this.health.getValue();
   }
 
+  getDirection() {
+    return this.direction.getValue();
+  }
+
+  setDirection(x, y) {
+    this.direction.setValue([x, y]);
+  }
+
   getRotation() {
     return this.rotation.getValue();
   }
@@ -115,6 +156,14 @@ class LivingEntity extends Entity {
   }
 
   canMove(application) {
+    return this.b_alive.getValue();
+  }
+
+  canAttack() {
+    return true;
+  }
+
+  canRotate(application) {
     return this.b_alive.getValue();
   }
 }
