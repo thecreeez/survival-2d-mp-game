@@ -27,7 +27,7 @@ class Client {
     this.register();
 
     setInterval(() => {
-      let deltaTime = Date.now() - this.lastTimeUpdate
+      let deltaTime = Date.now() - this.lastTimeUpdate;
       Application.instance.updateTick();
       this.controlsHandler.update(deltaTime);
       Screen.SubtitleHandler.update(deltaTime);

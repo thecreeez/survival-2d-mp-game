@@ -45,6 +45,8 @@ class TilePlacePacket {
       pos,
       sheetPos
     }));
+
+    //client.application.spawnEntity(new EffectEntity)
   }
 }
 

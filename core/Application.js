@@ -22,6 +22,7 @@ import SaveRequestPacket from "./packets/SaveRequestPacket.js";
 
 import SharedData from "./SharedData.js";
 import Item from "./world/Item.js";
+import Tile from "./world/Tile.js";
 
 class Application {
   static version = 2;
@@ -45,6 +46,9 @@ class Application {
         PlayerEntity,
         SpiderEntity
       ],
+      tilesetData: {
+        "2:2": 1
+      },
       entitiesTextures: {
         [PlayerEntity.id]: ["anti-tank", "grenadier", "leader", "machine-gunner", "radio-operator", "sniper"]
       },
@@ -68,6 +72,14 @@ class Application {
 
     if (!this.isClient()) {
       this.spawnEntity(new SpiderEntity({ position: [300, 300]}));
+
+      for (let i = -20; i < 20; i++) {
+        for (let j = -20; j < 20; j++) {
+          this.getWorld("core:spawn").setTile(new Tile({ pack: "core", pos: [i,j], sheetPos: [0,1] }))
+        }
+      }
+
+      this.getWorld("core:spawn").setTile(new Tile({ pack: "core", pos: [0, 0], sheetPos: [0, 0] }))
     }
 
     Application.instance = this;

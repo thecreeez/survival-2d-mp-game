@@ -42,37 +42,44 @@ class Screen {
     if (!client.getPlayer())
       return;
 
-    ctx.save();
-    ctx.translate(canvas.width / 2 - client.getPlayer().getPosition()[0], canvas.height / 2 - client.getPlayer().getPosition()[1]);
-
-    this.renderWorld(client, deltaTime, MapRenderer.RenderSteps.floor);
-
-    client.application.getEntities().sort((a,b) => a.getPosition()[1] > b.getPosition()[1] ? 1 : -1).forEach((entity) => {
-      if (EntityRendererRegistry[entity.getId()]) {
-        EntityRendererRegistry[entity.getId()].render(ctx, entity);
-        EntityRendererRegistry[entity.getId()].updateEntity(entity, deltaTime);
-        return;
-      }
-
-      EntityRenderer.render(ctx, entity);
-      console.error(`Entity ${entity.getUuid()} ${entity.getId()} can't be rendered. Renderer has not be set.`);
-    })
-
-    this.renderWorld(client, deltaTime, MapRenderer.RenderSteps.wall);
-    this.renderWorld(client, deltaTime, MapRenderer.RenderSteps.top);
-
-    ctx.restore();
+    this.renderWorld(client, deltaTime);
 
     if (client.getMapBuilder().bEnabled) {
       client.getMapBuilder().render(ctx, deltaTime);
     }
 
-    //this.renderLogs(client, deltaTime);
+    this.renderLogs(client, deltaTime);
     SubtitleHandler.render(canvas, ctx);
   }
 
-  static renderWorld(client, deltaTime, type) {
-    MapRenderer.render(canvas, ctx, client, type);
+  static renderWorld(client, deltaTime) {
+    ctx.save();
+    ctx.translate(canvas.width / 2 - client.getPlayer().getPosition()[0], canvas.height / 2 - client.getPlayer().getPosition()[1]);
+
+    let queue = client.application.getEntities()
+    queue.push(...MapRenderer.getTilesToRender(canvas, ctx, client));
+    queue = queue.sort((a, b) => a.getPosition()[1] > b.getPosition()[1] ? 1 : -1);
+
+    //queue.splice(0, queue.length / 1.01);
+
+    queue.forEach((gameObject, i) => {
+      if (gameObject.type === "tile") {
+        ctx.drawImage(gameObject.sprite, gameObject.screenPos[0], gameObject.screenPos[1], MapRenderer.cellSize, MapRenderer.cellSize)
+      } else {
+        let entity = gameObject;
+
+        if (EntityRendererRegistry[entity.getId()]) {
+          EntityRendererRegistry[entity.getId()].render(ctx, entity);
+          EntityRendererRegistry[entity.getId()].updateEntity(entity, deltaTime);
+          return;
+        }
+
+        EntityRenderer.render(ctx, entity);
+        console.error(`Entity ${entity.getUuid()} ${entity.getId()} can't be rendered. Renderer has not be set.`);
+      }
+    })
+
+    ctx.restore();
   }
 
   /**

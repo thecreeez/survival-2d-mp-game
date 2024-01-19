@@ -57,6 +57,15 @@ class PackAssetsRegistry extends Registry {
 
     return packs
   }
+
+  static getTile(pack, pos, reversed = false) {
+    if (!PackAssetsRegistry.packs[pack]) {
+      console.error(`Pack isn't exist...`);
+      return false;
+    }
+
+    return PackAssetsRegistry.packs[pack].textures.tileset.get(pos[0], pos[1], reversed);
+  }
 }
 
 export default PackAssetsRegistry;
