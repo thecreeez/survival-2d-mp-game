@@ -4,10 +4,9 @@ import ItemRegistry from "./registry/ItemRegistry.js";
 
 import World from "./world/World.js";
 
-import OrcEntity from "./world/entity/OrcEntity.js";
+import SpiderEntity from "./world/entity/SpiderEntity.js";
 import ItemEntity from "./world/entity/ItemEntity.js";
 import PlayerEntity from "./world/entity/PlayerEntity.js";
-import EffectEntity from "./world/entity/EffectEntity.js";
 
 import EntityRegisterPacket from "./packets/EntityRegisterPacket.js";
 import EntityRemovePacket from "./packets/EntityRemovePacket.js";
@@ -44,9 +43,11 @@ class Application {
       entitiesClasses: [
         ItemEntity,
         PlayerEntity,
-        OrcEntity,
-        EffectEntity
+        SpiderEntity
       ],
+      entitiesTextures: {
+        [PlayerEntity.id]: ["anti-tank", "grenadier", "leader", "machine-gunner", "radio-operator", "sniper"]
+      },
       packetsClasses: [
         HandshakePacket,
         SaveRequestPacket,
@@ -60,44 +61,20 @@ class Application {
         MovementUpdatePacket,
         CommandInputPacket
       ],
-      items: [
-        new Item({
-          id: "log",
-          maxStack: 16,
-          spritePos: [0, 0]
-        })
-      ],
-      tilesetData: {
-        "1:3": 1,
-        "1:7": 1,
-        "1:7": 1,
-        "1:8": 1,
-        "1:9": 1,
-        "1:10": 1,
-        "6:2": 2,
-        "7:2": 2,
-        "8:2": 2,
-        "13:5": 2,
-        "14:5": 2,
-        "15:5": 2
-      }
+      effectsTextures: ["big-explosion", "big-fragments", "bullet-impacts", "hit-sparks", "hit-spatters", "laser-flash", "muzzle-flashes", "small-explosion", "small-fragments", "smoke"]
     })
 
-    this.registerPack({
-      pack: `forest`
-    });
-
-    this.loadPacks(); // Передвинуть это в сервере/клиенте, чтоб можно было просунуть логику подгрузки
+    this.loadPacks(); // Передвинуть это в сервер/клиент, чтоб можно было просунуть логику подгрузки
 
     if (!this.isClient()) {
-      this.spawnEntity(new OrcEntity({ position: [300, 300]}));
+      this.spawnEntity(new SpiderEntity({ position: [300, 300]}));
     }
 
     Application.instance = this;
     console.log(`Load app. Context: ${this.context.type}`);
   }
 
-  registerPack({ pack, entitiesClasses = [], packetsClasses = [], items = [], tilesetData = {} }) {
+  registerPack({ pack, entitiesClasses = [], entitiesTextures = {}, packetsClasses = [], items = [], tilesetData = {}, effectsTextures = [] }) {
     if (this.state != 0) {
       console.error(`Packs cannot be registered on this state.`)
       return;
@@ -105,7 +82,9 @@ class Application {
 
     this._packs[pack] = {
       entitiesClasses,
+      entitiesTextures,
       packetsClasses,
+      effectsTextures,
       items,
       tilesetData
     };
@@ -144,8 +123,6 @@ class Application {
 
       console.log(`Pack ${packId} loaded.`)
     }
-
-    console.log(this._packs);
   }
 
   getPack(packId) {
@@ -258,7 +235,7 @@ class Application {
 
     let player = this.context.getPlayer();
 
-    if (controlsHandler.horizontal != player.getDirection()[0] || controlsHandler.vertical != -player.getDirection()[1] || player.bSitting() != controlsHandler.bSitting || player.bAttacking() != controlsHandler.bAttacking) {
+    if (controlsHandler.horizontal != player.getDirection()[0] || controlsHandler.vertical != -player.getDirection()[1] || player.bCrawling() != controlsHandler.bSitting || player.bAttacking() != controlsHandler.bAttacking) {
       MovementUpdatePacket.clientSend(this.context.connectionHandler.getSocket(), 
         controlsHandler.bSitting, 
         controlsHandler.bAttacking, 

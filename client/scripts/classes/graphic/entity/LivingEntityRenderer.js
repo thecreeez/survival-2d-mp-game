@@ -1,42 +1,83 @@
+import MathUtils from "../../../../../core/utils/MathUtils.js";
 import EntityRenderer from "./EntityRenderer.js";
 
 class LivingEntityRenderer extends EntityRenderer {
   static Entity = null;
-  static size = [300, 300];
+  static size = [50, 50];
 
   static renderMain(ctx, entity) {
-    super.renderMain(ctx, entity);
-
-    ctx.drawImage(this.getCurrentSprite(entity), entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - this.size[1] / 2, this.size[0], this.size[1]);
+    if (!this.getCurrentSprite(entity)) {
+      return;
+    }
+    ctx.drawImage(this.getCurrentSprite(entity), entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - this.size[1], this.size[0], this.size[1]);
     ctx.font = `15px arial`;
     ctx.fillStyle = `white`;
-    //ctx.fillText(entity.getState(), entity.getPosition()[0], entity.getPosition()[1] - this.size[1] / 2);
   }
 
   static renderDebug(ctx, entity) {
-    //super.renderDebug(ctx, entity);
+    super.renderDebug(ctx, entity);
 
     ctx.font = `15px arial`;
     ctx.fillStyle = `white`
     ctx.textAlign = "center";
-    ctx.fillText(`[${entity.getPosition()}]`, entity.getPosition()[0], entity.getPosition()[1] - this.size[1] / 4)
+    ctx.fillText(`[${entity.getPosition()}]`, entity.getPosition()[0], entity.getPosition()[1] - this.size[1])
   }
 
   static updateEntity(entity, deltaTime) {
     super.updateEntity(entity, deltaTime);
-    entity.currentSpriteTime += deltaTime;
+    this.updateState(entity);
+    this.updateSpriteAnimation(entity, deltaTime);
+  }
 
-    let spriteSheet = this.getSpriteSheet(entity);
-    let frameDuration = this[`${entity.getState()}Speed`] ? this[`${entity.getState()}Speed`] : 100;
+  static updateSpriteAnimation(entity, deltaTime) {
+    let stateData = this[entity.getState()];
 
-    if (frameDuration < entity.currentSpriteTime) {
+    if (entity.currentSprite >= stateData.sprites && !stateData.repeatable) {
+      return;
+    }
+
+    let updateSprite = () => {
       entity.currentSprite++;
       entity.currentSpriteTime = 0;
+      entity.distanceAfterLastRender = 0;
 
-      if (entity.currentSprite >= spriteSheet.sheetSize[0]) {
-        entity.currentSprite = 0;
+      if (entity.currentSprite >= stateData.sprites) {
+        if (stateData.repeatable) {
+          entity.currentSprite = 0;
+        } else {
+          entity.currentSprite--;
+        }
       }
     }
+
+    entity.currentSpriteTime += deltaTime;
+
+    if (!stateData.durationType || stateData.durationType == "time") {
+      if (stateData.spriteDuration < entity.currentSpriteTime) {
+        updateSprite();
+      }
+    }
+
+    if (stateData.durationType == "distance") {
+      if (stateData.spriteDuration < entity.distanceAfterLastRender) {
+        updateSprite();
+      }
+    }
+  }
+
+  static updateState(entity) {
+    if (!entity.lastRenderedPosition) {
+      entity.lastRenderedPosition = entity.getPosition();
+      entity.distanceAfterLastRender = 0;
+    }
+
+    entity.distanceAfterLastRender += MathUtils.distanceBetween(entity.lastRenderedPosition, entity.getPosition());
+    entity.lastRenderedPosition = entity.getPosition();
+
+    if (entity.lastRenderedState != entity.getState()) {
+      entity.currentSprite = 0;
+    }
+    entity.lastRenderedState = entity.getState();
   }
 
   static getCurrentSprite(entity) {
@@ -45,7 +86,9 @@ class LivingEntityRenderer extends EntityRenderer {
       entity.currentSprite = 0;
     }
 
-    return spriteSheet.get(entity.currentSprite, entity.getRotation());
+    let flipped = entity.getRotation() == 1;
+
+    return spriteSheet.get(entity.currentSprite, entity.getStateId(), flipped);
   }
 }
 

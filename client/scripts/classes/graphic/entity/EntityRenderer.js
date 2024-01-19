@@ -9,11 +9,15 @@ class EntityRenderer {
   }
 
   static renderMain(ctx, entity) {
-
+    ctx.fillStyle = `black`
+    ctx.beginPath();
+    ctx.arc(entity.getPosition()[0], entity.getPosition()[1], 25, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   static renderDebug(ctx, entity) {
-    ctx.strokeRect(entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - this.size[1] / 2, this.size[0], this.size[1])
+    if (this.size)
+      ctx.strokeRect(entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - this.size[1], this.size[0], this.size[1])
   }
 
   static updateEntity(entity, deltaTime) {
@@ -21,16 +25,12 @@ class EntityRenderer {
   }
 
   static getSpriteSheet(entity) {
-    if (!entity.states) {
-      return PackAssetsRegistry.packs[entity.getPackId()].textures.entities[entity.getId()].default
-    }
-
-    if (!PackAssetsRegistry.packs[entity.getPackId()].textures.entities[entity.getId()][entity.getState()]) {
-      console.error(`Can't find state ${entity.getState()}`)
+    if (!PackAssetsRegistry.packs[entity.getPackId()].textures.entities[entity.getId()][entity.getTexture()]) {
+      console.error(`Can't find entity spriteset ${entity.getFullId()}`)
       return false;
     }
 
-    return PackAssetsRegistry.packs[entity.getPackId()].textures.entities[entity.getId()][entity.getState()];
+    return PackAssetsRegistry.packs[entity.getPackId()].textures.entities[entity.getId()][entity.getTexture()];
   }
 }
 

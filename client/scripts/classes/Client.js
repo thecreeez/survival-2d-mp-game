@@ -6,9 +6,8 @@ import Screen from "./graphic/Screen.js";
 
 import EntityRendererRegistry from "./graphic/EntityRendererRegistry.js";
 import PlayerEntityRenderer from "./graphic/entity/PlayerEntityRenderer.js";
+import SpiderEntityRenderer from "./graphic/entity/SpiderEntityRenderer.js";
 import ItemEntityRenderer from "./graphic/entity/ItemEntityRenderer.js";
-import OrcEntityRenderer from "./graphic/entity/OrcEntityRenderer.js";
-import EffectEntityRenderer from "./graphic/entity/EffectEntityRenderer.js";
 import PackAssetsRegistry from "./registry/PackAssetsRegistry.js";
 
 class Client {
@@ -65,9 +64,8 @@ class Client {
 
   register() {
     EntityRendererRegistry.register(PlayerEntityRenderer);
+    EntityRendererRegistry.register(SpiderEntityRenderer);
     EntityRendererRegistry.register(ItemEntityRenderer);
-    EntityRendererRegistry.register(OrcEntityRenderer);
-    EntityRendererRegistry.register(EffectEntityRenderer);
   }
 
   getControlsHandler() {

@@ -1,5 +1,5 @@
 class SpriteSheet {
-  constructor({ path, spriteSize = [32,32] }) {
+  constructor({ path, spriteSize = [32,32], makeAlsoReversed = false }) {
     this.img = new Image();
     this.img.src = path;
     this.spriteSize = spriteSize;
@@ -8,6 +8,9 @@ class SpriteSheet {
     this.loaded = false;
 
     this.canvases = [];
+    this.canvasesReversed = [];
+
+    this.haveReversedSprites = makeAlsoReversed;
 
     this.img.onload = () => {
       this.sheetSize = [Math.floor(this.img.width / this.spriteSize[0]), Math.floor(this.img.height / this.spriteSize[1])]
@@ -32,6 +35,28 @@ class SpriteSheet {
           }
 
           this.canvases[y][x] = canvas;
+
+          if (this.haveReversedSprites) {
+            canvas = document.createElement("canvas");
+            canvas.width = this.spriteSize[0];
+            canvas.height = this.spriteSize[1];
+
+            let ctx = canvas.getContext("2d");
+            ctx.scale(-1, 1);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(this.img, -x * this.spriteSize[0] - this.spriteSize[0], -y * this.spriteSize[1]);
+            ctx['imageSmoothingEnabled'] = false;       /* standard */
+            ctx['mozImageSmoothingEnabled'] = false;    /* Firefox */
+            ctx['oImageSmoothingEnabled'] = false;      /* Opera */
+            ctx['webkitImageSmoothingEnabled'] = false; /* Safari */
+            ctx['msImageSmoothingEnabled'] = false;     /* IE */
+
+            if (!this.canvasesReversed[y]) {
+              this.canvasesReversed[y] = []
+            }
+
+            this.canvasesReversed[y][x] = canvas;
+          }
         }
       }
 
@@ -39,7 +64,7 @@ class SpriteSheet {
     }
   }
 
-  get(x,y) {
+  get(x,y, reversed = false) {
     if (!this.loaded) {
       return false;
     }
@@ -54,6 +79,14 @@ class SpriteSheet {
       y = this.sheetSize[1] - 1;
     }
 
+    if (reversed && this.haveReversedSprites) {
+      return this.canvasesReversed[y][x];
+    }
+
+    if (reversed) {
+      console.error(`Can't get reversed. In constructor defined as no need to reverse.`)
+    }
+    
     return this.canvases[y][x];
   }
 

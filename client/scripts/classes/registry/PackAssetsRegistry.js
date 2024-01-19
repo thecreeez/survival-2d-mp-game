@@ -7,8 +7,8 @@ const DEFAULT_PATH_TO_ASSETS = `/client/assets`;
 class PackAssetsRegistry extends Registry {
   static packs = {};
 
-  static DEFAULT_ENTITY_SPRITE_SIZE = [32,32];
-  static DEFAULT_TILE_SPRITE_SIZE = [8, 8];
+  static DEFAULT_ENTITY_SPRITE_SIZE = [16,16];
+  static DEFAULT_TILE_SPRITE_SIZE = [16, 16];
 
   static register(packId, packData) {
     this.packs[packId] = {
@@ -20,23 +20,25 @@ class PackAssetsRegistry extends Registry {
 
     this._registerEntities(packId, packData);
     this._registerTileset(packId, packData);
+
+    console.log(this.packs);
   }
 
   static _registerEntities(packId, packData) {
+    let entities = this.packs[packId].textures.entities;
+
     packData.entitiesClasses.forEach((entityClass) => {
-      this.packs[packId].textures.entities[entityClass.empty().getId()] = {};
-      let entityTextureData = this.packs[packId].textures.entities[entityClass.empty().getId()];
+      let path = `${DEFAULT_PATH_TO_ASSETS}/${packId}/entities/${entityClass.id}/default.png`;
 
-      if (entityClass.empty().states) {
-        entityClass.empty().states.forEach((stateName) => {
-          let path = `${DEFAULT_PATH_TO_ASSETS}/${packId}/entities/${entityClass.id}/${stateName}.png`;
+      entities[entityClass.id] = {
+        default: new SpriteSheet({ path, spriteSize: this.DEFAULT_ENTITY_SPRITE_SIZE, makeAlsoReversed: true })
+      };
 
-          entityTextureData[stateName] = new SpriteSheet({ path, spriteSize: this.DEFAULT_ENTITY_SPRITE_SIZE });
+      if (packData.entitiesTextures[entityClass.id]) {
+        packData.entitiesTextures[entityClass.id].forEach(entityTexture => {
+          let path = `${DEFAULT_PATH_TO_ASSETS}/${packId}/entities/${entityClass.id}/${entityTexture}.png`;
+          entities[entityClass.id][entityTexture] = new SpriteSheet({ path, spriteSize: this.DEFAULT_ENTITY_SPRITE_SIZE, makeAlsoReversed: true });
         })
-      } else {
-        let path = `${DEFAULT_PATH_TO_ASSETS}/${packId}/entities/${entityClass.id}.png`;
-
-        entityTextureData["default"] = new SpriteSheet({ path, spriteSize: this.DEFAULT_ENTITY_SPRITE_SIZE });
       }
     });
   }

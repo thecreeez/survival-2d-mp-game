@@ -1,5 +1,6 @@
 import SharedData from "../../SharedData.js";
 import EntityRegistry from "../../registry/EntityRegistry.js";
+import MathUtils from "../../utils/MathUtils.js";
 
 class Entity {
   static id = `undefined_entity`;
@@ -8,11 +9,13 @@ class Entity {
   uuid = new SharedData("uuid", SharedData.STR_T, "uuid").makeImportant();
   world = new SharedData("world", SharedData.STR_T, "none");
   position = new SharedData("position", SharedData.POS_T, [0, 0]);
+  texture = new SharedData("texture", SharedData.STR_T, "default");
 
-  constructor({ position = [0,0], world = "core:spawn" } = {}) {
+  constructor({ position = [0,0], worldId = "core:spawn", customTexture = "default" } = {}) {
     this.position.setValue(position);
-    this.world.setValue(world);
+    this.world.setValue(worldId);
     this.uuid.setValue("UUID-RANDOM-" + Math.floor(Math.random() * 10000));
+    this.texture.setValue(customTexture);
   }
 
   static parse(data) {
@@ -141,24 +144,8 @@ class Entity {
     return datas;
   }
 
-  /**
-   * 
-   * @param {Entity} entity 
-   */
   distanceTo(entity) {
-    let vector = [...this.position.getValue()];
-
-    entity.position.getValue().forEach((value, i) => {
-      vector[i] = vector[i] - value;
-    })
-
-    let sum = 0;
-
-    vector.forEach((value) => {
-      sum += value * value;
-    })
-
-    return Math.sqrt(sum)
+    return MathUtils.distanceBetween(this.getPosition(), entity.getPosition())
   }
 
   getFullId() {
@@ -174,7 +161,11 @@ class Entity {
   }
 
   getPosition() {
-    return this.position.getValue();
+    return [...this.position.getValue()];
+  }
+
+  getTexture() {
+    return this.texture.getValue();
   }
 
   getPackId() {

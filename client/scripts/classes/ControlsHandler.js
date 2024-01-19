@@ -53,7 +53,7 @@ class ControlsHandler {
   }
 
   _updateSitting() {
-    if (this.keys["Shift"]) {
+    if (this.keys["ShiftLeft"]) {
       this.bSitting = true;
     } else {
       this.bSitting = false;

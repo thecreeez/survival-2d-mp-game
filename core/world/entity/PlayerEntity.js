@@ -5,34 +5,37 @@ class PlayerEntity extends LivingEntity {
   static id = `player_entity`;
 
   name = new SharedData("name", SharedData.STR_T, "Player");
-  b_sitting = new SharedData("b_sitting", SharedData.BUL_T, false).makeImportant();
+  b_crawling = new SharedData("b_crawling", SharedData.BUL_T, false)
   b_attacking = new SharedData("b_attacking", SharedData.BUL_T, false);
 
   // from client
   bWantAttack = false;
+  bWantToCrawl = false;
 
-  constructor({ name = "user", health = 100, position = [0, 0]} = {}) {
+  constructor({ name = "user", worldId = "core:spawn", health = 100, position = [0, 0]} = {}) {
     super({
       attackRange: 50,
       damage: 10,
       moveSpeed: 5,
       position,
-      health
+      health,
+      worldId,
+      states: ["idle", "walk", "crawl", "attack", "hurt", "dead", "throw"]
     });
     
     this.name.setValue(name);
-    this.b_sitting.setValue(false);
     this.direction.setValue([0,0]);
   }
 
   updateServerTick(application, deltaTick) {
     super.updateServerTick(application, deltaTick);
+
     if (this.bWantAttack != this.b_attacking.getValue()) {
       this.b_attacking.setValue(this.bWantAttack);
     }
 
-    if (this.canRotate(application)) {
-      this.updateServerRotation(application, deltaTick);
+    if (this.bWantToCrawl != this.b_crawling.getValue()) {
+      this.b_crawling.setValue(this.bWantToCrawl);
     }
 
     if (this.getState() == "attack") {
@@ -45,12 +48,24 @@ class PlayerEntity extends LivingEntity {
   updateServerState(application, deltaTick) {
     super.updateServerState(application, deltaTick);
 
+    if (this.getState() == "dead") {
+      return;
+    }
+
     if (this.bAttacking() && this.canAttack() && this.getState() != "attack") {
-      this.state.setValue("attack");
+      this.setState("attack")
     }
 
     if (this.getState() == "attack" && (!this.bAttacking() || !this.canAttack())) {
-      this.state.setValue("idle");
+      this.setState("idle")
+    }
+
+    if (this.getState() != "crawl" && this.bWantToCrawl && this.canCrawl()) {
+      this.setState("crawl");
+    }
+
+    if (this.getState() == "crawl" && (!this.bCrawling() || !this.canCrawl())) {
+      this.setState("idle");
     }
   }
 
@@ -100,8 +115,8 @@ class PlayerEntity extends LivingEntity {
     return this.attack_range.getValue();
   }
 
-  bSitting() {
-    return this.b_sitting.getValue();
+  bCrawling() {
+    return this.b_crawling.getValue();
   }
 
   bAttacking() {
@@ -114,6 +129,14 @@ class PlayerEntity extends LivingEntity {
 
   canMove(application) {
     return super.canMove(application) && !this.bAttacking();
+  }
+
+  canCrawl() {
+    if (this.getTimeAfterLastMove() < 50) {
+      return false;
+    }
+
+    return this.getState() == "idle" || this.getState() == "crawl";
   }
 }
 

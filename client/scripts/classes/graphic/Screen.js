@@ -2,6 +2,7 @@ import Client from "../Client.js";
 import EntityRendererRegistry from "./EntityRendererRegistry.js";
 import MapRenderer from "./MapRenderer.js";
 import SubtitleHandler from "./SubtitleHandler.js";
+import EntityRenderer from "./entity/EntityRenderer.js";
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -53,6 +54,7 @@ class Screen {
         return;
       }
 
+      EntityRenderer.render(ctx, entity);
       console.error(`Entity ${entity.getUuid()} ${entity.getId()} can't be rendered. Renderer has not be set.`);
     })
 

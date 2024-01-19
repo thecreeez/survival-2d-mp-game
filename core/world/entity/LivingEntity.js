@@ -22,21 +22,14 @@ class LivingEntity extends Entity {
   currentSprite = 0;
   currentSpriteTime = 0;
 
-  constructor({ health = 100, position = [0, 0], moveSpeed = 1, attackRange = 20, damage = 1 } = {}) {
-    super({ position })
+  constructor({ health = 100, worldId = "core:spawn", position = [0, 0], customTexture = "default", moveSpeed = 1, attackRange = 20, damage = 1, states = ["idle"] } = {}) {
+    super({ position, customTexture, worldId });
+
     this.health.setValue(health);
     this.move_speed.setValue(moveSpeed);
     this.attack_range.setValue(attackRange);
     this.damage.setValue(damage);
-
-    // Move all attack logic to this class
-    this.states = [
-      "idle",
-      "walk",
-      "hurt",
-      "attack",
-      "dead"
-    ]
+    this.states = states;
   }
 
   updateServerTick(application, deltaTick) {
@@ -49,6 +42,7 @@ class LivingEntity extends Entity {
     if (this.canMove(application) && (this.getDirection()[0] != 0 || this.getDirection()[1] != 0)) {
       let newPosition = [this.getPosition()[0] + this.getDirection()[0] * this.move_speed.getValue(), this.getPosition()[1] + this.getDirection()[1] * this.move_speed.getValue()];
 
+      // FIND WAY TO MOVE IT ONLY 1 POS IF HE CANT MOVE
       if (!this.canBeMovedTo(newPosition)) {
         return;
       }
@@ -63,26 +57,18 @@ class LivingEntity extends Entity {
       return;
     }
 
-    if (this.getDirection()[0] != 0) {
-      if (this.getDirection()[0] >= 0 && this.getDirection()[1] >= 0) {
-        this.rotation.setValue(0);
-      } else if (this.getDirection()[0] < 0 && this.getDirection()[1] >= 0) {
-        this.rotation.setValue(1);
-      }
+    if (this.getDirection()[0] > 0) {
+      this.rotation.setValue(0);
     }
 
-    if (this.getDirection()[1] != 0) {
-      if (this.getDirection()[0] >= 0 && this.getDirection()[1] < 0) {
-        this.rotation.setValue(2);
-      } else if (this.getDirection()[0] < 0 && this.getDirection()[1] < 0) {
-        this.rotation.setValue(3);
-      }
+    if (this.getDirection()[0] < 0) {
+      this.rotation.setValue(1);
     }
   }
 
   updateServerState(application, deltaTick) {
     if (this.getState() != "dead" && this.b_alive.getValue() == false) {
-      this.state.setValue("dead");
+      this.setState("dead");
       this.timeToDead = 1000;
     }
 
@@ -100,21 +86,21 @@ class LivingEntity extends Entity {
     }
 
     if (this.getTimeAfterLastMove() > 50 && this.getState() == "walk") {
-      this.state.setValue("idle");
+      this.setState("idle");
     }
 
     if (this.getTimeAfterLastMove() < 50 && this.getState() == "idle") {
-      this.state.setValue("walk");
+      this.setState("walk");
     }
 
     if (this.getState() == "hurt" && this.hurt_time.getValue() <= 0) {
-      this.state.setValue("idle");
+      this.setState("idle");
     }
   }
 
   handleDamage(entity, damage) {
     this.hurt_time.setValue(400);
-    this.state.setValue("hurt");
+    this.setState("hurt");
     this.health.setValue(this.health.getValue() - damage);
 
     if (this.getHealth() <= 0) {
@@ -125,8 +111,21 @@ class LivingEntity extends Entity {
     console.log(entity.getUuid()+" hurted "+this.getUuid()+" on "+damage+" damage");
   }
 
+  setState(state) {
+    if (this.states.indexOf(state) == -1) {
+      console.error(`Can't set state [${state}]. Not provided in states`)
+      return false;
+    }
+
+    this.state.setValue(state);
+  }
+
   getState() {
     return this.state.getValue();
+  }
+
+  getStateId() {
+    return this.states.indexOf(this.getState());
   }
 
   getHealth() {

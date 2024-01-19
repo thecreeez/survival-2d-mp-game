@@ -8,13 +8,15 @@ class EntityWithAI extends LivingEntity {
   target_type = new SharedData("target_type", SharedData.STR_T, "player_entity")
   target_vision_range = new SharedData("target_vision_range", SharedData.NUM_T, 500);
 
-  constructor({ position = [0, 0], health = 100, damage = 5, moveSpeed = 2, attackRange = 50, visionRange = 100, target_class = "core:player_entity" } = {}) {
+  constructor({ worldId = "core:spawn", position = [0, 0], health = 100, damage = 5, moveSpeed = 2, attackRange = 50, visionRange = 500, target_class = "core:player_entity", states = [] } = {}) {
     super({
       position,
+      worldId,
       health,
       damage,
       moveSpeed,
       attackRange,
+      states
     });
 
     this.target_type.setValue(target_class);
@@ -38,15 +40,15 @@ class EntityWithAI extends LivingEntity {
     this.updateDirection(application);
 
     if (this.getTargetEntity(application) && this.distanceTo(this.getTargetEntity(application)) < this.attack_range.getValue() && this.getState() != "attack") {
-      this.state.setValue("attack");
+      this.setState("attack");
     }
 
     if (!this.getTargetEntity(application) && this.getState() == "attack") {
-      this.state.setValue("idle");
+      this.setState("idle");
     }
 
     if (this.getTargetEntity(application) && this.distanceTo(this.getTargetEntity(application)) > this.attack_range.getValue() && this.getState() == "attack") {
-      this.state.setValue("idle");
+      this.setState("idle");
     }
   }
 
@@ -167,10 +169,7 @@ class EntityWithAI extends LivingEntity {
   }
 
   wannaMove(application) {
-    if (!this.getTargetEntity(application)) {
-      return false;
-    }
-
+    // Достаточно близко чтоб бить
     if (this.target_exist.getValue() && this.distanceTo(this.getTargetEntity(application)) < this.attack_range.getValue()) {
       return false;
     }
