@@ -4,7 +4,7 @@ import MapRenderer from "../MapRenderer.js";
 
 class ItemEntityRenderer extends EntityRenderer {
   static Entity = ItemEntity;
-  static size = [MapRenderer.cellSize, MapRenderer.cellSize];
+  static size = [MapRenderer.tileSize, MapRenderer.tileSize];
 
   static showed = false;
 

@@ -4,10 +4,12 @@ import ControlsHandler from "./ControlsHandler.js";
 import MapBuilder from "./graphic/MapBuilder.js";
 import Screen from "./graphic/Screen.js";
 
+import PlasmaProjectileEntityRenderer from "./graphic/entity/PlasmaProjectileEntityRenderer.js";
 import EntityRendererRegistry from "./graphic/EntityRendererRegistry.js";
 import PlayerEntityRenderer from "./graphic/entity/PlayerEntityRenderer.js";
 import SpiderEntityRenderer from "./graphic/entity/SpiderEntityRenderer.js";
 import ItemEntityRenderer from "./graphic/entity/ItemEntityRenderer.js";
+
 import PackAssetsRegistry from "./registry/PackAssetsRegistry.js";
 
 class Client {
@@ -66,6 +68,7 @@ class Client {
     EntityRendererRegistry.register(PlayerEntityRenderer);
     EntityRendererRegistry.register(SpiderEntityRenderer);
     EntityRendererRegistry.register(ItemEntityRenderer);
+    EntityRendererRegistry.register(PlasmaProjectileEntityRenderer);
   }
 
   getControlsHandler() {

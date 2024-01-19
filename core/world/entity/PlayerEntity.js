@@ -1,5 +1,6 @@
 import SharedData from "../../SharedData.js";
 import LivingEntity from "./LivingEntity.js";
+import PlasmaProjectileEntity from "./PlasmaProjectileEntity.js";
 
 class PlayerEntity extends LivingEntity {
   static id = `player_entity`;
@@ -38,11 +39,15 @@ class PlayerEntity extends LivingEntity {
       this.b_crawling.setValue(this.bWantToCrawl);
     }
 
-    if (this.getState() == "attack") {
-      this.getAttackableEntitiesInAttackRange(application).forEach((entity) => {
-        entity.handleDamage(this, this.damage.getValue());
-      })
+    if (this.getState() == "attack" && this.attackCooldown < 0) {
+      this.getWorld().application.spawnEntity(new PlasmaProjectileEntity({ position: this.getPosition(), worldId: this.getWorld().getId(), rotation: 0 }));
+      //this.getAttackableEntitiesInAttackRange(application).forEach((entity) => {
+      //  entity.handleDamage(this, this.damage.getValue());
+      //})
+      this.attackCooldown = this.attackCooldownMax;
     }
+
+    this.attackCooldown -= deltaTick;
   }
 
   updateServerState(application, deltaTick) {

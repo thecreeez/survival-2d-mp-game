@@ -7,6 +7,7 @@ import World from "./world/World.js";
 import SpiderEntity from "./world/entity/SpiderEntity.js";
 import ItemEntity from "./world/entity/ItemEntity.js";
 import PlayerEntity from "./world/entity/PlayerEntity.js";
+import PlasmaProjectileEntity from "./world/entity/PlasmaProjectileEntity.js";
 
 import EntityRegisterPacket from "./packets/EntityRegisterPacket.js";
 import EntityRemovePacket from "./packets/EntityRemovePacket.js";
@@ -19,6 +20,7 @@ import CommandInputPacket from "./packets/CommandInputPacket.js";
 import TilesRegisterPacket from "./packets/TilesRegisterPacket.js";
 import TilePlacePacket from "./packets/TilePlacePacket.js";
 import SaveRequestPacket from "./packets/SaveRequestPacket.js";
+import ParticleSpawnPacket from "./packets/ParticleSpawnPacket.js";
 
 import SharedData from "./SharedData.js";
 import Item from "./world/Item.js";
@@ -44,7 +46,8 @@ class Application {
       entitiesClasses: [
         ItemEntity,
         PlayerEntity,
-        SpiderEntity
+        SpiderEntity,
+        PlasmaProjectileEntity
       ],
       tilesetData: {
         "2:2": 1
@@ -63,9 +66,10 @@ class Application {
         TilesRegisterPacket,
         TilePlacePacket,
         MovementUpdatePacket,
-        CommandInputPacket
+        CommandInputPacket,
+        ParticleSpawnPacket,
       ],
-      effectsTextures: ["big-explosion", "big-fragments", "bullet-impacts", "hit-sparks", "hit-spatters", "laser-flash", "muzzle-flashes", "small-explosion", "small-fragments", "smoke"]
+      particlesTextures: ["big-explosion", "big-fragments", "bullet-impacts", "hit-sparks", "hit-spatters", "laser-flash", "muzzle-flashes", "small-explosion", "small-fragments", "smoke"]
     })
 
     this.loadPacks(); // Передвинуть это в сервер/клиент, чтоб можно было просунуть логику подгрузки
@@ -86,7 +90,7 @@ class Application {
     console.log(`Load app. Context: ${this.context.type}`);
   }
 
-  registerPack({ pack, entitiesClasses = [], entitiesTextures = {}, packetsClasses = [], items = [], tilesetData = {}, effectsTextures = [] }) {
+  registerPack({ pack, entitiesClasses = [], entitiesTextures = {}, packetsClasses = [], items = [], tilesetData = {}, particlesTextures = [] }) {
     if (this.state != 0) {
       console.error(`Packs cannot be registered on this state.`)
       return;
@@ -96,7 +100,7 @@ class Application {
       entitiesClasses,
       entitiesTextures,
       packetsClasses,
-      effectsTextures,
+      particlesTextures,
       items,
       tilesetData
     };
@@ -162,9 +166,13 @@ class Application {
     return worlds;
   }
 
-  spawnEntity(entity) {
+  spawnEntity(entity, context = EntityRegisterPacket.Contexts.world) {
     this._entities[entity.getUuid()] = entity;
     entity.application = this;
+
+    if (!this.isClient() && this.context.bLoaded) {
+      EntityRegisterPacket.serverSend(this.context.getPlayersConnections(), { context, serializedEntity: entity.serialize() })
+    }
 
     return entity;
   }
@@ -199,7 +207,6 @@ class Application {
         let newEntity = this.spawnEntity(new PlayerEntity({ name: this._entities[uuid].getName() }));
 
         this.context.getPlayerByName(newEntity.getName()).entity = newEntity;
-        EntityRegisterPacket.serverSend(this.context.getPlayersConnections(), { context: EntityRegisterPacket.Contexts.world, serializedEntity: newEntity.serialize() });
       }
     }
 

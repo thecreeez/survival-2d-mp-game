@@ -8,6 +8,13 @@ class World {
     this.application = false;
 
     this._tiles = {};
+    this._particles = [];
+  }
+
+  update(deltaTime) {
+    this._particles.forEach((particle) => {
+      particle.update(deltaTime);
+    })
   }
 
   save(tilePresets) {
@@ -81,6 +88,17 @@ class World {
     return this._tiles[`${Math.floor(pos[0] / tileSize)}:${Math.floor(pos[1] / tileSize)}`];
   }
 
+  spawnParticle(particle) {
+    particle.world = this;
+    particle.world_id.setValue(this.getId());
+
+    if (!this.application.isClient()) {
+      
+    }
+
+    this._particles.push(particle);
+  }
+
   setTile(tile) {
     this._tiles[`${tile.getPosition()[0]}:${tile.getPosition()[1]}`] = tile;
     tile.world = this;
@@ -96,6 +114,10 @@ class World {
 
   getEntities() {
     return Application.instance.getEntities().filter(entity => entity.getWorld() == this);
+  }
+
+  getParticles() {
+    return this._particles;
   }
 }
 

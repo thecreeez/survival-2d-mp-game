@@ -1,4 +1,5 @@
 import PackAssetsRegistry from "../../registry/PackAssetsRegistry.js";
+import MapRenderer from "../MapRenderer.js";
 
 class EntityRenderer {
   static Entity = null;
@@ -6,6 +7,13 @@ class EntityRenderer {
   static render(ctx, entity) {
     this.renderMain(ctx, entity);
     this.renderDebug(ctx, entity);
+
+    //if (this.size && !this.sizeFormed) {
+    //  this.size[0] = MapRenderer.tileSize;
+    //  this.size[1] = MapRenderer.tileSize;
+    //  this.sizeFormed = true;
+    //  console.log(this.size);
+    //}
   }
 
   static renderMain(ctx, entity) {
@@ -16,8 +24,15 @@ class EntityRenderer {
   }
 
   static renderDebug(ctx, entity) {
-    if (this.size)
+    if (this.size) {
+      ctx.strokeStyle = `black`;
       ctx.strokeRect(entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - this.size[1], this.size[0], this.size[1])
+    }
+
+    ctx.font = `15px arial`;
+    ctx.fillStyle = `white`
+    ctx.textAlign = "center";
+    ctx.fillText(`[${entity.getPosition()}]`, entity.getPosition()[0], entity.getPosition()[1] - this.size[1])
   }
 
   static updateEntity(entity, deltaTime) {

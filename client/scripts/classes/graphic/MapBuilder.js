@@ -127,9 +127,9 @@ class MapBuilder {
       ctx.save();
       ctx.translate(canvas.width / 2 - playerPos[0], canvas.height / 2 - playerPos[1]);
 
-      let cellPos = [tilePos[0] * MapRenderer.cellSize, tilePos[1] * MapRenderer.cellSize]
+      let cellPos = [tilePos[0] * MapRenderer.tileSize, tilePos[1] * MapRenderer.tileSize]
 
-      ctx.drawImage(tileTexture, cellPos[0], cellPos[1], MapRenderer.cellSize, MapRenderer.cellSize);
+      ctx.drawImage(tileTexture, cellPos[0], cellPos[1], MapRenderer.tileSize, MapRenderer.tileSize);
       ctx.restore();
     }
   }

@@ -1,6 +1,5 @@
 import Registry from "/core/utils/Registry.js";
 import SpriteSheet from "../graphic/SpriteSheet.js";
-import Application from "/core/Application.js";
 
 const DEFAULT_PATH_TO_ASSETS = `/client/assets`;
 
@@ -9,19 +8,20 @@ class PackAssetsRegistry extends Registry {
 
   static DEFAULT_ENTITY_SPRITE_SIZE = [16,16];
   static DEFAULT_TILE_SPRITE_SIZE = [16, 16];
+  static DEFAULT_PARTICLE_SPRITE_SIZE = [8, 8];
 
   static register(packId, packData) {
     this.packs[packId] = {
       textures: {
         entities: {},
-        tileset: false
+        particles: {},
+        tileset: false,
       }
     };
 
     this._registerEntities(packId, packData);
     this._registerTileset(packId, packData);
-
-    console.log(this.packs);
+    this._registerParticles(packId, packData)
   }
 
   static _registerEntities(packId, packData) {
@@ -48,6 +48,15 @@ class PackAssetsRegistry extends Registry {
     this.packs[packId].textures.tileset = new SpriteSheet({ path, spriteSize: this.DEFAULT_TILE_SPRITE_SIZE });
   }
 
+  static _registerParticles(packId, packData) {
+    let pathToParticles = `${DEFAULT_PATH_TO_ASSETS}/${packId}/particles`;
+
+    packData.particlesTextures.forEach((particleTexture) => {
+      let path = pathToParticles+`/${particleTexture}.png`;
+      this.packs[packId].textures.particles[particleTexture] = new SpriteSheet({ path, spriteSize: "height" });
+    })
+  }
+
   static getPacksId() {
     let packs = [];
 
@@ -58,13 +67,22 @@ class PackAssetsRegistry extends Registry {
     return packs
   }
 
-  static getTile(pack, pos, reversed = false) {
+  static getTile(pack, pos) {
     if (!PackAssetsRegistry.packs[pack]) {
       console.error(`Pack isn't exist...`);
       return false;
     }
 
-    return PackAssetsRegistry.packs[pack].textures.tileset.get(pos[0], pos[1], reversed);
+    return PackAssetsRegistry.packs[pack].textures.tileset.get(pos[0], pos[1]);
+  }
+
+  static getParticleSheet(pack, id) {
+    if (!PackAssetsRegistry.packs[pack]) {
+      console.error(`Pack isn't exist...`);
+      return false;
+    }
+
+    return PackAssetsRegistry.packs[pack].textures.particles[id];
   }
 }
 

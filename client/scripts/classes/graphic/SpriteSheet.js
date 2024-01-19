@@ -13,7 +13,17 @@ class SpriteSheet {
     this.haveReversedSprites = makeAlsoReversed;
 
     this.img.onload = () => {
-      this.sheetSize = [Math.floor(this.img.width / this.spriteSize[0]), Math.floor(this.img.height / this.spriteSize[1])]
+      if (spriteSize === "height") {
+        this.spriteSize = [this.img.height, this.img.height];
+      }
+
+      this.sheetSize = [Math.floor(this.img.width / this.spriteSize[0]), Math.floor(this.img.height / this.spriteSize[1])];
+
+      while (this.sheetSize[1] < 1) {
+        this.spriteSize[0] /= 2;
+        this.spriteSize[1] /= 2;
+        this.sheetSize = [Math.floor(this.img.width / this.spriteSize[0]), Math.floor(this.img.height / this.spriteSize[1])];
+      }
 
       for (let x = 0; x < this.sheetSize[0]; x++) {
         for (let y = 0; y < this.sheetSize[1]; y++) {

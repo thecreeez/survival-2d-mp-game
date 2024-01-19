@@ -1,8 +1,8 @@
 import Client from "../Client.js";
-import EntityRendererRegistry from "./EntityRendererRegistry.js";
+import PackAssetsRegistry from "../registry/PackAssetsRegistry.js";
 import MapRenderer from "./MapRenderer.js";
 import SubtitleHandler from "./SubtitleHandler.js";
-import EntityRenderer from "./entity/EntityRenderer.js";
+
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -60,22 +60,20 @@ class Screen {
     queue.push(...MapRenderer.getTilesToRender(canvas, ctx, client));
     queue = queue.sort((a, b) => a.getPosition()[1] > b.getPosition()[1] ? 1 : -1);
 
-    //queue.splice(0, queue.length / 1.01);
-
     queue.forEach((gameObject, i) => {
-      if (gameObject.type === "tile") {
-        ctx.drawImage(gameObject.sprite, gameObject.screenPos[0], gameObject.screenPos[1], MapRenderer.cellSize, MapRenderer.cellSize)
-      } else {
-        let entity = gameObject;
+      MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
+    })
 
-        if (EntityRendererRegistry[entity.getId()]) {
-          EntityRendererRegistry[entity.getId()].render(ctx, entity);
-          EntityRendererRegistry[entity.getId()].updateEntity(entity, deltaTime);
-          return;
+    client.getPlayer().getWorld().getParticles().forEach((particle) => {
+      let particleSheet = PackAssetsRegistry.getParticleSheet(particle.getPack(), particle.getId());
+      if (particle.currentSprite < particleSheet.sheetSize[0]) {
+        ctx.drawImage(particleSheet.get(particle.currentSprite, 0), particle.getPosition()[0], particle.getPosition()[1], MapRenderer.tileSize, MapRenderer.tileSize);
+        particle.currentSpriteTime += deltaTime;;
+
+        if (particle.currentSpriteTime > 50) {
+          particle.currentSprite++;
+          particle.currentSpriteTime = 0;
         }
-
-        EntityRenderer.render(ctx, entity);
-        console.error(`Entity ${entity.getUuid()} ${entity.getId()} can't be rendered. Renderer has not be set.`);
       }
     })
 
@@ -125,12 +123,12 @@ class Screen {
   }
 
   static getLocalTilePos(pos) {
-    return [Math.floor(pos[0] / MapRenderer.cellSize), Math.floor(pos[1] / MapRenderer.cellSize)];
+    return [Math.floor(pos[0] / MapRenderer.tileSize), Math.floor(pos[1] / MapRenderer.tileSize)];
   }
 
   static getGlobalTilePos(client, pos) {
     let playerPos = client.getPlayer().getPosition();
-    return [Math.floor((pos[0] + playerPos[0] - canvas.width / 2) / MapRenderer.cellSize), Math.floor((pos[1] + playerPos[1] - canvas.height / 2) / MapRenderer.cellSize)];
+    return [Math.floor((pos[0] + playerPos[0] - canvas.width / 2) / MapRenderer.tileSize), Math.floor((pos[1] + playerPos[1] - canvas.height / 2) / MapRenderer.tileSize)];
   }
 
   static toLocalPos(client, pos) {

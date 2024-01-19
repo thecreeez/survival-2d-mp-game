@@ -16,7 +16,8 @@ class Server {
   static http = http.createServer();
   static application = new Application(this);
 
-  static welcomeMessage = `Welcome to the game, {player} (Version {version})`
+  static welcomeMessage = `Welcome to the game, {player} (Version {version})`;
+  static bLoaded = false;
 
   static players = [];
 
@@ -24,6 +25,8 @@ class Server {
     this._initSocketEvents();
     this._initClientFiles();
     this.http.listen(3000);
+
+    Server.bLoaded = true;
 
     setInterval(() => {
       Application.instance.updateTick();

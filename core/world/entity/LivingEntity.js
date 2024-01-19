@@ -1,5 +1,8 @@
 import SharedData from "../../SharedData.js";
 import Entity from "./Entity.js";
+import Particle from "../Particle.js";
+
+import ParticleSpawnPacket from "../../packets/ParticleSpawnPacket.js";
 
 class LivingEntity extends Entity {
   health = new SharedData("health", SharedData.NUM_T, 100);
@@ -14,8 +17,12 @@ class LivingEntity extends Entity {
   damage = new SharedData("damage", SharedData.NUM_T, 1);
   b_alive = new SharedData("b_alive", SharedData.BUL_T, true);
 
+  effects = new SharedData("effects", SharedData.JSN_T, [])
+
   // SERVER
   lastTimeMove = 0;
+  attackCooldownMax = 400;
+  attackCooldown = 0;
   timeToDead = 1000;
 
   // Client
@@ -102,6 +109,14 @@ class LivingEntity extends Entity {
     this.hurt_time.setValue(400);
     this.setState("hurt");
     this.health.setValue(this.health.getValue() - damage);
+
+    if (!this.getWorld().application.isClient()) {
+      ParticleSpawnPacket.serverSend(
+        this.getWorld().application.context, 
+        this.getWorld().application.context.getPlayersConnections(), 
+        { particle: new Particle({ pack: "core", particleType: "small-explosion", worldId: this.getWorld().getId(), position: this.getPosition() }) }
+      );
+    }
 
     if (this.getHealth() <= 0) {
       this.b_alive.setValue(false);

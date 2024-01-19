@@ -1,4 +1,6 @@
+import Particle from "../world/Particle.js";
 import Tile from "../world/Tile.js";
+import ParticleSpawnPacket from "./ParticleSpawnPacket.js"
 
 class TilePlacePacket {
   static type = "tile_place_packet";
@@ -23,6 +25,7 @@ class TilePlacePacket {
       sheetPos
     }));
     TilePlacePacket.serverSend(server, server.getPlayersConnections(), { world, pos, pack, sheetPos, entity: server.getPlayerByConnection(conn).entity });
+    ParticleSpawnPacket.serverSend(server, server.getPlayersConnections(), { particle: new Particle({ pack: "core", worldId: invoker.getWorld().getId(), position: [pos[0] * 40, pos[1] * 40] }) })
   }
 
   static serverSend(server, users, { world, pos, pack, sheetPos, entity }) {
@@ -45,8 +48,6 @@ class TilePlacePacket {
       pos,
       sheetPos
     }));
-
-    //client.application.spawnEntity(new EffectEntity)
   }
 }
 

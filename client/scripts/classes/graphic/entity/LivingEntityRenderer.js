@@ -3,7 +3,7 @@ import EntityRenderer from "./EntityRenderer.js";
 
 class LivingEntityRenderer extends EntityRenderer {
   static Entity = null;
-  static size = [50, 50];
+  static size = [40, 40];
 
   static renderMain(ctx, entity) {
     if (!this.getCurrentSprite(entity)) {
@@ -16,11 +16,6 @@ class LivingEntityRenderer extends EntityRenderer {
 
   static renderDebug(ctx, entity) {
     super.renderDebug(ctx, entity);
-
-    ctx.font = `15px arial`;
-    ctx.fillStyle = `white`
-    ctx.textAlign = "center";
-    ctx.fillText(`[${entity.getPosition()}]`, entity.getPosition()[0], entity.getPosition()[1] - this.size[1])
   }
 
   static updateEntity(entity, deltaTime) {

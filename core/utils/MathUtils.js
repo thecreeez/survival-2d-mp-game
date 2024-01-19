@@ -14,6 +14,20 @@ class MathUtils {
 
     return Math.sqrt(sum)
   }
+  
+  static degreesToRadians(degrees) {
+    return degrees * (Math.PI / 180);
+  }
+
+  static radiansToDegrees(radians) {
+    return radians / (Math.PI / 180);
+  }
+
+  static getDistance(pos0, pos1) {
+    let position = [pos0[0] - pos1[0], pos0[1] - pos1[1]];
+
+    return Math.sqrt(Math.pow(position[0], 2) + Math.pow(position[1], 2));
+  }
 }
 
 export default MathUtils;
