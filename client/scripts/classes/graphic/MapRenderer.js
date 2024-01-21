@@ -1,9 +1,30 @@
+import MathUtils from "/core/utils/MathUtils.js";
 import PackAssetsRegistry from "../registry/PackAssetsRegistry.js";
 import EntityRendererRegistry from "./EntityRendererRegistry.js";
 import EntityRenderer from "./entity/EntityRenderer.js";
 
 class MapRenderer {
   static tileSize = 40;
+
+  static getEntitiesToRender(canvas, ctx, client) {
+
+    let gameObjects = [];
+
+    let nearEntities = client.application.getEntities().filter((entity) => entity.distanceTo(client.getPlayer()) < Math.max(canvas.width / 2, canvas.height / 2));
+
+    nearEntities.forEach((entity) => {
+      gameObjects.push({
+        entity,
+        type: "entity",
+
+        getPosition() {
+          return this.entity.getPosition();
+        }
+      })
+    })
+
+    return gameObjects;
+  }
 
   static getTilesToRender(canvas, ctx, client) {
     let cameraPos = client.getPlayer().getPosition();
@@ -54,39 +75,49 @@ class MapRenderer {
   }
 
   static renderGameObject(ctx, gameObject, deltaTime) {
-    if (gameObject.type === "tile") {
-      ctx.drawImage(gameObject.sprite, gameObject.screenPos[0], gameObject.screenPos[1], MapRenderer.tileSize, MapRenderer.tileSize)
-    } else if (gameObject.type === "particle") {
-      let particle = gameObject.particle;
-
-      let particleSheet = PackAssetsRegistry.getParticleSheet(particle.getPack(), particle.getId());
-
-      if (particle.currentSprite < particleSheet.sheetSize[0]) {
-        if (particle.attachedEntity) {
-          particle.position.setValue(particle.attachedEntity.getPosition());
-        }
-
-        ctx.drawImage(particleSheet.get(particle.currentSprite, 0), particle.getPosition()[0] - particle.getSize()[0] / 2, particle.getPosition()[1] - particle.getSize()[1], particle.getSize()[0], particle.getSize()[1]);
-        particle.currentSpriteTime += deltaTime;;
-
-        if (particle.currentSpriteTime > 50) {
-          particle.currentSprite++;
-          particle.currentSpriteTime = 0;
-        }
-      }
-    } else {
-      let entity = gameObject;
-
-      if (EntityRendererRegistry[entity.getId()]) {
-        EntityRendererRegistry[entity.getId()].render(ctx, entity);
-        EntityRendererRegistry[entity.getId()].updateEntity(entity, deltaTime);
-        EntityRendererRegistry[entity.getId()].endUpdateEntity(entity, deltaTime);
-        return;
-      }
-
-      EntityRenderer.render(ctx, entity);
-      console.error(`Entity ${entity.getUuid()} ${entity.getId()} can't be rendered. Renderer has not be set.`);
+    switch (gameObject.type) {
+      case "tile": return this._renderTileGameObject(ctx, gameObject, deltaTime);
+      case "particle": return this._renderParticleGameObject(ctx, gameObject, deltaTime);
+      case "entity": return this._renderEntityGameObject(ctx, gameObject, deltaTime);
+      default: return false;
     }
+  }
+
+  static _renderTileGameObject(ctx, gameObject, deltaTime) {
+    ctx.drawImage(gameObject.sprite, gameObject.screenPos[0], gameObject.screenPos[1], MapRenderer.tileSize, MapRenderer.tileSize)
+  }
+
+  static _renderParticleGameObject(ctx, gameObject, deltaTime) {
+    let particle = gameObject.particle;
+
+    let particleSheet = PackAssetsRegistry.getParticleSheet(particle.getPack(), particle.getId());
+
+    if (particle.currentSprite < particleSheet.sheetSize[0]) {
+      if (particle.attachedEntity) {
+        particle.position.setValue(particle.attachedEntity.getPosition());
+      }
+
+      ctx.drawImage(particleSheet.get(particle.currentSprite, 0), particle.getPosition()[0] - particle.getSize()[0] / 2, particle.getPosition()[1] - particle.getSize()[1], particle.getSize()[0], particle.getSize()[1]);
+      particle.currentSpriteTime += deltaTime;;
+
+      if (particle.currentSpriteTime > 50) {
+        particle.currentSprite++;
+        particle.currentSpriteTime = 0;
+      }
+    }
+  }
+
+  static _renderEntityGameObject(ctx, gameObject, deltaTime) {
+    let entity = gameObject.entity;
+
+    if (!EntityRendererRegistry[entity.getId()]) {
+      EntityRenderer.render(ctx, entity);
+      return false;
+    }
+
+    EntityRendererRegistry[entity.getId()].render(ctx, entity);
+    EntityRendererRegistry[entity.getId()].updateEntity(entity, deltaTime);
+    EntityRendererRegistry[entity.getId()].endUpdateEntity(entity, deltaTime);
   }
 
   static renderFloor(ctx, size, startFrom) {
