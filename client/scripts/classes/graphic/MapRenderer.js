@@ -84,7 +84,8 @@ class MapRenderer {
   }
 
   static _renderTileGameObject(ctx, gameObject, deltaTime) {
-    ctx.drawImage(gameObject.sprite, gameObject.screenPos[0], gameObject.screenPos[1], MapRenderer.tileSize, MapRenderer.tileSize)
+    ctx.drawImage(gameObject.sprite, gameObject.screenPos[0], gameObject.screenPos[1], MapRenderer.tileSize, MapRenderer.tileSize);
+    return true;
   }
 
   static _renderParticleGameObject(ctx, gameObject, deltaTime) {
@@ -104,7 +105,11 @@ class MapRenderer {
         particle.currentSprite++;
         particle.currentSpriteTime = 0;
       }
+
+      return true;
     }
+
+    return false;
   }
 
   static _renderEntityGameObject(ctx, gameObject, deltaTime) {
@@ -118,6 +123,8 @@ class MapRenderer {
     EntityRendererRegistry[entity.getId()].render(ctx, entity);
     EntityRendererRegistry[entity.getId()].updateEntity(entity, deltaTime);
     EntityRendererRegistry[entity.getId()].endUpdateEntity(entity, deltaTime);
+
+    return true;
   }
 
   static renderFloor(ctx, size, startFrom) {

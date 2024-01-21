@@ -25,7 +25,7 @@ class TilePlacePacket {
       sheetPos
     }));
     TilePlacePacket.serverSend(server, server.getPlayersConnections(), { world, pos, pack, sheetPos, entity: server.getPlayerByConnection(conn).entity });
-    ParticleSpawnPacket.serverSend(server, server.getPlayersConnections(), { particle: new Particle({ pack: "core", worldId: invoker.getWorld().getId(), position: [pos[0] * 40 + 20, pos[1] * 40 + 20] }) })
+    ParticleSpawnPacket.serverSend(server, server.getPlayersConnections(), { particle: new Particle({ pack: "core", worldId: invoker.getWorld().getId(), position: [pos[0] * 40 + 20, pos[1] * 40 + 40] }) })
   }
 
   static serverSend(server, users, { world, pos, pack, sheetPos, entity }) {

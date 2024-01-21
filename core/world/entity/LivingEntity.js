@@ -152,6 +152,10 @@ class LivingEntity extends Entity {
   }
 
   getMaxHealth() {
+    if (this.maxHealth < this.getHealth()) {
+      this.maxHealth = this.getHealth();
+    }
+
     return this.maxHealth;
   }
 

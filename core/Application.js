@@ -71,7 +71,7 @@ class Application {
       ],
       ui: [{
         name: "health-bars",
-        spriteSize: [48, 16]
+        spriteSize: [48, 6]
       }],
       particlesTextures: ["big-explosion", "big-fragments", "bullet-impacts", "hit-sparks", "hit-spatters", "laser-flash", "muzzle-flashes", "small-explosion", "small-fragments", "smoke"]
     })
