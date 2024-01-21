@@ -197,6 +197,10 @@ class LivingEntity extends Entity {
   canRotate(application) {
     return this.b_alive.getValue();
   }
+
+  isDead() {
+    return !this.b_alive.getValue();
+  }
 }
 
 export default LivingEntity;

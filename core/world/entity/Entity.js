@@ -175,6 +175,10 @@ class Entity {
   getPackId() {
     return this.constructor.pack;
   }
+
+  isDead() {
+    return false;
+  }
 }
 
 export default Entity;

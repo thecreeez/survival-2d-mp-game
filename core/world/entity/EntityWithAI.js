@@ -73,6 +73,9 @@ class EntityWithAI extends LivingEntity {
         if (this.distanceTo(otherEntity) > this.target_vision_range.getValue())
           return;
 
+        if (otherEntity.isDead())
+          return;
+
         possibleTarget = otherEntity;
       })
 
@@ -93,6 +96,12 @@ class EntityWithAI extends LivingEntity {
     }
 
     if (this.distanceTo(targetEntity) > this.target_vision_range.getValue()) {
+      this.target_exist.setValue(false);
+      this.target_uuid.setValue("no_target");
+      return;
+    }
+
+    if (targetEntity.isDead()) {
       this.target_exist.setValue(false);
       this.target_uuid.setValue("no_target");
       return;
@@ -161,6 +170,7 @@ class EntityWithAI extends LivingEntity {
       return;
     }
 
+    this.rotation.setValue(targetEntity.getPosition()[0] > this.getPosition()[0] ? 0 : 1);
     targetEntity.handleDamage(this, this.damage.getValue());
   }
 
@@ -178,7 +188,7 @@ class EntityWithAI extends LivingEntity {
   }
 
   canAttack(entity) {
-    if (!this.b_alive.getValue()) {
+    if (entity.isDead()) {
       return false;
     }
 
