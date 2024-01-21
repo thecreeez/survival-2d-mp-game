@@ -3,6 +3,7 @@ import PlayerEntity from "/core/world/entity/PlayerEntity.js";
 
 class PlayerEntityRenderer extends LivingEntityRenderer {
   static Entity = PlayerEntity;
+  static Type = "friend";
   
   static idle = {
     spriteDuration: 800,

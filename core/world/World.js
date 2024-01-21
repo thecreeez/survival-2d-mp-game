@@ -97,6 +97,8 @@ class World {
     }
 
     this._particles.push(particle);
+
+    return particle;
   }
 
   setTile(tile) {

@@ -1,5 +1,6 @@
 import PlasmaProjectileEntity from "/core/world/entity/PlasmaProjectileEntity.js";
 import EntityRenderer from "./EntityRenderer.js";
+import Particle from "/core/world/Particle.js";
 
 class PlasmaProjectileEntityRenderer extends EntityRenderer {
   static Entity = PlasmaProjectileEntity;
@@ -20,7 +21,13 @@ class PlasmaProjectileEntityRenderer extends EntityRenderer {
   }
 
   static updateEntity(entity, deltaTime) {
+    super.updateEntity(entity, deltaTime);
     entity.currentSpriteTime += deltaTime;
+
+    if (entity.distanceAfterLastRender > this.size[0] / 2) {
+      entity.getWorld().spawnParticle(new Particle({ pack: "core", worldId: entity.getWorld().getId(), position: entity.lastRenderedPosition, lifeTime: 2000, particleType: "smoke", size: [20,20] }));
+      entity.distanceAfterLastRender = 0;
+    }
 
     if (entity.currentSpriteTime >= PlasmaProjectileEntityRenderer.spriteTime && entity.currentSprite < this.getSpriteSheet(entity).sheetSize[0]) {
       entity.currentSprite++;

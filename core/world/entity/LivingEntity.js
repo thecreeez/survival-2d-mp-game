@@ -37,6 +37,8 @@ class LivingEntity extends Entity {
     this.attack_range.setValue(attackRange);
     this.damage.setValue(damage);
     this.states = states;
+
+    this.maxHealth = health;
   }
 
   updateServerTick(application, deltaTick) {
@@ -110,11 +112,13 @@ class LivingEntity extends Entity {
     this.setState("hurt");
     this.health.setValue(this.health.getValue() - damage);
 
+    let entitySize = 40;
+
     if (!this.getWorld().application.isClient()) {
       ParticleSpawnPacket.serverSend(
         this.getWorld().application.context, 
         this.getWorld().application.context.getPlayersConnections(), 
-        { particle: new Particle({ pack: "core", particleType: "small-explosion", worldId: this.getWorld().getId(), position: this.getPosition() }) }
+        { particle: new Particle({ pack: "core", particleType: "small-explosion", worldId: this.getWorld().getId(), position: [this.getPosition()[0], this.getPosition()[1] - entitySize / 2] }) }
       );
     }
 
@@ -145,6 +149,10 @@ class LivingEntity extends Entity {
 
   getHealth() {
     return this.health.getValue();
+  }
+
+  getMaxHealth() {
+    return this.maxHealth;
   }
 
   getDirection() {

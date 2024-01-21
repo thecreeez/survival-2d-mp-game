@@ -15,13 +15,15 @@ class PackAssetsRegistry extends Registry {
       textures: {
         entities: {},
         particles: {},
+        ui: {},
         tileset: false,
       }
     };
 
     this._registerEntities(packId, packData);
     this._registerTileset(packId, packData);
-    this._registerParticles(packId, packData)
+    this._registerParticles(packId, packData);
+    this._registerUI(packId, packData);
   }
 
   static _registerEntities(packId, packData) {
@@ -57,6 +59,15 @@ class PackAssetsRegistry extends Registry {
     })
   }
 
+  static _registerUI(packId, packData) {
+    let uis = this.packs[packId].textures.ui;
+    packData.ui.forEach((ui) => {
+      let path = `${DEFAULT_PATH_TO_ASSETS}/${packId}/ui/${ui.name}.png`;
+
+      uis[ui.name] = new SpriteSheet({ path, spriteSize: ui.spriteSize, makeAlsoReversed: true })
+    });
+  }
+
   static getPacksId() {
     let packs = [];
 
@@ -83,6 +94,15 @@ class PackAssetsRegistry extends Registry {
     }
 
     return PackAssetsRegistry.packs[pack].textures.particles[id];
+  }
+
+  static getUISheet(pack, id) {
+    if (!PackAssetsRegistry.packs[pack]) {
+      console.error(`Pack isn't exist...`);
+      return false;
+    }
+
+    return PackAssetsRegistry.packs[pack].textures.ui[id];
   }
 }
 

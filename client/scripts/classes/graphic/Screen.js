@@ -58,23 +58,11 @@ class Screen {
 
     let queue = client.application.getEntities()
     queue.push(...MapRenderer.getTilesToRender(canvas, ctx, client));
+    queue.push(...MapRenderer.getParticlesToRender(client.getPlayer().getWorld()));
     queue = queue.sort((a, b) => a.getPosition()[1] > b.getPosition()[1] ? 1 : -1);
 
     queue.forEach((gameObject, i) => {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
-    })
-
-    client.getPlayer().getWorld().getParticles().forEach((particle) => {
-      let particleSheet = PackAssetsRegistry.getParticleSheet(particle.getPack(), particle.getId());
-      if (particle.currentSprite < particleSheet.sheetSize[0]) {
-        ctx.drawImage(particleSheet.get(particle.currentSprite, 0), particle.getPosition()[0], particle.getPosition()[1], MapRenderer.tileSize, MapRenderer.tileSize);
-        particle.currentSpriteTime += deltaTime;;
-
-        if (particle.currentSpriteTime > 50) {
-          particle.currentSprite++;
-          particle.currentSpriteTime = 0;
-        }
-      }
     })
 
     ctx.restore();

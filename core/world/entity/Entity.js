@@ -53,7 +53,11 @@ class Entity {
     })
   }
 
-  updateServerTick() {
+  updateServerTick(application, deltaTime) {
+    
+  }
+
+  updateClientTick(application, deltaTime) {
     
   }
 

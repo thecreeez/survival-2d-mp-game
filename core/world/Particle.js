@@ -10,6 +10,7 @@ class Particle {
 
   life_time = new SharedData("life_time", SharedData.NUM_T, 1000);
   direction = new SharedData("direction", SharedData.POS_T, [0, 0]);
+  size = new SharedData("size", SharedData.POS_T, [40, 40]);
   randomOffset = new SharedData("randomOffset", SharedData.POS_T, [0, 0]);
 
   currentLifeTime = 0;
@@ -17,7 +18,9 @@ class Particle {
   currentSpriteTime = 0;
   currentSprite = 0;
 
-  constructor({ pack = "core", worldId = "core:spawn", position = [0,0], lifeTime = 1000, particleType = "smoke", direction = [0,0], randomOffset = [0,0] } = {}) {
+  attachedEntity = false
+
+  constructor({ pack = "core", worldId = "core:spawn", position = [0,0], lifeTime = 1000, particleType = "smoke", direction = [0,0], randomOffset = [0,0], size = [40,40] } = {}) {
     this.uuid.setValue("UUID-RANDOM-" + Math.floor(Math.random() * 10000));
     this.world_id.setValue(worldId);
     this.position.setValue(position);
@@ -28,6 +31,7 @@ class Particle {
     this.life_time.setValue(lifeTime);
     this.direction.setValue(direction);
     this.randomOffset.setValue(randomOffset);
+    this.size.setValue(size);
 
     this.currentLifeTime = lifeTime;
   }
@@ -79,6 +83,14 @@ class Particle {
 
   getPosition() {
     return this.position.getValue();
+  }
+
+  getSize() {
+    return this.size.getValue();
+  }
+
+  attach(entity) {
+    this.attachedEntity = entity;
   }
 }
 

@@ -1,4 +1,5 @@
 import MathUtils from "../../../../../core/utils/MathUtils.js";
+import PackAssetsRegistry from "../../registry/PackAssetsRegistry.js";
 import EntityRenderer from "./EntityRenderer.js";
 
 class LivingEntityRenderer extends EntityRenderer {
@@ -12,6 +13,10 @@ class LivingEntityRenderer extends EntityRenderer {
     ctx.drawImage(this.getCurrentSprite(entity), entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - this.size[1], this.size[0], this.size[1]);
     ctx.font = `15px arial`;
     ctx.fillStyle = `white`;
+
+    let healthBar = this.getHealthBar();
+
+    ctx.drawImage(healthBar, entity.getPosition()[0] - healthBar.width / 2, entity.getPosition()[1] - this.size[1] * 1.2, healthBar.width, healthBar.height);
   }
 
   static renderDebug(ctx, entity) {
@@ -21,10 +26,9 @@ class LivingEntityRenderer extends EntityRenderer {
   static updateEntity(entity, deltaTime) {
     super.updateEntity(entity, deltaTime);
     this.updateState(entity);
-    this.updateSpriteAnimation(entity, deltaTime);
   }
 
-  static updateSpriteAnimation(entity, deltaTime) {
+  static endUpdateEntity(entity, deltaTime) {
     let stateData = this[entity.getState()];
 
     if (entity.currentSprite >= stateData.sprites && !stateData.repeatable) {
@@ -61,14 +65,6 @@ class LivingEntityRenderer extends EntityRenderer {
   }
 
   static updateState(entity) {
-    if (!entity.lastRenderedPosition) {
-      entity.lastRenderedPosition = entity.getPosition();
-      entity.distanceAfterLastRender = 0;
-    }
-
-    entity.distanceAfterLastRender += MathUtils.distanceBetween(entity.lastRenderedPosition, entity.getPosition());
-    entity.lastRenderedPosition = entity.getPosition();
-
     if (entity.lastRenderedState != entity.getState()) {
       entity.currentSprite = 0;
     }
@@ -84,6 +80,14 @@ class LivingEntityRenderer extends EntityRenderer {
     let flipped = entity.getRotation() == 1;
 
     return spriteSheet.get(entity.currentSprite, entity.getStateId(), flipped);
+  }
+
+  static getHealthBar() {
+    switch (this.Type) {
+      case "friend": return PackAssetsRegistry.getUISheet("core", "health-bars").get(0, 0);
+      case "enemy": return PackAssetsRegistry.getUISheet("core", "health-bars").get(2, 0);
+      default: return PackAssetsRegistry.getUISheet("core", "health-bars").get(1, 0);
+    }
   }
 }
 

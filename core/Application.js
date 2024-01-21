@@ -69,6 +69,10 @@ class Application {
         CommandInputPacket,
         ParticleSpawnPacket,
       ],
+      ui: [{
+        name: "health-bars",
+        spriteSize: [48, 16]
+      }],
       particlesTextures: ["big-explosion", "big-fragments", "bullet-impacts", "hit-sparks", "hit-spatters", "laser-flash", "muzzle-flashes", "small-explosion", "small-fragments", "smoke"]
     })
 
@@ -90,7 +94,7 @@ class Application {
     console.log(`Load app. Context: ${this.context.type}`);
   }
 
-  registerPack({ pack, entitiesClasses = [], entitiesTextures = {}, packetsClasses = [], items = [], tilesetData = {}, particlesTextures = [] }) {
+  registerPack({ pack, entitiesClasses = [], entitiesTextures = {}, packetsClasses = [], items = [], tilesetData = {}, particlesTextures = [], ui = [] }) {
     if (this.state != 0) {
       console.error(`Packs cannot be registered on this state.`)
       return;
@@ -102,6 +106,7 @@ class Application {
       packetsClasses,
       particlesTextures,
       items,
+      ui,
       tilesetData
     };
   }
@@ -200,6 +205,9 @@ class Application {
   }
 
   removeEntity(uuid) {
+    if (!this._entities[uuid])
+      return console.error(`ERROR: ENTITY DELETED ALREADY.`)
+
     if (!this.isClient()) {
       EntityRemovePacket.serverSend(this.context.getPlayersConnections(), uuid);
 
@@ -263,6 +271,12 @@ class Application {
           -controlsHandler.vertical,
         ]
       );
+    }
+
+    let startTick = Date.now();
+
+    for (let uuid in this._entities) {
+      this._entities[uuid].updateClientTick(this, startTick - this.lastTickTime);
     }
   }
 
