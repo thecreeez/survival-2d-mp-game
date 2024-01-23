@@ -29,7 +29,7 @@ class PackAssetsRegistry extends Registry {
   static _registerEntities(packId, packData) {
     let entities = this.packs[packId].textures.entities;
 
-    packData.entitiesClasses.forEach((entityClass) => {
+    packData.entities.forEach((entityClass) => {
       let path = `${DEFAULT_PATH_TO_ASSETS}/${packId}/entities/${entityClass.id}/default.png`;
 
       entities[entityClass.id] = {
@@ -53,7 +53,7 @@ class PackAssetsRegistry extends Registry {
   static _registerParticles(packId, packData) {
     let pathToParticles = `${DEFAULT_PATH_TO_ASSETS}/${packId}/particles`;
 
-    packData.particlesTextures.forEach((particleTexture) => {
+    packData.particles.forEach((particleTexture) => {
       let path = pathToParticles+`/${particleTexture}.png`;
       this.packs[packId].textures.particles[particleTexture] = new SpriteSheet({ path, spriteSize: "height" });
     })

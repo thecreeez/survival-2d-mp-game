@@ -5,26 +5,16 @@ import ItemRegistry from "./registry/ItemRegistry.js";
 import World from "./world/World.js";
 
 import SpiderEntity from "./world/entity/SpiderEntity.js";
-import ItemEntity from "./world/entity/ItemEntity.js";
 import PlayerEntity from "./world/entity/PlayerEntity.js";
-import PlasmaProjectileEntity from "./world/entity/PlasmaProjectileEntity.js";
 
 import EntityRegisterPacket from "./packets/EntityRegisterPacket.js";
 import EntityRemovePacket from "./packets/EntityRemovePacket.js";
-import ClientErrorPacket from "./packets/ClientErrorPacket.js";
-import HandshakePacket from "./packets/HandshakePacket.js";
-import WelcomePacket from "./packets/WelcomePacket.js";
-import EntityUpdatePacket from "./packets/EntityUpdatePacket.js";
 import MovementUpdatePacket from "./packets/MovementUpdatePacket.js";
-import CommandInputPacket from "./packets/CommandInputPacket.js";
-import TilesRegisterPacket from "./packets/TilesRegisterPacket.js";
-import TilePlacePacket from "./packets/TilePlacePacket.js";
-import SaveRequestPacket from "./packets/SaveRequestPacket.js";
-import ParticleSpawnPacket from "./packets/ParticleSpawnPacket.js";
 
 import SharedData from "./SharedData.js";
-import Item from "./world/Item.js";
 import Tile from "./world/Tile.js";
+
+import core from "../packs/core.js";
 
 class Application {
   static version = 2;
@@ -41,40 +31,7 @@ class Application {
     this.context = context;
     this.lastTickTime = Date.now();
     
-    this.registerPack({
-      pack: `core`,
-      entitiesClasses: [
-        ItemEntity,
-        PlayerEntity,
-        SpiderEntity,
-        PlasmaProjectileEntity
-      ],
-      tilesetData: {
-        "2:2": 1
-      },
-      entitiesTextures: {
-        [PlayerEntity.id]: ["anti-tank", "grenadier", "leader", "machine-gunner", "radio-operator", "sniper"]
-      },
-      packetsClasses: [
-        HandshakePacket,
-        SaveRequestPacket,
-        WelcomePacket,
-        ClientErrorPacket,
-        EntityRegisterPacket,
-        EntityUpdatePacket,
-        EntityRemovePacket,
-        TilesRegisterPacket,
-        TilePlacePacket,
-        MovementUpdatePacket,
-        CommandInputPacket,
-        ParticleSpawnPacket,
-      ],
-      ui: [{
-        name: "health-bars",
-        spriteSize: [48, 6]
-      }],
-      particlesTextures: ["big-explosion", "big-fragments", "bullet-impacts", "hit-sparks", "hit-spatters", "laser-flash", "muzzle-flashes", "small-explosion", "small-fragments", "smoke"]
-    })
+    this.registerPack(core);
 
     this.loadPacks(); // Передвинуть это в сервер/клиент, чтоб можно было просунуть логику подгрузки
 
@@ -94,19 +51,20 @@ class Application {
     console.log(`Load app. Context: ${this.context.type}`);
   }
 
-  registerPack({ pack, entitiesClasses = [], entitiesTextures = {}, packetsClasses = [], items = [], tilesetData = {}, particlesTextures = [], ui = [] }) {
+  registerPack({ pack, entities = [], entitiesTextures = {}, packets = [], items = [], tilesetData = {}, particles = [], ui = [], props = [] }) {
     if (this.state != 0) {
       console.error(`Packs cannot be registered on this state.`)
       return;
     }
 
     this._packs[pack] = {
-      entitiesClasses,
+      entities,
       entitiesTextures,
-      packetsClasses,
-      particlesTextures,
+      packets,
+      particles,
       items,
       ui,
+      props,
       tilesetData
     };
   }
@@ -117,7 +75,7 @@ class Application {
     console.log(`Loading packs...`)
     for (let packId in this._packs) {
       console.log(`Pack ${packId} loading...`)
-      this._packs[packId].entitiesClasses.forEach((entityClass) => {
+      this._packs[packId].entities.forEach((entityClass) => {
         console.log(`Entity ${entityClass.id} registering...`)
         EntityRegistry.register(packId, entityClass.id, entityClass);
         entityClass.pack = `${packId}`;
@@ -125,7 +83,7 @@ class Application {
         entityClass.onRegister(this);
       })
 
-      this._packs[packId].packetsClasses.forEach((packetClass) => {
+      this._packs[packId].packets.forEach((packetClass) => {
         console.log(`Packet ${packetClass.type} registering...`);
         PacketRegistry.register(packId, packetClass.type, packetClass);
         packetClass.type = `${packId}:${packetClass.type}`;
@@ -135,6 +93,12 @@ class Application {
         console.log(`Item ${item.id} registering...`);
         ItemRegistry.register(packId, item.id, item);
         item.id = `${packId}:${item.id}`;
+      })
+
+      this._packs[packId].props.forEach((prop) => {
+        console.log(`Prop`, prop);
+        // TO-DO: Registration
+        //PropRegistry.register(packId, prop);
       })
 
       if (this.isClient()) {
