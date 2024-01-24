@@ -5,9 +5,10 @@ import EntityRenderer from "./entity/EntityRenderer.js";
 
 class MapRenderer {
   static tileSize = 40;
-  static lightTileSize = 40;
+  static lightTileSize = 20;
 
-  static maxLightLevel = 4;
+  static maxLightLevel = 16;
+  static minLightLevel = 0;
 
   static getEntitiesToRender(canvas, ctx, client) {
 
@@ -81,9 +82,9 @@ class MapRenderer {
             light = lightImpact;
           }
         })
-        ctx.fillStyle = `rgba(0,0,0,${1 - (light / MapRenderer.maxLightLevel)})`;
+        ctx.fillStyle = `rgba(0,0,0,${1 - (Math.max(light, MapRenderer.minLightLevel) / MapRenderer.maxLightLevel)})`;
 
-        ctx.fillRect(worldPos[0], worldPos[1], this.lightTileSize + 0.5, this.lightTileSize + 0.2);
+        ctx.fillRect(worldPos[0], worldPos[1], this.lightTileSize + 0.5, this.lightTileSize);
       }
     }
   }
@@ -134,7 +135,7 @@ class MapRenderer {
   }
 
   static _renderTileGameObject(ctx, gameObject, deltaTime) {
-    ctx.drawImage(gameObject.sprite, gameObject.screenPos[0], gameObject.screenPos[1], MapRenderer.tileSize, MapRenderer.tileSize);
+    ctx.drawImage(gameObject.sprite, gameObject.screenPos[0] - 0.5, gameObject.screenPos[1] - 0.5, MapRenderer.tileSize + 1, MapRenderer.tileSize + 1);
     return true;
   }
 
