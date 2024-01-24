@@ -15,15 +15,49 @@ class PackAssetsRegistry extends Registry {
       textures: {
         entities: {},
         particles: {},
+        props: {},
         ui: {},
         tileset: false,
+        propSet: false
       }
     };
 
+    this._registerProps(packId, packData);
     this._registerEntities(packId, packData);
     this._registerTileset(packId, packData);
     this._registerParticles(packId, packData);
     this._registerUI(packId, packData);
+  }
+
+  static _registerProps(packId, packData) {
+    let props = this.packs[packId].textures.props;
+
+    let path = `${DEFAULT_PATH_TO_ASSETS}/${packId}/props.png`;
+    let spriteSheet = new SpriteSheet({ path, spriteSize: this.DEFAULT_TILE_SPRITE_SIZE });
+
+    packData.props.forEach((prop) => {
+      props[prop.id] = prop;
+      
+      for (let stateId in props[prop.id].states) {
+        spriteSheet.onload((spriteSheet) => {
+          let state = props[prop.id].states[stateId];
+
+          let canvas = document.createElement("canvas");
+          let ctx = canvas.getContext("2d");
+
+          canvas.width = state.spriteSize[0] * this.DEFAULT_TILE_SPRITE_SIZE[0];
+          canvas.height = state.spriteSize[1] * this.DEFAULT_TILE_SPRITE_SIZE[1];
+
+          for (let w = 0; w < state.spriteSize[0]; w++) {
+            for (let h = 0; h < state.spriteSize[1]; h++) {
+              ctx.drawImage(spriteSheet.get(w, h), w * this.DEFAULT_TILE_SPRITE_SIZE[0], h * this.DEFAULT_TILE_SPRITE_SIZE[1]);
+            }
+          }
+
+          state.canvas = canvas;
+        })
+      }
+    })
   }
 
   static _registerEntities(packId, packData) {

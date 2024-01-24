@@ -12,6 +12,8 @@ class SpriteSheet {
 
     this.haveReversedSprites = makeAlsoReversed;
 
+    this._onloadListeners = [];
+
     this.img.onload = () => {
       if (spriteSize === "height") {
         this.spriteSize = [this.img.height, this.img.height];
@@ -71,6 +73,10 @@ class SpriteSheet {
       }
 
       this.loaded = true;
+
+      this._onloadListeners.forEach((func) => {
+        func(this);
+      })
     }
   }
 
@@ -108,6 +114,10 @@ class SpriteSheet {
         ctx.drawImage(this.get(x,y), x * 30, y * 30, 30, 30);
       }
     }
+  }
+
+  onload(func) {
+    this._onloadListeners.push(func);
   }
 }
 
