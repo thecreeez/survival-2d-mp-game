@@ -42,7 +42,9 @@ class Screen {
     if (!client.getPlayer())
       return;
 
-    this.renderWorld(client, deltaTime);
+    let startRenderTime = Date.now();
+
+    let amountOfRenderObjects = this.renderWorld(client, deltaTime);
 
     if (client.getMapBuilder().bEnabled) {
       client.getMapBuilder().render(ctx, deltaTime);
@@ -50,6 +52,11 @@ class Screen {
 
     this.renderLogs(client, deltaTime);
     SubtitleHandler.render(canvas, ctx);
+
+    this.renderNumber([10, canvas.height - 10], amountOfRenderObjects, 4);
+
+    // FPS
+    this.renderNumber([10, canvas.height - 40], Date.now() - startRenderTime, 2);
   }
 
   static renderWorld(client, deltaTime) {
@@ -67,6 +74,8 @@ class Screen {
     })
 
     ctx.restore();
+
+    return queue.length;
   }
 
   /**
@@ -128,6 +137,24 @@ class Screen {
   static toWorldPos(client, pos) {
     let playerPos = client.getPlayer().getPosition();
     return [pos[0] + playerPos[0] - canvas.width / 2, pos[1] + playerPos[1] - canvas.height / 2]
+  }
+
+  static renderNumber(position = [0,0], number, colorId = 0) {
+    let symbolSize = 20;
+    let uiNumberSheet = PackAssetsRegistry.getUISheet("core", "numbers");
+    ("" + number).split("").forEach((numberSymbol, i) => {
+      let fixedNumber = numberSymbol - 1 == -1 ? 9 : numberSymbol - 1;
+
+      if (numberSymbol == ".") {
+        fixedNumber = 11;
+      }
+
+      if (!uiNumberSheet.get(fixedNumber, colorId)) {
+        console.log(numberSymbol);
+      }
+
+      ctx.drawImage(uiNumberSheet.get(fixedNumber, colorId), position[0] + i * symbolSize + symbolSize, position[1] - symbolSize, symbolSize, symbolSize)
+    })
   }
 }
 

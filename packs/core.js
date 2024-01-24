@@ -1,6 +1,7 @@
 import PlasmaProjectileEntity from "../core/world/entity/PlasmaProjectileEntity.js";
 import PlayerEntity from "../core/world/entity/PlayerEntity.js";
 import SpiderEntity from "../core/world/entity/SpiderEntity.js";
+import PropEntity from "../core/world/entity/PropEntity.js";
 import ItemEntity from "../core/world/entity/ItemEntity.js";
 
 import EntityRegisterPacket from "../core/packets/EntityRegisterPacket.js";
@@ -16,12 +17,15 @@ import TilePlacePacket from "../core/packets/TilePlacePacket.js";
 import SaveRequestPacket from "../core/packets/SaveRequestPacket.js";
 import ParticleSpawnPacket from "../core/packets/ParticleSpawnPacket.js";
 
+import props from "./core_props.js";
+
 export default {
   pack: "core",
   entities: [
     ItemEntity,
     PlayerEntity,
     SpiderEntity,
+    PropEntity,
     PlasmaProjectileEntity
   ],
   entitiesTextures: {
@@ -41,26 +45,17 @@ export default {
     CommandInputPacket,
     ParticleSpawnPacket,
   ],
-  ui: [{
-    name: "health-bars",
-    spriteSize: [48, 6]
-  }],
-  props: [{
-    id: "lamp",
-    states: {
-      default: {
-        spritePos: [0, 0],
-        spriteSize: [2, 3],
-        worldSize: [80, 120],
-        tags: ["light-source"]
-      },
-      broken: {
-        spritePos: [2, 2],
-        spriteSize: [2, 1],
-        worldSize: [80, 40]
-      }
+  ui: [
+    {
+      name: "health-bars",
+      spriteSize: [48, 6]
+    }, 
+    {
+      name: "numbers",
+      spriteSize: [8, 8]
     }
-  }],
+  ],
+  props,
   particles: [
     "big-explosion", 
     "big-fragments", 

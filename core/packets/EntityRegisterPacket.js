@@ -31,8 +31,6 @@ class EntityRegisterPacket {
       client.addLog(`INFO`, `Player ${entity.getName()} joined to the game.`)
     }
 
-    client.addLog(`INFO`, `NEW ENTITY AT [${entity.getPosition()}]`)
-
     client.application.spawnEntity(entity);
   }
 }

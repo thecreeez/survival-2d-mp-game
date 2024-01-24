@@ -1,6 +1,7 @@
 import EntityRegistry from "./registry/EntityRegistry.js";
 import PacketRegistry from "./registry/PacketRegistry.js";
 import ItemRegistry from "./registry/ItemRegistry.js";
+import PropRegistry from "./registry/PropRegistry.js";
 
 import World from "./world/World.js";
 
@@ -15,6 +16,7 @@ import SharedData from "./SharedData.js";
 import Tile from "./world/Tile.js";
 
 import core from "../packs/core.js";
+import PropEntity from "./world/entity/PropEntity.js";
 
 class Application {
   static version = 2;
@@ -36,8 +38,6 @@ class Application {
     this.loadPacks(); // Передвинуть это в сервер/клиент, чтоб можно было просунуть логику подгрузки
 
     if (!this.isClient()) {
-      this.spawnEntity(new SpiderEntity({ position: [300, 300]}));
-
       for (let i = -20; i < 20; i++) {
         for (let j = -20; j < 20; j++) {
           this.getWorld("core:spawn").setTile(new Tile({ pack: "core", pos: [i,j], sheetPos: [0,1] }))
@@ -45,6 +45,20 @@ class Application {
       }
 
       this.getWorld("core:spawn").setTile(new Tile({ pack: "core", pos: [0, 0], sheetPos: [0, 0] }))
+
+      for (let i = -10; i < 10; i++) {
+        let state = "default";
+
+        if (Math.random() > 0.7) {
+          state = "broken";
+        }
+
+        this.spawnEntity(new PropEntity({ position: [80 * i, 0], state }));
+      }
+
+      this.spawnEntity(new PropEntity({ position: [120,120], propId: "red_car" }));
+      this.spawnEntity(new PropEntity({ position: [200, 120], propId: "red_car", state: "top" }));
+      this.spawnEntity(new SpiderEntity({ position: [600, 300] }));
     }
 
     Application.instance = this;
@@ -96,9 +110,7 @@ class Application {
       })
 
       this._packs[packId].props.forEach((prop) => {
-        console.log(`Prop`, prop);
-        // TO-DO: Registration
-        //PropRegistry.register(packId, prop);
+        PropRegistry.register(packId, prop.id, prop);
       })
 
       if (this.isClient()) {

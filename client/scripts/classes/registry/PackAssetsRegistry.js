@@ -42,6 +42,10 @@ class PackAssetsRegistry extends Registry {
         spriteSheet.onload((spriteSheet) => {
           let state = props[prop.id].states[stateId];
 
+          if (!state.worldSize) {
+            state.worldSize = prop.defaultWorldSize ? [...prop.defaultWorldSize] : [40,40];
+          }
+
           let canvas = document.createElement("canvas");
           let ctx = canvas.getContext("2d");
 
@@ -50,7 +54,7 @@ class PackAssetsRegistry extends Registry {
 
           for (let w = 0; w < state.spriteSize[0]; w++) {
             for (let h = 0; h < state.spriteSize[1]; h++) {
-              ctx.drawImage(spriteSheet.get(w, h), w * this.DEFAULT_TILE_SPRITE_SIZE[0], h * this.DEFAULT_TILE_SPRITE_SIZE[1]);
+              ctx.drawImage(spriteSheet.get(w + state.spritePos[0], h + state.spritePos[1]), w * this.DEFAULT_TILE_SPRITE_SIZE[0], h * this.DEFAULT_TILE_SPRITE_SIZE[1]);
             }
           }
 
@@ -64,6 +68,10 @@ class PackAssetsRegistry extends Registry {
     let entities = this.packs[packId].textures.entities;
 
     packData.entities.forEach((entityClass) => {
+      if (entityClass.customTextureBehavior) {
+        return;
+      }
+
       let path = `${DEFAULT_PATH_TO_ASSETS}/${packId}/entities/${entityClass.id}/default.png`;
 
       entities[entityClass.id] = {
@@ -137,6 +145,15 @@ class PackAssetsRegistry extends Registry {
     }
 
     return PackAssetsRegistry.packs[pack].textures.ui[id];
+  }
+
+  static getProp(pack, id, state) {
+    if (!PackAssetsRegistry.packs[pack]) {
+      console.error(`Pack isn't exist...`);
+      return false;
+    }
+
+    return PackAssetsRegistry.packs[pack].textures.props[id].states[state];
   }
 }
 

@@ -9,6 +9,7 @@ class LivingEntityRenderer extends EntityRenderer {
   static healthBarCanvas = document.createElement("canvas");
 
   static renderMain(ctx, entity) {
+    super.renderMain(ctx, entity);
     if (!this.getCurrentSprite(entity)) {
       return;
     }

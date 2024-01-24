@@ -9,6 +9,7 @@ import EntityRendererRegistry from "./graphic/EntityRendererRegistry.js";
 import PlayerEntityRenderer from "./graphic/entity/PlayerEntityRenderer.js";
 import SpiderEntityRenderer from "./graphic/entity/SpiderEntityRenderer.js";
 import ItemEntityRenderer from "./graphic/entity/ItemEntityRenderer.js";
+import PropEntityRenderer from "./graphic/entity/PropEntityRenderer.js";
 
 import PackAssetsRegistry from "./registry/PackAssetsRegistry.js";
 
@@ -23,8 +24,6 @@ class Client {
     this.connectionHandler = new ConnectionHandler(this, ip);
     this.controlsHandler = new ControlsHandler(this);
     this.mapBuilder = new MapBuilder(this);
-
-    this.mapBuilder.bEnabled = true;
 
     this.register();
 
@@ -69,6 +68,7 @@ class Client {
     EntityRendererRegistry.register(SpiderEntityRenderer);
     EntityRendererRegistry.register(ItemEntityRenderer);
     EntityRendererRegistry.register(PlasmaProjectileEntityRenderer);
+    EntityRendererRegistry.register(PropEntityRenderer);
   }
 
   getControlsHandler() {

@@ -8,19 +8,12 @@ class EntityRenderer {
   static render(ctx, entity) {
     this.renderMain(ctx, entity);
     //this.renderDebug(ctx, entity);
-
-    //if (this.size && !this.sizeFormed) {
-    //  this.size[0] = MapRenderer.tileSize;
-    //  this.size[1] = MapRenderer.tileSize;
-    //  this.sizeFormed = true;
-    //  console.log(this.size);
-    //}
   }
 
   static renderMain(ctx, entity) {
-    ctx.fillStyle = `black`
+    ctx.fillStyle = `red`
     ctx.beginPath();
-    ctx.arc(entity.getPosition()[0], entity.getPosition()[1], 25, 0, Math.PI * 2);
+    ctx.arc(entity.getPosition()[0], entity.getPosition()[1], 5, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -41,7 +34,6 @@ class EntityRenderer {
   }
 
   static endUpdateEntity(entity, deltaTime) {
-    //entity.distanceAfterLastRender = 0;
   }
 
   static getSpriteSheet(entity) {

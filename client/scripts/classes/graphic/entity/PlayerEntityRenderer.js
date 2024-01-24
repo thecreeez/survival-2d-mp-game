@@ -60,16 +60,19 @@ class PlayerEntityRenderer extends LivingEntityRenderer {
 
   static renderDebug(ctx, entity) {
     super.renderDebug(ctx, entity);
+  }
 
-    //let pos = [entity.getPosition()[0], entity.getPosition()[1] - entity.getAttackRange()];
-    //let size = [entity.getAttackRange(), entity.getAttackRange() * 2];
-//
-    //ctx.strokeStyle = `black`;
-    //if (entity.getLookingSide() == `left`) {
-    //  pos[0] -= entity.getAttackRange();
-    //}
-    //
-    //ctx.strokeRect(pos[0], pos[1], size[0], size[1])
+  // Deprecated
+  static renderAttackRange(ctx, entity) {
+    let pos = [entity.getPosition()[0], entity.getPosition()[1] - entity.getAttackRange()];
+    let size = [entity.getAttackRange(), entity.getAttackRange() * 2];
+
+    ctx.strokeStyle = `black`;
+    if (entity.getLookingSide() == `left`) {
+      pos[0] -= entity.getAttackRange();
+    }
+
+    ctx.strokeRect(pos[0], pos[1], size[0], size[1])
   }
 }
 

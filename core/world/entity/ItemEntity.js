@@ -5,6 +5,9 @@ import Entity from "./Entity.js";
 class ItemEntity extends Entity {
   static id = `item_entity`;
 
+  // Имеется своя система подгрузки текстур и не требуется использовать встроенную
+  static customTextureBehavior = true;
+
   item_id = new SharedData("item_id", SharedData.STR_T, "air")
   count = new SharedData("count", SharedData.NUM_T, 1)
 
