@@ -71,7 +71,9 @@ class MapRenderer {
       })
     })
 
-    return gameObjects;
+    let canvas = document.querySelector("canvas");
+
+    return gameObjects.filter((gameObject) => MathUtils.distanceBetween(gameObject.getPosition(), world.application.context.getPlayer().getPosition()) < Math.max(canvas.width / 2, canvas.height / 2));
   }
 
   static renderGameObject(ctx, gameObject, deltaTime) {
@@ -117,6 +119,7 @@ class MapRenderer {
 
     if (!EntityRendererRegistry[entity.getId()]) {
       EntityRenderer.render(ctx, entity);
+      console.error(`No Renderer file for [${entity.getFullId()}] entity.`);
       return false;
     }
 
