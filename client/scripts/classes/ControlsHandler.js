@@ -29,12 +29,17 @@ class ControlsHandler {
 
       let pos = [ev.clientX, ev.clientY];
 
-      if (this.client.mapBuilder.handleClick(pos))
+      if (this.client.mapBuilder.handleMouseUp(pos))
         return;
     }
 
     window.onmousedown = (ev) => {
       this.isMouseDown = true;
+
+      let pos = [ev.clientX, ev.clientY];
+
+      if (this.client.mapBuilder.handleMouseDown(pos))
+        return;
     }
   }
 

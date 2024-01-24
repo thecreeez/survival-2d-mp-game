@@ -14,6 +14,9 @@ class MapBuilder {
     this.selectedPos = [0,0];
     this.tilesets = PackAssetsRegistry.getPacksId();
 
+    this.mouseDownSelectedPos = [0,0]
+    this.mouseUpSelectedPos = [0,0];
+
     this.bEnabled = true;
 
     this.bPackSelectorOpened = true;
@@ -34,6 +37,10 @@ class MapBuilder {
   }
 
   render(ctx, deltaTime) {
+    if (!this.bEnabled) {
+      return;
+    }
+
     this.renderPackSelector(ctx);
     this.renderTileSelector(ctx);
     
@@ -94,42 +101,66 @@ class MapBuilder {
     ctx.fillRect(tilesetBackground[0], tilesetBackground[1], tilesetBackground[2], tilesetBackground[3])
     ctx.drawImage(tileset.img, tilesetBackground[0], tilesetBackground[1], tilesetBackground[2], tilesetBackground[3])
 
-    ctx.strokeStyle = `yellow`;
-    ctx.strokeRect(this.pos[0] + this.selectedPos[0] * this.cellSize, offsetHeight + this.selectedPos[1] * this.cellSize, this.cellSize, this.cellSize)
-
-    let mousePos = this.client.controlsHandler.mousePos;
+    this._renderSelection(ctx, tilesetBackground, offsetHeight);
 
     if (this._isItemInPos(tilesetBackground, this.client.controlsHandler.mousePos)) {
+      let mousePos = this.client.controlsHandler.mousePos;
       let localMousePos = [mousePos[0] - this.pos[0], mousePos[1] - offsetHeight];
-      let tilePos = [Math.floor(localMousePos[0] / this.cellSize), Math.floor(localMousePos[1] / this.cellSize)]
+      let mouseTilePos = [Math.floor(localMousePos[0] / this.cellSize), Math.floor(localMousePos[1] / this.cellSize)]
 
       ctx.strokeStyle = `green`;
-      ctx.strokeRect(this.pos[0] + tilePos[0] * this.cellSize, offsetHeight + tilePos[1] * this.cellSize, this.cellSize, this.cellSize);
+      ctx.strokeRect(this.pos[0] + mouseTilePos[0] * this.cellSize, offsetHeight + mouseTilePos[1] * this.cellSize, this.cellSize, this.cellSize);
 
       ctx.fillStyle = `white`;
-      ctx.fillText(`Hover: [${tilePos[0]},${tilePos[1]}]`, this.pos[0], tilesetBackground[1] + tilesetBackground[3] - this.fontSize - 6);
+      ctx.fillText(`Hover: [${mouseTilePos[0]},${mouseTilePos[1]}]`, this.pos[0], tilesetBackground[1] + tilesetBackground[3] - this.fontSize - 6);
     }
     ctx.fillStyle = `white`;
-    ctx.fillText(`Selected: [${this.selectedPos[0]},${this.selectedPos[1]}]`, this.pos[0], tilesetBackground[1] + tilesetBackground[3] - 3);
+    ctx.fillText(`Selected: [${this.mouseDownSelectedPos[0]},${this.mouseDownSelectedPos[1]}]`, this.pos[0], tilesetBackground[1] + tilesetBackground[3] - 3);
+  }
+
+  _renderSelection(ctx, tilesetBackground, offsetHeight) {
+    let mousePos = this.client.controlsHandler.mousePos;
+
+    let localMousePos = [mousePos[0] - this.pos[0], mousePos[1] - offsetHeight];
+    let mouseTilePos = [Math.floor(localMousePos[0] / this.cellSize), Math.floor(localMousePos[1] / this.cellSize)]
+    let mouseUpPos = this.client.controlsHandler.isMouseDown && this._isItemInPos(tilesetBackground, mousePos) ? mouseTilePos : this.mouseUpSelectedPos;
+
+    let xBounds = [Math.min(this.mouseDownSelectedPos[0], mouseUpPos[0]), Math.max(this.mouseDownSelectedPos[0], mouseUpPos[0])];
+    let yBounds = [Math.min(this.mouseDownSelectedPos[1], mouseUpPos[1]), Math.max(this.mouseDownSelectedPos[1], mouseUpPos[1])];
+
+    let sizeSelected = [xBounds[1] - xBounds[0] + 1, yBounds[1] - yBounds[0] + 1];
+
+    ctx.strokeStyle = `yellow`;
+    ctx.strokeRect(this.pos[0] + xBounds[0] * this.cellSize, offsetHeight + yBounds[0] * this.cellSize, this.cellSize * sizeSelected[0], this.cellSize * sizeSelected[1]);
   }
 
   renderTileOnMouse(ctx) {
     if (this.getCurrentTileset()) {
-      let tileTexture = this.getCurrentTileset().get(this.selectedPos[0], this.selectedPos[1]);
-
-      if (!tileTexture)
-        return console.error(this.selectedPos);
-
       let playerPos = this.client.getPlayer().getPosition();
       let mousePos = this.client.controlsHandler.mousePos;
-      let tilePos = Screen.getGlobalTilePos(this.client, mousePos);
 
       ctx.save();
+      ctx.globalAlpha = 0.7;
       ctx.translate(canvas.width / 2 - playerPos[0], canvas.height / 2 - playerPos[1]);
 
-      let cellPos = [tilePos[0] * MapRenderer.tileSize, tilePos[1] * MapRenderer.tileSize]
+      let xBounds = [Math.min(this.mouseDownSelectedPos[0], this.mouseUpSelectedPos[0]), Math.max(this.mouseDownSelectedPos[0], this.mouseUpSelectedPos[0])];
+      let yBounds = [Math.min(this.mouseDownSelectedPos[1], this.mouseUpSelectedPos[1]), Math.max(this.mouseDownSelectedPos[1], this.mouseUpSelectedPos[1])];
 
-      ctx.drawImage(tileTexture, cellPos[0], cellPos[1], MapRenderer.tileSize, MapRenderer.tileSize);
+      let tileTexture;
+      let tilePos;
+      let tileOnScreenPos;
+      for (let x = xBounds[0]; x <= xBounds[1]; x++) {
+        for (let y = yBounds[0]; y <= yBounds[1]; y++) {
+          tileTexture = this.getCurrentTileset().get(x, y);
+          tilePos = Screen.getGlobalTilePos(this.client, [mousePos[0] + (x - xBounds[0]) * MapRenderer.tileSize, mousePos[1] + (y - yBounds[0]) * MapRenderer.tileSize]);
+          tileOnScreenPos = [tilePos[0] * MapRenderer.tileSize, tilePos[1] * MapRenderer.tileSize];
+
+          if (!tileTexture)
+            return console.error(this.selectedPos);
+
+          ctx.drawImage(tileTexture, tileOnScreenPos[0], tileOnScreenPos[1], MapRenderer.tileSize, MapRenderer.tileSize);
+        }
+      }
       ctx.restore();
     }
   }
@@ -169,7 +200,21 @@ class MapBuilder {
     return this._isItemInPos(tilesetBackground, this.client.controlsHandler.mousePos);
   }
 
-  handleClick(pos) {
+  handleMouseUp(pos) {
+    if (!this.bEnabled)
+      return;
+
+    if (this.isMouseOnTileSelector()) {
+      let offsetHeight = this.pos[1] + this.fontSize + this.marginButton;
+
+      let localMousePos = [pos[0] - this.pos[0], pos[1] - offsetHeight];
+      let tilePos = [Math.floor(localMousePos[0] / this.cellSize), Math.floor(localMousePos[1] / this.cellSize)];
+      this.mouseUpSelectedPos = tilePos;
+      return;
+    }
+  }
+
+  handleMouseDown(pos) {
     if (!this.bEnabled)
       return;
 
@@ -196,15 +241,23 @@ class MapBuilder {
 
       let localMousePos = [pos[0] - this.pos[0], pos[1] - offsetHeight];
       let tilePos = [Math.floor(localMousePos[0] / this.cellSize), Math.floor(localMousePos[1] / this.cellSize)];
-      this.selectedPos = tilePos;
+      this.mouseDownSelectedPos = tilePos;
       return;
     }
 
     if (!this.getCurrentTileset())
       return;
 
-    let tilePos = Screen.getGlobalTilePos(this.client, pos);
-    TilePlacePacket.clientSend(this.client.connectionHandler.getSocket(), { pos: tilePos, pack: this.tilesets[this.selectedTilesetIndex], sheetPos: this.selectedPos });
+    let xBounds = [Math.min(this.mouseDownSelectedPos[0], this.mouseUpSelectedPos[0]), Math.max(this.mouseDownSelectedPos[0], this.mouseUpSelectedPos[0])];
+    let yBounds = [Math.min(this.mouseDownSelectedPos[1], this.mouseUpSelectedPos[1]), Math.max(this.mouseDownSelectedPos[1], this.mouseUpSelectedPos[1])];
+
+    let tilePos;
+    for (let x = xBounds[0]; x <= xBounds[1]; x++) {
+      for (let y = yBounds[0]; y <= yBounds[1]; y++) {
+        tilePos = Screen.getGlobalTilePos(this.client, [pos[0] + (x - xBounds[0]) * MapRenderer.tileSize, pos[1] + (y - yBounds[0]) * MapRenderer.tileSize]);
+        TilePlacePacket.clientSend(this.client.connectionHandler.getSocket(), { pos: tilePos, pack: this.tilesets[this.selectedTilesetIndex], sheetPos: [x,y] });
+      }
+    }
   }
 
   // item [x, y, width, height] pos [x,y]
