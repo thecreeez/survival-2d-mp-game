@@ -5,6 +5,9 @@ import EntityRenderer from "./entity/EntityRenderer.js";
 
 class MapRenderer {
   static tileSize = 40;
+  static lightTileSize = 40;
+
+  static maxLightLevel = 4;
 
   static getEntitiesToRender(canvas, ctx, client) {
 
@@ -54,6 +57,51 @@ class MapRenderer {
     }
 
     return tiles;
+  }
+
+  static renderLightTiles(canvas, ctx, client) {
+    let cameraPos = client.getPlayer().getPosition();
+
+    let size = [canvas.width / this.lightTileSize, canvas.height / this.lightTileSize];
+    let startFrom = [Math.floor((cameraPos[0] - canvas.width / 2) / this.lightTileSize), Math.floor((cameraPos[1] - canvas.height / 2) / this.lightTileSize)];
+
+    let lightSources = this.getLightSources(client);
+
+    for (let y = startFrom[1]; y < startFrom[1] + size[1] + 1; y += 1) {
+      for (let x = startFrom[0]; x < startFrom[0] + size[0] + 1; x += 1) {
+        let worldPos = [x * this.lightTileSize, y * this.lightTileSize]
+        
+        let light = 0;
+
+        lightSources.forEach((gameObject) => {
+          let lightSource = gameObject;
+          let lightImpact = MapRenderer.maxLightLevel - MathUtils.getDistance(worldPos, [lightSource.getPosition()[0] - MapRenderer.tileSize / 2, lightSource.getPosition()[1] - MapRenderer.tileSize / 2]) / MapRenderer.lightTileSize;
+
+          if (lightImpact > light) {
+            light = lightImpact;
+          }
+        })
+        ctx.fillStyle = `rgba(0,0,0,${1 - (light / MapRenderer.maxLightLevel)})`;
+
+        ctx.fillRect(worldPos[0], worldPos[1], this.lightTileSize + 0.5, this.lightTileSize + 0.2);
+      }
+    }
+  }
+
+  static getLightLevel(client, worldPos) {
+    let cameraPos = client.getPlayer().getPosition();
+    return MathUtils.getDistance(worldPos, [cameraPos[0] - 20, cameraPos[1] - 20]) / 300;
+  }
+
+  static getLightSources(client) {
+    let canvas = document.querySelector("canvas");
+
+    let gameObjects = this.getEntitiesToRender(canvas, canvas.getContext("2d"), client);
+
+    // All props with light-source tag;
+    gameObjects = gameObjects.filter(gameObject => gameObject.entity.getTags().indexOf("light-source") != -1);
+
+    return gameObjects;
   }
 
   static getParticlesToRender(world) {

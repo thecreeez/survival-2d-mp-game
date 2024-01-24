@@ -17,7 +17,7 @@ class MapBuilder {
     this.mouseDownSelectedPos = [0,0]
     this.mouseUpSelectedPos = [0,0];
 
-    this.bEnabled = true;
+    this.bEnabled = false;
 
     this.bPackSelectorOpened = true;
     this.bTileSelectorOpened = true;

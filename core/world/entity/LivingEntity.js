@@ -29,8 +29,8 @@ class LivingEntity extends Entity {
   currentSprite = 0;
   currentSpriteTime = 0;
 
-  constructor({ health = 100, worldId = "core:spawn", position = [0, 0], customTexture = "default", moveSpeed = 1, attackRange = 20, damage = 1, states = ["idle"] } = {}) {
-    super({ position, customTexture, worldId });
+  constructor({ health = 100, worldId = "core:spawn", position = [0, 0], customTexture = "default", moveSpeed = 1, attackRange = 20, damage = 1, states = ["idle"], tags = [] } = {}) {
+    super({ position, customTexture, worldId, tags });
 
     this.health.setValue(health);
     this.move_speed.setValue(moveSpeed);

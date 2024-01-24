@@ -21,7 +21,8 @@ class PlayerEntity extends LivingEntity {
       position,
       health,
       worldId,
-      states: ["idle", "walk", "crawl", "attack", "hurt", "dead", "throw"]
+      states: ["idle", "walk", "crawl", "attack", "hurt", "dead", "throw"],
+      tags: ["light-source"]
     });
     
     this.name.setValue(name);

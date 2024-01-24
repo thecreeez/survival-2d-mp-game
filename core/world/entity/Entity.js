@@ -11,11 +11,12 @@ class Entity {
   position = new SharedData("position", SharedData.POS_T, [0, 0]);
   texture = new SharedData("texture", SharedData.STR_T, "default");
 
-  constructor({ position = [0,0], worldId = "core:spawn", customTexture = "default" } = {}) {
+  constructor({ position = [0,0], worldId = "core:spawn", customTexture = "default", tags = [] } = {}) {
     this.position.setValue(position);
     this.world.setValue(worldId);
     this.uuid.setValue("UUID-RANDOM-" + Math.floor(Math.random() * 10000));
     this.texture.setValue(customTexture);
+    this.tags = tags;
   }
 
   static parse(data) {
@@ -178,6 +179,10 @@ class Entity {
 
   isDead() {
     return false;
+  }
+
+  getTags() {
+    return this.tags;
   }
 }
 

@@ -39,6 +39,24 @@ class PropEntity extends Entity {
   getState() {
     return this.state.getValue();
   }
+
+  getPropData() {
+    return PropRegistry.getById(this.getPackId(), this.getPropId());
+  }
+
+  getTags() {
+    let propData = PropRegistry.getById(this.getPackId(), this.getPropId());
+
+    if (propData.states[this.getState()].tags) {
+      return propData.states[this.getState()].tags;
+    }
+
+    if (propData.tags) {
+      return propData.tags;
+    }
+
+    return this.tags;
+  }
 }
 
 export default PropEntity;

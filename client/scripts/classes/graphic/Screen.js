@@ -18,6 +18,7 @@ ctx['msImageSmoothingEnabled'] = false;     /* IE */
 window.onresize = (ev) => {
   canvas.width = document.body.clientWidth;
   canvas.height = document.body.clientHeight;
+
   ctx['imageSmoothingEnabled'] = false;       /* standard */
   ctx['mozImageSmoothingEnabled'] = false;    /* Firefox */
   ctx['oImageSmoothingEnabled'] = false;      /* Opera */
@@ -56,7 +57,9 @@ class Screen {
     this.renderNumber([10, canvas.height - 10], amountOfRenderObjects, 4);
 
     // FPS
-    this.renderNumber([10, canvas.height - 40], Date.now() - startRenderTime, 2);
+    this.renderNumber([10, canvas.height - 40], deltaTime, 2);
+
+    this.renderText([10, canvas.height - 60], `DeltaTime: ${Date.now() - startRenderTime}`);
   }
 
   static renderWorld(client, deltaTime) {
@@ -73,6 +76,7 @@ class Screen {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
 
+    MapRenderer.renderLightTiles(canvas, ctx, client);
     ctx.restore();
 
     return queue.length;
@@ -156,6 +160,55 @@ class Screen {
       ctx.drawImage(uiNumberSheet.get(fixedNumber, colorId), position[0] + i * symbolSize + symbolSize, position[1] - symbolSize, symbolSize, symbolSize)
     })
   }
+
+  static renderText(position = [0,0], text) {
+    let symbolSize = 20;
+    let uiFontSheet = PackAssetsRegistry.getUISheet("core", "font");
+    text.split("").forEach((symbol, i) => {
+      let pos = getPosition(symbol);
+
+      ctx.drawImage(uiFontSheet.get(pos[0], pos[1]), position[0] + i * symbolSize * 0.9 + symbolSize, position[1] - symbolSize, symbolSize, symbolSize)
+    })
+  }
+}
+
+function getPosition(symbol) {
+  symbol = symbol.toUpperCase();
+  const POSITIONS = {
+    A: [0, 0],
+    B: [1, 0],
+    C: [2, 0],
+    D: [3, 0],
+    E: [4, 0],
+    F: [5, 0],
+    G: [6, 0],
+    H: [7, 0],
+
+    I: [0, 1],
+    J: [1, 1],
+    K: [2, 1],
+    L: [3, 1],
+    M: [4, 1],
+    N: [5, 1],
+    O: [6, 1],
+    P: [7, 1],
+
+    Q: [0, 2],
+    R: [1, 2],
+    S: [2, 2],
+    T: [3, 2],
+    U: [4, 2],
+    V: [5, 2],
+    W: [6, 2],
+    X: [7, 2],
+
+    Y: [0, 3],
+    Z: [1, 3],
+
+    "?": [7,7]
+  }
+
+  return POSITIONS[symbol] ? POSITIONS[symbol] : [7, 7];
 }
 
 export default Screen;

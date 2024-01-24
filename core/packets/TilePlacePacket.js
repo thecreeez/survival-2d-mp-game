@@ -43,6 +43,8 @@ class TilePlacePacket {
     let pack = args[5];
     let sheetPos = [args[6], args[7]];
 
+    let entity = client.application.getEntity(entityUuid);
+
     client.application.getWorld(worldId).setTile(new Tile({
       pack,
       pos,

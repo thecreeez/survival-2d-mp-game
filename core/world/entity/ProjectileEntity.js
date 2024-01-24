@@ -12,8 +12,8 @@ class ProjectileEntity extends Entity {
 
   distanceTraveled = 0;
 
-  constructor({ position = [0, 0], worldId = "core:spawn", rotation = 90, moveSpeed = 3, maxDistance = 1000 } = {}) {
-    super({ position, worldId });
+  constructor({ position = [0, 0], worldId = "core:spawn", rotation = 90, moveSpeed = 3, maxDistance = 1000, tags = [] } = {}) {
+    super({ position, worldId, tags });
 
     this.direction.setValue(this.getDirectionByRotation(rotation));
     this.move_speed.setValue(moveSpeed);
