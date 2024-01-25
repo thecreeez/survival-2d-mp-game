@@ -36,6 +36,10 @@ class LivingEntityRenderer extends EntityRenderer {
       return;
     }
 
+    if (entity.lastRenderUpdate) {
+      deltaTime = Date.now() - entity.lastRenderUpdate;
+    }
+
     let updateSprite = () => {
       entity.currentSprite++;
       entity.currentSpriteTime = 0;
@@ -63,6 +67,8 @@ class LivingEntityRenderer extends EntityRenderer {
         updateSprite();
       }
     }
+
+    entity.lastRenderUpdate = Date.now();
   }
 
   static updateState(entity) {
