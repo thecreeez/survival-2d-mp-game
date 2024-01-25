@@ -119,7 +119,7 @@ class MapRenderer {
       let lightColor = lightData.lightColor;
       let worldPos = lightData.worldPos;
 
-      ctx.fillStyle = `rgba(${lightColor[0]}, ${lightColor[1]}, ${lightColor[2]},${(light / MapRenderer.maxLightLevel)})`;
+      ctx.fillStyle = `rgba(${lightColor[0] / 2}, ${lightColor[1] / 2}, ${lightColor[2] / 2},${Math.min((light / MapRenderer.maxLightLevel) - 0.2), 0.3})`;
       ctx.fillRect(worldPos[0], worldPos[1], MapRenderer.lightTileSize + 0.5, MapRenderer.lightTileSize);
     })
   }

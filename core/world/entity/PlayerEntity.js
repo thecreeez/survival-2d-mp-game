@@ -22,7 +22,7 @@ class PlayerEntity extends LivingEntity {
       health,
       worldId,
       states: ["idle", "walk", "crawl", "attack", "hurt", "dead", "throw"],
-      tags: ["light-source", "light-color:0,120,0", "light-level:15"],
+      tags: ["light-source", "light-color:0,120,0", "light-level:7"],
     });
     
     this.name.setValue(name);

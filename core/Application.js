@@ -50,7 +50,7 @@ class Application {
         let state = "default";
 
         if (Math.random() > 0.7) {
-          state = "broken";
+          state = "blue";
         }
 
         this.spawnEntity(new PropEntity({ position: [80 * i, 0], state }));

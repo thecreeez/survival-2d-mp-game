@@ -6,12 +6,12 @@ export default [
       default: {
         spritePos: [0, 0],
         spriteSize: [2, 3],
-        tags: ["light-source", "light-color:120,0,120", "light-level:10"],
+        tags: ["light-source", "light-color:120,0,120", "light-level:16"],
       },
       blue: {
         spritePos: [0, 0],
         spriteSize: [2, 3],
-        tags: ["light-source", "light-color:0,120,0", "light-level:10"],
+        tags: ["light-source", "light-color:255,0,0", "light-level:16"],
       },
       broken: {
         spritePos: [2, 2],

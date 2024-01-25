@@ -57,7 +57,7 @@ class Screen {
     this.renderNumber([10, canvas.height - 10], amountOfRenderObjects, 4);
 
     // FPS
-    this.renderNumber([10, canvas.height - 40], deltaTime, 2);
+    this.renderNumber([10, canvas.height - 40], Math.floor(1000 / (Date.now() - startRenderTime)), 2);
 
     this.renderText([10, canvas.height - 60], `DeltaTime: ${Date.now() - startRenderTime}`);
   }
