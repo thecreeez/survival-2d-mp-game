@@ -66,17 +66,27 @@ class Screen {
     ctx.save();
     ctx.translate(canvas.width / 2 - client.getPlayer().getPosition()[0], canvas.height / 2 - client.getPlayer().getPosition()[1]);
 
+    let lightMap = MapRenderer.getLightMap(canvas, ctx, client);
+
+    // Tiles
+    MapRenderer.getTilesToRender(canvas, ctx, client).forEach((gameObject) => {
+      MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
+    })
+
+    MapRenderer.renderLightSources(ctx, lightMap);
+
     let queue = []
     queue.push(...MapRenderer.getEntitiesToRender(canvas, ctx, client));
-    queue.push(...MapRenderer.getTilesToRender(canvas, ctx, client));
     queue.push(...MapRenderer.getParticlesToRender(client.getPlayer().getWorld()));
     queue = queue.sort((a, b) => a.getPosition()[1] > b.getPosition()[1] ? 1 : -1);
 
+    // Entities & Particles
     queue.forEach((gameObject, i) => {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
 
-    MapRenderer.renderLightTiles(canvas, ctx, client);
+    MapRenderer.renderFog(ctx, lightMap);
+
     ctx.restore();
 
     return queue.length;
