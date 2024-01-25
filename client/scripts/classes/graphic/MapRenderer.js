@@ -5,8 +5,7 @@ import EntityRenderer from "./entity/EntityRenderer.js";
 
 class MapRenderer {
   static tileSize = 40;
-  static lightPerTile = 4;
-  static lightTileSize = MapRenderer.tileSize / MapRenderer.lightPerTile * 2;
+  static lightTileSize = 20;
 
   static maxLightLevel = 16;
   static minLightLevel = 0;
@@ -81,7 +80,7 @@ class MapRenderer {
 
         lightSources.forEach((gameObject) => {
           let lightSource = gameObject;
-          let lightImpact = lightSource.lightLevel - MathUtils.getDistance(worldPos, [lightSource.getPosition()[0], lightSource.getPosition()[1] - MapRenderer.tileSize / 3]) / MapRenderer.lightTileSize;
+          let lightImpact = lightSource.lightLevel - MathUtils.getDistance(worldPos, [lightSource.getPosition()[0], lightSource.getPosition()[1] - MapRenderer.tileSize / 3]) / (MapRenderer.tileSize);
 
           if (lightImpact > light) {
             light = lightImpact;
