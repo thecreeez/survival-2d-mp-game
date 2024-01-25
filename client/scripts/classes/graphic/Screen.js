@@ -68,8 +68,10 @@ class Screen {
 
     let lightMap = MapRenderer.getLightMap(canvas, ctx, client);
 
+    let tilesQueue = MapRenderer.getTilesToRender(canvas, ctx, client);
+
     // Tiles
-    MapRenderer.getTilesToRender(canvas, ctx, client).forEach((gameObject) => {
+    tilesQueue.forEach((gameObject) => {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
 
@@ -89,7 +91,7 @@ class Screen {
 
     ctx.restore();
 
-    return queue.length;
+    return queue.length + tilesQueue.length;
   }
 
   /**
