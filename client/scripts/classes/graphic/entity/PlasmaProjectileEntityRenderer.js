@@ -6,7 +6,7 @@ class PlasmaProjectileEntityRenderer extends EntityRenderer {
   static Entity = PlasmaProjectileEntity;
   static size = [20, 20];
 
-  static spriteTime = 50;
+  static spriteTime = 100;
 
   static renderMain(ctx, entity) {
     if (!this.getSpriteSheet(entity)) {
@@ -22,7 +22,13 @@ class PlasmaProjectileEntityRenderer extends EntityRenderer {
 
   static updateEntity(entity, deltaTime) {
     super.updateEntity(entity, deltaTime);
+
+    if (entity.lastTimeRendered) {
+      deltaTime = Date.now() - entity.lastTimeRendered;
+    }
+
     entity.currentSpriteTime += deltaTime;
+    entity.lastTimeRendered = Date.now();
 
     if (entity.distanceAfterLastRender > this.size[0] / 2) {
       entity.getWorld().spawnParticle(new Particle({ pack: "core", worldId: entity.getWorld().getId(), position: entity.lastRenderedPosition, lifeTime: 2000, particleType: "smoke", size: [20,20] }));
