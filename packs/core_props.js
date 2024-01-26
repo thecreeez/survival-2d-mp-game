@@ -119,6 +119,7 @@ export default [
         spritePos: [6, 8],
         spriteSize: [2, 2],
       }
-    }
+    },
+    onDamage: "death/spawn_particle:core:big-fragments"
   },
 ]

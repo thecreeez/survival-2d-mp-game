@@ -19,8 +19,12 @@ class PlasmaProjectileEntity extends ProjectileEntity {
 
     let handleSuccess = entity.handleDamage(this.getOwner(), this.damage.getValue());
 
-    if (handleSuccess)
+    if (handleSuccess) {
+      let direction = [entity.getPosition()[0] - this.getPosition()[0], entity.getPosition()[1] - this.getPosition()[1]]
+
+      entity.position.setValue([entity.getPosition()[0] + direction[0] / 5, entity.getPosition()[1] + direction[1] / 5]);
       this.getWorld().application.removeEntity(this.getUuid());
+    }
   }
 }
 

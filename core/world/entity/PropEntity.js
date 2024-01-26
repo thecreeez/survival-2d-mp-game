@@ -84,6 +84,7 @@ class PropEntity extends Entity {
             ParticleSpawnPacket.serverSend(server, server.getPlayersConnections(), { particle })
             return;
           }
+          case "death": this.getWorld().application.removeEntity(this.getUuid()); return;
         }
       })
 
