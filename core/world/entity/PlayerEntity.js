@@ -6,12 +6,15 @@ class PlayerEntity extends LivingEntity {
   static id = `player_entity`;
 
   name = new SharedData("name", SharedData.STR_T, "Player");
-  b_crawling = new SharedData("b_crawling", SharedData.BUL_T, false)
+  b_crawling = new SharedData("b_crawling", SharedData.BUL_T, false);
   b_attacking = new SharedData("b_attacking", SharedData.BUL_T, false);
+
+  aim_rotation = new SharedData("aim_rotation", SharedData.NUM_T, 0);
 
   // from client
   bWantAttack = false;
   bWantToCrawl = false;
+  aimRotationFromClient = 0;
 
   constructor({ name = "user", worldId = "core:spawn", health = 100, position = [0, 0]} = {}) {
     super({
@@ -40,11 +43,12 @@ class PlayerEntity extends LivingEntity {
       this.b_crawling.setValue(this.bWantToCrawl);
     }
 
+    if (this.aimRotationFromClient != this.aim_rotation.getValue()) {
+      this.aim_rotation.setValue(this.aimRotationFromClient);
+    }
+
     if (this.getState() == "attack" && this.attackCooldown < 0) {
-      this.getWorld().application.spawnEntity(new PlasmaProjectileEntity({ position: this.getPosition(), worldId: this.getWorld().getId(), rotation: 0 }));
-      //this.getAttackableEntitiesInAttackRange(application).forEach((entity) => {
-      //  entity.handleDamage(this, this.damage.getValue());
-      //})
+      this.getWorld().application.spawnEntity(new PlasmaProjectileEntity({ position: this.getPosition(), worldId: this.getWorld().getId(), rotation: this.aim_rotation.getValue() }));
       this.attackCooldown = this.attackCooldownMax;
     }
 
@@ -72,6 +76,18 @@ class PlayerEntity extends LivingEntity {
 
     if (this.getState() == "crawl" && (!this.bCrawling() || !this.canCrawl())) {
       this.setState("idle");
+    }
+  }
+
+  updateServerRotation(application, deltaTick) {
+    if (!this.canRotate(application)) {
+      return;
+    }
+
+    if (this.getAimRotation() > 90 && this.getAimRotation() < 270) {
+      this.rotation.setValue(1);
+    } else {
+      this.rotation.setValue(0);
     }
   }
 
@@ -115,6 +131,10 @@ class PlayerEntity extends LivingEntity {
 
   getName() {
     return this.name.getValue();
+  }
+
+  getAimRotation() {
+    return this.aim_rotation.getValue();
   }
 
   getAttackRange() {

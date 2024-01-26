@@ -3,8 +3,8 @@ import ClientErrorPacket from "./ClientErrorPacket.js";
 class MovementUpdatePacket {
   static type = "update_movement";
 
-  static clientSend(socket, bCrawling, bAttacking, direction) {
-    socket.send(`${this.type}/${bCrawling}/${bAttacking}/${direction.join("/")}`);
+  static clientSend(socket, bCrawling, bAttacking, direction, aimRotation) {
+    socket.send(`${this.type}/${bCrawling}/${bAttacking}/${direction.join("/")}/${aimRotation}`);
   }
 
   /**
@@ -18,6 +18,7 @@ class MovementUpdatePacket {
     let bCrawling = args[1] == "true";
     let bAttacking = args[2] == "true";
     let direction = [Number(args[3]), Number(args[4])];
+    let aimRotation = Math.floor(Number(args[5]) * 100) / 100;
 
     let player = server.getPlayerByConnection(conn);
 
@@ -27,6 +28,7 @@ class MovementUpdatePacket {
     }
 
     player.entity.direction.setValue(direction);
+    player.entity.aimRotationFromClient = aimRotation;
     player.entity.bWantToCrawl = bCrawling;
     player.entity.bWantAttack = bAttacking;
   }

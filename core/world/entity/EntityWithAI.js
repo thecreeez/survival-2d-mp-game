@@ -5,10 +5,11 @@ class EntityWithAI extends LivingEntity {
   target_uuid = new SharedData("target_uuid", SharedData.STR_T, "no_target")
   target_pos = new SharedData("target_pos", SharedData.POS_T, [0,0])
   target_exist = new SharedData("target_exist", SharedData.BUL_T, false)
-  target_type = new SharedData("target_type", SharedData.STR_T, "player_entity")
+  target_class = new SharedData("target_class", SharedData.STR_T, "player_entity")
+  target_tag = new SharedData("target_tag", SharedData.STR_T, "human")
   target_vision_range = new SharedData("target_vision_range", SharedData.NUM_T, 500);
 
-  constructor({ worldId = "core:spawn", position = [0, 0], health = 100, damage = 5, moveSpeed = 2, attackRange = 50, visionRange = 500, target_class = "core:player_entity", states = [] } = {}) {
+  constructor({ worldId = "core:spawn", position = [0, 0], health = 100, damage = 5, moveSpeed = 2, attackRange = 50, visionRange = 500, target_tag = "human", target_class = "core:player_entity", states = [] } = {}) {
     super({
       position,
       worldId,
@@ -19,7 +20,9 @@ class EntityWithAI extends LivingEntity {
       states
     });
 
-    this.target_type.setValue(target_class);
+    this.target_class.setValue(target_class);
+    this.target_tag.setValue(target_tag);
+    
     this.target_pos.setValue([...position]);
     this.target_vision_range.setValue(visionRange);
   }
@@ -65,8 +68,8 @@ class EntityWithAI extends LivingEntity {
         if (otherEntity == this)
           return;
 
-        // Если сущность не того типа
-        if (this.target_type.getValue() != otherEntity.getFullId())
+        // Если сущность не того типа и не имеет нужного тэга
+        if (this.target_class.getValue() != otherEntity.getFullId() && otherEntity.getTags().indexOf(this.target_tag.getValue()) == -1)
           return;
 
         // Если сущность слишком далеко

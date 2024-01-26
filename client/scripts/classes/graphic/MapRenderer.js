@@ -8,7 +8,7 @@ class MapRenderer {
   static lightTileSize = 20;
 
   static maxLightLevel = 16;
-  static minLightLevel = 0;
+  static minLightLevel = 3;
 
   static getEntitiesToRender(canvas, ctx, client) {
 
@@ -78,9 +78,9 @@ class MapRenderer {
         let lightColor = [0, 0, 0];
         let amountOfLightColors = 0;
 
-        lightSources.forEach((gameObject) => {
+        lightSources.forEach((gameObject) => {          
           let lightSource = gameObject;
-          let lightImpact = lightSource.lightLevel - MathUtils.getDistance(worldPos, [lightSource.getPosition()[0], lightSource.getPosition()[1] - MapRenderer.tileSize / 3]) / (MapRenderer.tileSize);
+          let lightImpact = lightSource.lightLevel - MathUtils.getDistance(worldPos, [lightSource.getPosition()[0], lightSource.getPosition()[1] - MapRenderer.tileSize / 3]) / (MapRenderer.lightTileSize);
 
           if (lightImpact > light) {
             light = lightImpact;
@@ -104,7 +104,7 @@ class MapRenderer {
         lightMap.push({
           worldPos,
           lightColor,
-          light: light
+          light
         })
       }
     }

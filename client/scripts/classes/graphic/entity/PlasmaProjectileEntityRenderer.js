@@ -30,7 +30,7 @@ class PlasmaProjectileEntityRenderer extends EntityRenderer {
     entity.currentSpriteTime += deltaTime;
     entity.lastTimeRendered = Date.now();
 
-    if (entity.distanceAfterLastRender > this.size[0] / 2) {
+    if (entity.distanceAfterLastRender > this.size[0] / 2 && false) {
       entity.getWorld().spawnParticle(new Particle({ pack: "core", worldId: entity.getWorld().getId(), position: entity.lastRenderedPosition, lifeTime: 2000, particleType: "smoke", size: [20,20] }));
       entity.distanceAfterLastRender = 0;
     }

@@ -236,16 +236,15 @@ class Application {
     if (!this.context.getPlayer())
       return;
 
-    let player = this.context.getPlayer();
-
-    if (controlsHandler.horizontal != player.getDirection()[0] || controlsHandler.vertical != -player.getDirection()[1] || player.bCrawling() != controlsHandler.bSitting || player.bAttacking() != controlsHandler.bAttacking) {
+    if (this.clientNeedToUpdateControls()) {
       MovementUpdatePacket.clientSend(this.context.connectionHandler.getSocket(), 
         controlsHandler.bSitting, 
         controlsHandler.bAttacking, 
         [
           controlsHandler.horizontal,
           -controlsHandler.vertical,
-        ]
+        ],
+        controlsHandler.calculateAimRotation()
       );
     }
 
@@ -254,6 +253,29 @@ class Application {
     for (let uuid in this._entities) {
       this._entities[uuid].updateClientTick(this, startTick - this.lastTickTime);
     }
+  }
+
+  clientNeedToUpdateControls() {
+    let player = this.context.getPlayer();
+    let controlsHandler = this.context.getControlsHandler();
+
+    if (controlsHandler.horizontal != player.getDirection()[0] || controlsHandler.vertical != -player.getDirection()[1]) {
+      return true;
+    }
+
+    if (player.bCrawling() != controlsHandler.bSitting) {
+      return true;
+    }
+    
+    if (player.bAttacking() != controlsHandler.bAttacking) {
+      return true;
+    }
+
+    if (player.getAimRotation() != controlsHandler.calculateAimRotation()) {
+      return true;
+    }
+
+    return false;
   }
 
   isClient() {

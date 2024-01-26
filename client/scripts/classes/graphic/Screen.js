@@ -54,19 +54,26 @@ class Screen {
     this.renderLogs(client, deltaTime);
     SubtitleHandler.render(canvas, ctx);
 
+    // Rendered objects
     this.renderNumber([10, canvas.height - 10], amountOfRenderObjects, 4);
 
     // FPS
     this.renderNumber([10, canvas.height - 40], Math.floor(1000 / (Date.now() - startRenderTime)), 2);
 
-    this.renderText([10, canvas.height - 60], `DeltaTime: ${Date.now() - startRenderTime}`);
+    // Rotation
+    this.renderNumber([10, canvas.height - 70], client.getPlayer().getAimRotation(), 3);
+
+    this.renderText([10, canvas.height - 100], `DeltaTime: ${Date.now() - startRenderTime}`);
   }
 
   static renderWorld(client, deltaTime) {
     ctx.save();
     ctx.translate(canvas.width / 2 - client.getPlayer().getPosition()[0], canvas.height / 2 - client.getPlayer().getPosition()[1]);
 
-    let lightMap = MapRenderer.getLightMap(canvas, ctx, client);
+    let lightMap = false;
+    if (client.lightSystemOn) {
+      lightMap = MapRenderer.getLightMap(canvas, ctx, client);
+    }
 
     let tilesQueue = MapRenderer.getTilesToRender(canvas, ctx, client);
 
@@ -75,7 +82,9 @@ class Screen {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
 
-    MapRenderer.renderLightSources(ctx, lightMap);
+    if (client.lightSystemOn) {
+      MapRenderer.renderLightSources(ctx, lightMap);
+    }
 
     let queue = []
     queue.push(...MapRenderer.getEntitiesToRender(canvas, ctx, client));
@@ -87,7 +96,9 @@ class Screen {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
 
-    MapRenderer.renderFog(ctx, lightMap);
+    if (client.lightSystemOn) {
+      MapRenderer.renderFog(ctx, lightMap);
+    }
 
     ctx.restore();
 

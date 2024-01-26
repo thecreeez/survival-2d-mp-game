@@ -39,8 +39,8 @@ class ProjectileEntity extends Entity {
 
   getDirectionByRotation(rotation) {
     return [
-      Math.sin(MathUtils.degreesToRadians(rotation)), 
-      Math.cos(MathUtils.degreesToRadians(rotation))
+      Math.cos(MathUtils.degreesToRadians(rotation)), 
+      Math.sin(MathUtils.degreesToRadians(rotation))
     ];
   }
 

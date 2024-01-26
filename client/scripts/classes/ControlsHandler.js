@@ -1,5 +1,8 @@
 const canvas = document.querySelector("canvas");
 
+import MathUtils from "/core/utils/MathUtils.js"
+import Vector from "/core/utils/Vector.js"
+
 class ControlsHandler {
   constructor(client) {
     this.client = client;
@@ -97,6 +100,13 @@ class ControlsHandler {
       this.vertical = Math.min(this.vertical + deltaTime * 5, 1);
     else if (axis[1] < 0)
       this.vertical = Math.max(this.vertical - deltaTime * 5, -1);
+  }
+
+  calculateAimRotation() {
+    let direction = [this.mousePos[0] - canvas.width / 2, this.mousePos[1] - canvas.height / 2];
+    let rotation = new Vector(direction).getAngle();
+
+    return rotation;
   }
 }
 
