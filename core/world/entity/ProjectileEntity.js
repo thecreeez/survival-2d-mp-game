@@ -7,20 +7,27 @@ class ProjectileEntity extends Entity {
   move_speed = new SharedData("move_speed", SharedData.NUM_T, 1);
   max_distance = new SharedData("max_distance", SharedData.NUM_T, 100);
 
+  damage = new SharedData("damage", SharedData.NUM_T, 1);
+
+  owner_uuid = new SharedData("owner_uuid", SharedData.STR_T, "world");
+
   currentSprite = 0;
   currentSpriteTime = 0;
 
   distanceTraveled = 0;
 
-  constructor({ position = [0, 0], worldId = "core:spawn", rotation = 90, moveSpeed = 3, maxDistance = 1000, tags = [] } = {}) {
+  constructor({ ownerUuid, position = [0, 0], worldId = "core:spawn", damage = 1, rotation = 90, moveSpeed = 3, maxDistance = 1000, tags = [] } = {}) {
     super({ position, worldId, tags });
 
     this.direction.setValue(this.getDirectionByRotation(rotation));
     this.move_speed.setValue(moveSpeed);
     this.max_distance.setValue(maxDistance);
+    this.owner_uuid.setValue(ownerUuid);
+    this.damage.setValue(damage);
   }
 
   updateServerTick(application, deltaTick) {
+    super.updateServerTick(application, deltaTick);
     let newPosition = [this.getPosition()[0] + this.getDirection()[0] * this.move_speed.getValue(), this.getPosition()[1] + this.getDirection()[1] * this.move_speed.getValue()];
     
     if (!this.canBeMovedTo(newPosition)) {
@@ -46,6 +53,18 @@ class ProjectileEntity extends Entity {
 
   getDirection() {
     return this.direction.getValue();
+  }
+
+  getOwner() {
+    if (this.owner_uuid.getValue() == "world") {
+      return false;
+    }
+
+    return this.getWorld().application.getEntity(this.owner_uuid.getValue())
+  }
+
+  getDamage() {
+    return this.damage.getValue();
   }
 }
 

@@ -5,6 +5,7 @@ import MathUtils from "../../utils/MathUtils.js";
 class Entity {
   static id = `undefined_entity`;
   static pack = `undefined_pack`;
+  static size = [40,40];
 
   uuid = new SharedData("uuid", SharedData.STR_T, "uuid").makeImportant();
   world = new SharedData("world", SharedData.STR_T, "none");
@@ -55,10 +56,38 @@ class Entity {
   }
 
   updateServerTick(application, deltaTime) {
-    
+    let pos = this.getPosition();
+    let size = this.getSize();
+
+    application.getEntities().forEach((otherEntity) => {
+      if (otherEntity == this) {
+        return;
+      }
+
+      let otherPos = otherEntity.getPosition();
+      let otherSize = otherEntity.getSize();
+      /**
+       * rect1.x < rect2.x + rect2.w &&
+         rect1.x + rect1.w > rect2.x &&
+         rect1.y < rect2.y + rect2.h &&
+         rect1.y + rect1.h > rect2.y
+       */
+
+      if (pos[0] - size[0] / 2 < otherPos[0] + otherSize[0] / 2 &&
+          pos[0] + size[0] / 2 > otherPos[0] - otherSize[0] / 2 &&
+          pos[1] - size[1] / 2 < otherPos[1] + otherSize[1] / 2 &&
+          pos[1] + size[1] / 2 > otherPos[1] - otherSize[1] / 2
+      ) {
+        this.onCollide(application, otherEntity);
+      }
+    })
   }
 
   updateClientTick(application, deltaTime) {
+    
+  }
+
+  onCollide(application, entity) {
     
   }
 
@@ -183,6 +212,10 @@ class Entity {
 
   getTags() {
     return this.tags;
+  }
+
+  getSize() {
+    return this.constructor.size;
   }
 }
 

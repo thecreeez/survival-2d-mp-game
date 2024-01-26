@@ -18,7 +18,8 @@ export default [
         spriteSize: [2, 1],
         worldSize: [80, 40]
       }
-    }
+    },
+    onDamage: "state:broken/spawn_particle:core:big-fragments"
   },
   {
     id: "barrel",

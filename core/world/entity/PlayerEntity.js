@@ -4,6 +4,7 @@ import PlasmaProjectileEntity from "./PlasmaProjectileEntity.js";
 
 class PlayerEntity extends LivingEntity {
   static id = `player_entity`;
+  static size = [50, 50];
 
   name = new SharedData("name", SharedData.STR_T, "Player");
   b_crawling = new SharedData("b_crawling", SharedData.BUL_T, false);
@@ -15,6 +16,7 @@ class PlayerEntity extends LivingEntity {
   bWantAttack = false;
   bWantToCrawl = false;
   aimRotationFromClient = 0;
+  attackCooldownMax = 200;
 
   constructor({ name = "user", worldId = "core:spawn", health = 100, position = [0, 0]} = {}) {
     super({
@@ -48,7 +50,7 @@ class PlayerEntity extends LivingEntity {
     }
 
     if (this.getState() == "attack" && this.attackCooldown < 0) {
-      this.getWorld().application.spawnEntity(new PlasmaProjectileEntity({ position: this.getPosition(), worldId: this.getWorld().getId(), rotation: this.aim_rotation.getValue() }));
+      this.getWorld().application.spawnEntity(new PlasmaProjectileEntity({ ownerUuid: this.getUuid(),position: this.getPosition(), worldId: this.getWorld().getId(), rotation: this.aim_rotation.getValue() }));
       this.attackCooldown = this.attackCooldownMax;
     }
 

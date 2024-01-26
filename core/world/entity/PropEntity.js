@@ -1,6 +1,9 @@
 import PropRegistry from "../../registry/PropRegistry.js";
 import SharedData from "../../SharedData.js";
+import Particle from "../Particle.js";
 import Entity from "./Entity.js";
+
+import ParticleSpawnPacket from "../../packets/ParticleSpawnPacket.js";
 
 class PropEntity extends Entity {
   static id = `prop_entity`;
@@ -56,6 +59,38 @@ class PropEntity extends Entity {
     }
 
     return this.tags;
+  }
+
+  handleDamage(entity, damage) {
+    let propData = this.getPropData();
+
+    if (propData.onDamage) {
+      let moves = propData.onDamage.split("/");
+      
+      moves.forEach((arg) => {
+        let args = arg.split(":");
+
+        switch (args[0]) {
+          case "state": this.state.setValue(args[1]); return;
+          case "spawn_particle": {
+            let server = this.getWorld().application.context;
+
+            let particle = this.getWorld().spawnParticle(new Particle({
+              pack: args[1],
+              particleType: args[2],
+              position: this.getPosition(),
+              worldId: this.getWorld().getId()
+            }))
+            ParticleSpawnPacket.serverSend(server, server.getPlayersConnections(), { particle })
+            return;
+          }
+        }
+      })
+
+      return true;
+    }
+
+    return false;
   }
 }
 

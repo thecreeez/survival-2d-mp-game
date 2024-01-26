@@ -2,6 +2,7 @@ import EntityWithAI from "./EntityWithAI.js";
 
 class SpiderEntity extends EntityWithAI {
   static id = `spider_entity`;
+  static size = [50, 50];
 
   constructor({ worldId = "core:spawn", position = [0, 0] } = {}) {
     super({

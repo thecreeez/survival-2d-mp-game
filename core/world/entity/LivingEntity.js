@@ -17,7 +17,7 @@ class LivingEntity extends Entity {
   damage = new SharedData("damage", SharedData.NUM_T, 1);
   b_alive = new SharedData("b_alive", SharedData.BUL_T, true);
 
-  effects = new SharedData("effects", SharedData.JSN_T, [])
+  effects = new SharedData("effects", SharedData.JSN_T, []);
 
   // SERVER
   lastTimeMove = 0;
@@ -108,6 +108,10 @@ class LivingEntity extends Entity {
   }
 
   handleDamage(entity, damage) {
+    if (!this.b_alive.getValue()) {
+      return false;
+    }
+
     this.hurt_time.setValue(400);
     this.setState("hurt");
     this.health.setValue(this.health.getValue() - damage);
@@ -118,7 +122,7 @@ class LivingEntity extends Entity {
       ParticleSpawnPacket.serverSend(
         this.getWorld().application.context, 
         this.getWorld().application.context.getPlayersConnections(), 
-        { particle: new Particle({ pack: "core", particleType: "small-explosion", worldId: this.getWorld().getId(), position: [this.getPosition()[0], this.getPosition()[1] - entitySize / 2] }) }
+        { particle: new Particle({ pack: "core", particleType: "hit-sparks", worldId: this.getWorld().getId(), position: [this.getPosition()[0], this.getPosition()[1] - entitySize / 2] }) }
       );
     }
 
@@ -128,6 +132,7 @@ class LivingEntity extends Entity {
     }
 
     console.log(entity.getUuid()+" hurted "+this.getUuid()+" on "+damage+" damage");
+    return true;
   }
 
   setState(state) {

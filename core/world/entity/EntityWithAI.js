@@ -113,6 +113,18 @@ class EntityWithAI extends LivingEntity {
     this.target_pos.setValue([...targetEntity.getPosition()]);
   }
 
+  handleDamage(entity, damage) {
+    let handleSuccess = super.handleDamage(entity, damage);
+
+    if (entity) {
+      this.target_exist.setValue(true);
+      this.target_uuid.setValue(entity.getUuid());
+      this.target_pos.setValue(entity.getPosition());
+    }
+
+    return handleSuccess;
+  }
+
   /**
    * 
    * @param {Application} application 

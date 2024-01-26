@@ -71,7 +71,7 @@ class Screen {
     ctx.translate(canvas.width / 2 - client.getPlayer().getPosition()[0], canvas.height / 2 - client.getPlayer().getPosition()[1]);
 
     let lightMap = false;
-    if (client.lightSystemOn) {
+    if (client.lightEngineOn) {
       lightMap = MapRenderer.getLightMap(canvas, ctx, client);
     }
 
@@ -82,7 +82,7 @@ class Screen {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
 
-    if (client.lightSystemOn) {
+    if (client.lightEngineOn) {
       MapRenderer.renderLightSources(ctx, lightMap);
     }
 
@@ -96,7 +96,7 @@ class Screen {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
 
-    if (client.lightSystemOn) {
+    if (client.lightEngineOn) {
       MapRenderer.renderFog(ctx, lightMap);
     }
 
