@@ -1,16 +1,11 @@
 import SharedData from "../../SharedData.js";
-import LivingEntity from "./LivingEntity.js";
+import HumanEntity from "./HumanEntity.js";
 import PlasmaProjectileEntity from "./PlasmaProjectileEntity.js";
 
-class PlayerEntity extends LivingEntity {
+class PlayerEntity extends HumanEntity {
   static id = `player_entity`;
-  static size = [50, 50];
 
   name = new SharedData("name", SharedData.STR_T, "Player");
-  b_crawling = new SharedData("b_crawling", SharedData.BUL_T, false);
-  b_attacking = new SharedData("b_attacking", SharedData.BUL_T, false);
-
-  aim_rotation = new SharedData("aim_rotation", SharedData.NUM_T, 0);
 
   // from client
   bWantAttack = false;
@@ -20,13 +15,10 @@ class PlayerEntity extends LivingEntity {
 
   constructor({ name = "user", worldId = "core:spawn", health = 100, position = [0, 0]} = {}) {
     super({
-      attackRange: 50,
-      damage: 10,
       moveSpeed: 5,
       position,
       health,
       worldId,
-      states: ["idle", "walk", "crawl", "attack", "hurt", "dead", "throw"],
       tags: ["light-source", "light-color:0,120,0", "light-level:7"],
     });
     
@@ -50,7 +42,11 @@ class PlayerEntity extends LivingEntity {
     }
 
     if (this.getState() == "attack" && this.attackCooldown < 0) {
-      this.getWorld().application.spawnEntity(new PlasmaProjectileEntity({ ownerUuid: this.getUuid(),position: this.getPosition(), worldId: this.getWorld().getId(), rotation: this.aim_rotation.getValue() }));
+      let dispersion = 5;
+      let bulletPosition = [this.getPosition()[0], this.getPosition()[1] - this.getSize()[1] / 2];
+      let bulletRotation = this.aim_rotation.getValue() + (Math.random() * dispersion - dispersion * 0.5) ;
+
+      this.getWorld().application.spawnEntity(new PlasmaProjectileEntity({ ownerUuid: this.getUuid(), position: bulletPosition, worldId: this.getWorld().getId(), rotation: bulletRotation }));
       this.attackCooldown = this.attackCooldownMax;
     }
 
@@ -93,78 +89,8 @@ class PlayerEntity extends LivingEntity {
     }
   }
 
-  getAttackableEntitiesInAttackRange(application) {
-    let pos = [this.getPosition()[0], this.getPosition()[1] - this.getAttackRange()];
-    let size = [this.getAttackRange(), this.getAttackRange() * 2];
-
-    if (this.getLookingSide() == `left`) {
-      pos[0] -= this.getAttackRange();
-    }
-
-    let entityInAttackRange = (entity) => {
-      if (entity == this)
-        return false;
-
-      if (!entity.health)
-        return false;
-
-      if (entity.hurt_time.getValue() > 0)
-        return false;
-      
-      let entityPos = entity.getPosition();
-
-      if (entityPos[0] < pos[0])
-        return false;
-
-      if (entityPos[0] > pos[0] + size[0])
-        return false;
-
-      if (entityPos[1] < pos[1])
-        return false;
-
-      if (entityPos[1] > pos[1] + size[1])
-        return false;
-
-      return true;
-    }
-
-    return application.getEntities().filter(entityInAttackRange);
-  }
-
   getName() {
     return this.name.getValue();
-  }
-
-  getAimRotation() {
-    return this.aim_rotation.getValue();
-  }
-
-  getAttackRange() {
-    return this.attack_range.getValue();
-  }
-
-  bCrawling() {
-    return this.b_crawling.getValue();
-  }
-
-  bAttacking() {
-    return this.b_attacking.getValue();
-  }
-
-  canAttack() {
-    return super.canAttack() && this.b_alive.getValue();
-  }
-
-  canMove(application) {
-    return super.canMove(application) && !this.bAttacking();
-  }
-
-  canCrawl() {
-    if (this.getTimeAfterLastMove() < 50) {
-      return false;
-    }
-
-    return this.getState() == "idle" || this.getState() == "crawl";
   }
 }
 

@@ -10,6 +10,7 @@ class SpiderEntity extends EntityWithAI {
       visionRange: 100,
       health: 100,
       target_class: "core:player_entity",
+      target_tag: "human",
       damage: 3,
       attackRange: 50,
       moveSpeed: 1,

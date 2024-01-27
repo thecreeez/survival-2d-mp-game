@@ -131,6 +131,10 @@ class LivingEntity extends Entity {
       this.health.setValue(0);
     }
 
+    if (!entity) {
+      return true;
+    }
+
     console.log(entity.getUuid()+" hurted "+this.getUuid()+" on "+damage+" damage");
     return true;
   }

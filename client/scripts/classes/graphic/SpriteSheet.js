@@ -2,7 +2,7 @@ class SpriteSheet {
   constructor({ path, spriteSize = [32,32], makeAlsoReversed = false }) {
     this.img = new Image();
     this.img.src = path;
-    this.spriteSize = spriteSize;
+    this.spriteSize = [...spriteSize];
     this.sheetSize = false;
 
     this.loaded = false;
@@ -72,6 +72,7 @@ class SpriteSheet {
         }
       }
 
+      console.log(`Registering spritesheet: ${path}. SpriteSize: [${this.spriteSize}]`)
       this.loaded = true;
 
       this._onloadListeners.forEach((func) => {

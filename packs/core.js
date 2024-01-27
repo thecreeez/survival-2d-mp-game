@@ -2,6 +2,7 @@ import PlasmaProjectileEntity from "../core/world/entity/PlasmaProjectileEntity.
 import PlayerEntity from "../core/world/entity/PlayerEntity.js";
 import SpiderEntity from "../core/world/entity/SpiderEntity.js";
 import PropEntity from "../core/world/entity/PropEntity.js";
+import HumanGuardEntity from "../core/world/entity/HumanGuardEntity.js";
 import ItemEntity from "../core/world/entity/ItemEntity.js";
 
 import EntityRegisterPacket from "../core/packets/EntityRegisterPacket.js";
@@ -26,10 +27,12 @@ export default {
     PlayerEntity,
     SpiderEntity,
     PropEntity,
-    PlasmaProjectileEntity
+    PlasmaProjectileEntity,
+    HumanGuardEntity
   ],
   entitiesTextures: {
-    [PlayerEntity.id]: ["anti-tank", "grenadier", "leader", "machine-gunner", "radio-operator", "sniper"]
+    [PlayerEntity.id]: ["anti-tank", "grenadier", "leader", "machine-gunner", "radio-operator", "sniper"],
+    [HumanGuardEntity.id]: ["anti-tank", "grenadier", "machine-gunner", "radio-operator", "sniper"]
   },
   packets: [
     HandshakePacket,

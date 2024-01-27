@@ -10,6 +10,7 @@ import PlayerEntityRenderer from "./graphic/entity/PlayerEntityRenderer.js";
 import SpiderEntityRenderer from "./graphic/entity/SpiderEntityRenderer.js";
 import ItemEntityRenderer from "./graphic/entity/ItemEntityRenderer.js";
 import PropEntityRenderer from "./graphic/entity/PropEntityRenderer.js";
+import HumanGuardEntityRenderer from "./graphic/entity/HumanGuardEntityRenderer.js";
 
 import PackAssetsRegistry from "./registry/PackAssetsRegistry.js";
 
@@ -71,6 +72,7 @@ class Client {
     EntityRendererRegistry.register(ItemEntityRenderer);
     EntityRendererRegistry.register(PlasmaProjectileEntityRenderer);
     EntityRendererRegistry.register(PropEntityRenderer);
+    EntityRendererRegistry.register(HumanGuardEntityRenderer);
   }
 
   getControlsHandler() {

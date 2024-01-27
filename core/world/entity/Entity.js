@@ -67,6 +67,9 @@ class Entity {
       let otherPos = otherEntity.getPosition();
       let otherSize = otherEntity.getSize();
 
+      if (!size)
+        console.log(otherEntity);
+
       if (pos[0] - size[0] / 2 < otherPos[0] + otherSize[0] / 2 &&
           pos[0] + size[0] / 2 > otherPos[0] - otherSize[0] / 2 &&
           pos[1] - size[1] / 2 < otherPos[1] + otherSize[1] / 2 &&

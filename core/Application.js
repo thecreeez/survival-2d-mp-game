@@ -7,6 +7,8 @@ import World from "./world/World.js";
 
 import SpiderEntity from "./world/entity/SpiderEntity.js";
 import PlayerEntity from "./world/entity/PlayerEntity.js";
+import PropEntity from "./world/entity/PropEntity.js";
+import HumanGuardEntity from "./world/entity/HumanGuardEntity.js";
 
 import EntityRegisterPacket from "./packets/EntityRegisterPacket.js";
 import EntityRemovePacket from "./packets/EntityRemovePacket.js";
@@ -16,7 +18,6 @@ import SharedData from "./SharedData.js";
 import Tile from "./world/Tile.js";
 
 import core from "../packs/core.js";
-import PropEntity from "./world/entity/PropEntity.js";
 
 class Application {
   static version = 2;
@@ -59,6 +60,7 @@ class Application {
       this.spawnEntity(new PropEntity({ position: [120,120], propId: "red_car" }));
       this.spawnEntity(new PropEntity({ position: [200, 120], propId: "red_car", state: "top" }));
       this.spawnEntity(new SpiderEntity({ position: [600, 300] }));
+      this.spawnEntity(new HumanGuardEntity({ position: [-300, 100] }));
     }
 
     Application.instance = this;
