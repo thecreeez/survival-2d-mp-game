@@ -8,8 +8,11 @@ class HumanEntity extends LivingEntity {
   b_attacking = new SharedData("b_attacking", SharedData.BUL_T, false);
   aim_rotation = new SharedData("aim_rotation", SharedData.NUM_T, 0);
 
-  have_owner = new SharedData("have_owner", SharedData.BUL_T, false);
-  owner_name = new SharedData("owner_name", SharedData.STR_T, "no_owner");
+  have_leader = new SharedData("have_leader", SharedData.BUL_T, false);
+  leader_name = new SharedData("leader_name", SharedData.STR_T, "no_leader");
+
+  // Default:[EMPTY_MESSAGE]
+  message = new SharedData("message", SharedData.STR_T, "Message placeholder");
 
   type = new SharedData("type", SharedData.STR_T, "default");
 
@@ -42,6 +45,18 @@ class HumanEntity extends LivingEntity {
     return this.b_attacking.getValue();
   }
 
+  updateServerRotation(application, deltaTick) {
+    if (!this.canRotate(application)) {
+      return;
+    }
+
+    if (this.getAimRotation() > 90 && this.getAimRotation() < 270) {
+      this.rotation.setValue(1);
+    } else {
+      this.rotation.setValue(0);
+    }
+  }
+
   canAttack() {
     return super.canAttack() && this.b_alive.getValue();
   }
@@ -64,6 +79,30 @@ class HumanEntity extends LivingEntity {
     }
 
     return this.texture.getValue();
+  }
+
+  getMessage() {
+    if (this.message.getValue() === "[EMPTY_MESSAGE]")
+      return false;
+
+    return this.message.getValue();
+  }
+
+  setMessage(message = false) {
+    if (!message) {
+      this.message.setValue("[EMPTY_MESSAGE]");
+      return;
+    }
+
+    this.message.setValue(message);
+  }
+
+  getLeaderName() {
+    if (!this.have_leader.getValue()) {
+      return false;
+    }
+
+    return this.leader_name.getValue();
   }
 }
 

@@ -1,53 +1,9 @@
-import LivingEntityRenderer from "./LivingEntityRenderer.js";
+import HumanEntityRenderer from "./HumanEntityRenderer.js";
 import PlayerEntity from "/core/world/entity/PlayerEntity.js";
 
-class PlayerEntityRenderer extends LivingEntityRenderer {
+class PlayerEntityRenderer extends HumanEntityRenderer {
   static Entity = PlayerEntity;
   static Type = "friend";
-
-  static idle = {
-    spriteDuration: 800,
-    sprites: 2,
-    repeatable: true
-  }
-
-  static walk = {
-    spriteDuration: 10,
-    durationType: "distance",
-    sprites: 2,
-    repeatable: true
-  }
-
-  static crawl = {
-    spriteDuration: 10,
-    durationType: "distance",
-    sprites: 2,
-    repeatable: false
-  }
-
-  static attack = {
-    spriteDuration: 100,
-    sprites: 2,
-    repeatable: true
-  }
-
-  static hurt = {
-    spriteDuration: 100,
-    sprites: 3,
-    repeatable: false
-  }
-
-  static dead = {
-    spriteDuration: 100,
-    sprites: 5,
-    repeatable: false
-  }
-
-  static throw = {
-    spriteDuration: 100,
-    sprites: 3,
-    repeatable: false
-  }
 
   static renderMain({ ctx, entity, renderHealthBar }) {
     super.renderMain({ ctx, entity, renderHealthBar });
@@ -55,7 +11,14 @@ class PlayerEntityRenderer extends LivingEntityRenderer {
     ctx.font = `15px arial`;
     ctx.textAlign = `center`;
     ctx.fillStyle = `white`;
-    ctx.fillText(entity.getName(), entity.getPosition()[0], entity.getPosition()[1] - this.size[1] - 15)
+
+    let offset = 15;
+
+    if (entity.getMessage()) {
+      offset += 15;
+    }
+
+    ctx.fillText(entity.getName(), entity.getPosition()[0], entity.getPosition()[1] - this.size[1] - offset)
   }
 
   static renderDebug({ ctx, entity }) {

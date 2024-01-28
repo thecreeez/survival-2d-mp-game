@@ -2,6 +2,8 @@ import Client from "../Client.js";
 import PackAssetsRegistry from "../registry/PackAssetsRegistry.js";
 import MapRenderer from "./MapRenderer.js";
 import SubtitleHandler from "./SubtitleHandler.js";
+import HumanGuardEntityRenderer from "./entity/HumanGuardEntityRenderer.js";
+import PropEntityRenderer from "./entity/PropEntityRenderer.js";
 
 
 const canvas = document.querySelector("canvas");
@@ -43,8 +45,6 @@ class Screen {
     if (!client.getPlayer())
       return;
 
-    let startRenderTime = Date.now();
-
     let amountOfRenderObjects = this.renderWorld(client, deltaTime);
 
     if (client.getMapBuilder().bEnabled) {
@@ -54,16 +54,16 @@ class Screen {
     this.renderLogs(client, deltaTime);
     SubtitleHandler.render(canvas, ctx);
 
-    // Rendered objects
-    this.renderNumber([10, canvas.height - 10], amountOfRenderObjects, 4);
+    // Followers
+    HumanGuardEntityRenderer.renderOnScreen({
+      ctx,
+      pos: [10, canvas.height - 80],
+      entityData: {}
+    });
+    this.renderNumber([40, canvas.height - 40], client.getPlayer().getFollowers(), 3);
 
-    // FPS
-    this.renderNumber([10, canvas.height - 40], Math.floor(1000 / (Date.now() - startRenderTime)), 2);
-
-    // Rotation
-    this.renderNumber([10, canvas.height - 70], client.getPlayer().getAimRotation(), 3);
-
-    this.renderText([10, canvas.height - 100], `DeltaTime: ${Date.now() - startRenderTime}`);
+    // Money
+    this.renderNumber([10, canvas.height - 10], client.getPlayer().getMoney(), 4);
   }
 
   static renderWorld(client, deltaTime) {

@@ -83,16 +83,20 @@ class PlayerEntity extends HumanEntity {
     }
   }
 
-  updateServerRotation(application, deltaTick) {
-    if (!this.canRotate(application)) {
-      return;
+  getFollowers() {
+    return this.followers.getValue();
+  }
+
+  getMoney() {
+    return this.money.getValue();
+  }
+
+  getSpot() {
+    if (!this.have_spot.getValue()) {
+      return false;
     }
 
-    if (this.getAimRotation() > 90 && this.getAimRotation() < 270) {
-      this.rotation.setValue(1);
-    } else {
-      this.rotation.setValue(0);
-    }
+    return this.spot.getValue();
   }
 
   getName() {
