@@ -7,6 +7,12 @@ class PlayerEntity extends HumanEntity {
 
   name = new SharedData("name", SharedData.STR_T, "Player");
 
+  followers = new SharedData("followers", SharedData.NUM_T, 0);
+  money = new SharedData("money", SharedData.NUM_T, 0);
+
+  spot = new SharedData("spot", SharedData.POS_T, [0,0]);
+  have_spot = new SharedData("have_spot", SharedData.BUL_T, false);
+
   // from client
   bWantAttack = false;
   bWantToCrawl = false;

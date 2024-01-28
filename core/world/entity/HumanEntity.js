@@ -8,6 +8,9 @@ class HumanEntity extends LivingEntity {
   b_attacking = new SharedData("b_attacking", SharedData.BUL_T, false);
   aim_rotation = new SharedData("aim_rotation", SharedData.NUM_T, 0);
 
+  have_owner = new SharedData("have_owner", SharedData.BUL_T, false);
+  owner_name = new SharedData("owner_name", SharedData.STR_T, "no_owner");
+
   type = new SharedData("type", SharedData.STR_T, "default");
 
   constructor({ moveSpeed, position, health, worldId, states = [], tags = [], type = "default" } = {}) {
