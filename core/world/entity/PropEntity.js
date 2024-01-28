@@ -48,7 +48,7 @@ class PropEntity extends Entity {
   }
 
   getTags() {
-    let propData = PropRegistry.getById(this.getPackId(), this.getPropId());
+    let propData = this.getPropData();
 
     if (propData.states[this.getState()].tags) {
       return propData.states[this.getState()].tags;
@@ -92,6 +92,20 @@ class PropEntity extends Entity {
     }
 
     return false;
+  }
+
+  getSize() {
+    let propData = this.getPropData();
+
+    if (propData.states[this.getState()].worldSize) {
+      return propData.states[this.getState()].worldSize;
+    }
+
+    if (propData.defaultWorldSize) {
+      return propData.defaultWorldSize;
+    }
+
+    return this.getSize();
   }
 }
 
