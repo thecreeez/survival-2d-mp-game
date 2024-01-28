@@ -8,8 +8,8 @@ class LivingEntityRenderer extends EntityRenderer {
 
   static healthBarCanvas = document.createElement("canvas");
 
-  static renderMain(ctx, entity) {
-    super.renderMain(ctx, entity);
+  static renderMain({ctx, entity, renderHealthBar = true}) {
+    super.renderMain({ctx, entity});
     if (!this.getCurrentSprite(entity)) {
       return;
     }
@@ -17,19 +17,21 @@ class LivingEntityRenderer extends EntityRenderer {
     ctx.font = `15px arial`;
     ctx.fillStyle = `white`;
 
-    this.renderHealthBar(ctx, entity);
+    if (renderHealthBar) {
+      this.renderHealthBar({ctx, entity});
+    }
   }
 
-  static renderDebug(ctx, entity) {
-    super.renderDebug(ctx, entity);
+  static renderDebug({ctx, entity}) {
+    super.renderDebug({ctx, entity});
   }
 
-  static updateEntity(entity, deltaTime) {
-    super.updateEntity(entity, deltaTime);
+  static updateEntity({entity, deltaTime}) {
+    super.updateEntity({entity, deltaTime});
     this.updateState(entity);
   }
 
-  static endUpdateEntity(entity, deltaTime) {
+  static endUpdateEntity({entity, deltaTime}) {
     let stateData = this[entity.getState()];
 
     if (entity.currentSprite >= stateData.sprites && !stateData.repeatable) {
@@ -89,7 +91,7 @@ class LivingEntityRenderer extends EntityRenderer {
     return spriteSheet.get(entity.currentSprite, entity.getStateId(), flipped);
   }
 
-  static renderHealthBar(ctx, entity) {
+  static renderHealthBar({ctx, entity}) {
     let healthBarBackground = this.getHealthBar(false);
     ctx.drawImage(healthBarBackground, entity.getPosition()[0] - healthBarBackground.width * 0.75, entity.getPosition()[1] - this.size[1] * 1.2, healthBarBackground.width * 1.5, healthBarBackground.height * 1.5);
 

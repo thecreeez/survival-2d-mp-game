@@ -8,7 +8,7 @@ class PlasmaProjectileEntityRenderer extends EntityRenderer {
 
   static spriteTime = 100;
 
-  static renderMain(ctx, entity) {
+  static renderMain({ctx, entity}) {
     if (!this.getSpriteSheet(entity)) {
       return;
     }
@@ -16,12 +16,12 @@ class PlasmaProjectileEntityRenderer extends EntityRenderer {
     ctx.drawImage(this.getSpriteSheet(entity).get(entity.currentSprite,0), entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - this.size[1], this.size[0], this.size[1]);
   }
 
-  static renderDebug(ctx, entity) {
-    super.renderDebug(ctx, entity);
+  static renderDebug({ctx, entity}) {
+    super.renderDebug({ctx, entity});
   }
 
-  static updateEntity(entity, deltaTime) {
-    super.updateEntity(entity, deltaTime);
+  static updateEntity({entity, deltaTime}) {
+    super.updateEntity({entity, deltaTime});
 
     if (entity.lastTimeRendered) {
       deltaTime = Date.now() - entity.lastTimeRendered;

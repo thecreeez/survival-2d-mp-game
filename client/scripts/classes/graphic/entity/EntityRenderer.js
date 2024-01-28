@@ -5,23 +5,25 @@ import MapRenderer from "../MapRenderer.js";
 class EntityRenderer {
   static Entity = null;
 
-  static render(ctx, entity) {
-    this.renderMain(ctx, entity);
+  static render({ctx, entity}) {
+    this.renderMain({ctx, entity});
     //this.renderDebug(ctx, entity);
   }
 
-  static renderMain(ctx, entity) {
-    ctx.fillStyle = `red`
-    ctx.beginPath();
-    ctx.arc(entity.getPosition()[0], entity.getPosition()[1], 5, 0, Math.PI * 2);
-    ctx.fill();
+  static renderMain({ctx, entity}) {
+    
   }
 
-  static renderDebug(ctx, entity) {
+  static renderDebug({ctx, entity}) {
     if (this.size) {
       ctx.strokeStyle = `black`;
       ctx.strokeRect(entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - this.size[1], this.size[0], this.size[1])
     }
+
+    ctx.fillStyle = `red`
+    ctx.beginPath();
+    ctx.arc(entity.getPosition()[0], entity.getPosition()[1], 5, 0, Math.PI * 2);
+    ctx.fill();
 
     ctx.font = `15px arial`;
     ctx.fillStyle = `white`
@@ -29,11 +31,23 @@ class EntityRenderer {
     ctx.fillText(`[${entity.getPosition()}]`, entity.getPosition()[0], entity.getPosition()[1] - this.size[1])
   }
 
-  static updateEntity(entity, deltaTime) {
+  static renderOnScreen({ctx, pos, entityData}) {
+    let entity = new this.Entity(entityData);
+    entity.position.setValue([pos[0] + this.size[0] / 2, pos[1] + this.size[1]]);
+
+    this.renderMain({
+      ctx, 
+      entity, 
+      renderHealthBar: false,
+      renderName: false
+    });
+  }
+
+  static updateEntity({entity, deltaTime}) {
     this.calculateDistance(entity);
   }
 
-  static endUpdateEntity(entity, deltaTime) {
+  static endUpdateEntity({entity, deltaTime}) {
   }
 
   static getSpriteSheet(entity) {

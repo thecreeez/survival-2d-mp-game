@@ -8,8 +8,8 @@ class PropEntityRenderer extends EntityRenderer {
 
   static spriteTime = 50;
 
-  static renderMain(ctx, entity) {
-    super.renderMain(ctx, entity);
+  static renderMain({ctx, entity}) {
+    super.renderMain({ctx, entity});
     let propData = PackAssetsRegistry.getProp(entity.getPackId(), entity.getPropId(), entity.getState());
 
     if (!propData) {
@@ -21,11 +21,11 @@ class PropEntityRenderer extends EntityRenderer {
     ctx.drawImage(propData.canvas, entity.getPosition()[0] - propData.worldSize[0] / 2 + offset[0], entity.getPosition()[1] - propData.worldSize[1] + offset[1], propData.worldSize[0], propData.worldSize[1])
   }
 
-  static renderDebug(ctx, entity) {
-    super.renderDebug(ctx, entity);
+  static renderDebug({ctx, entity}) {
+    super.renderDebug({ctx, entity});
   }
 
-  static updateEntity(entity, deltaTime) {
+  static updateEntity({entity, deltaTime}) {
     
   }
 }

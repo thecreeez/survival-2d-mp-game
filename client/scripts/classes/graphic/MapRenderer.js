@@ -236,9 +236,9 @@ class MapRenderer {
       return false;
     }
 
-    EntityRendererRegistry[entity.getId()].render(ctx, entity);
-    EntityRendererRegistry[entity.getId()].updateEntity(entity, deltaTime);
-    EntityRendererRegistry[entity.getId()].endUpdateEntity(entity, deltaTime);
+    EntityRendererRegistry[entity.getId()].render({ctx, entity});
+    EntityRendererRegistry[entity.getId()].updateEntity({entity, deltaTime});
+    EntityRendererRegistry[entity.getId()].endUpdateEntity({entity, deltaTime});
 
     return true;
   }

@@ -26,7 +26,7 @@ class Client {
     this.controlsHandler = new ControlsHandler(this);
     this.mapBuilder = new MapBuilder(this);
 
-    this.lightEngineOn = true;
+    this.lightEngineOn = false;
 
     this.register();
 

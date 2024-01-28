@@ -4,7 +4,7 @@ import PlayerEntity from "/core/world/entity/PlayerEntity.js";
 class PlayerEntityRenderer extends LivingEntityRenderer {
   static Entity = PlayerEntity;
   static Type = "friend";
-  
+
   static idle = {
     spriteDuration: 800,
     sprites: 2,
@@ -49,8 +49,8 @@ class PlayerEntityRenderer extends LivingEntityRenderer {
     repeatable: false
   }
 
-  static renderMain(ctx, entity) {
-    super.renderMain(ctx, entity);
+  static renderMain({ ctx, entity, renderHealthBar }) {
+    super.renderMain({ ctx, entity, renderHealthBar });
 
     ctx.font = `15px arial`;
     ctx.textAlign = `center`;
@@ -58,8 +58,8 @@ class PlayerEntityRenderer extends LivingEntityRenderer {
     ctx.fillText(entity.getName(), entity.getPosition()[0], entity.getPosition()[1] - this.size[1] - 15)
   }
 
-  static renderDebug(ctx, entity) {
-    super.renderDebug(ctx, entity);
+  static renderDebug({ ctx, entity }) {
+    super.renderDebug({ ctx, entity });
   }
 }
 
