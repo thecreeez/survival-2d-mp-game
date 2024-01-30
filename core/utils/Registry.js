@@ -1,5 +1,9 @@
 class Registry {
-  static getById(pack, id) {
+  static getById(pack, id = false) {
+    if (!id) {
+      return this[`${pack}`];
+    }
+
     return this[`${pack}:${id}`];
   }
 

@@ -1,5 +1,6 @@
 const canvas = document.querySelector("canvas");
 
+import Hotbar from "./graphic/Hotbar.js";
 import MathUtils from "/core/utils/MathUtils.js"
 import Vector from "/core/utils/Vector.js"
 
@@ -25,6 +26,9 @@ class ControlsHandler {
 
     window.onmousemove = (ev) => {
       this.mousePos = [ev.clientX, ev.clientY];
+
+      if (Hotbar.handleMouseMove(this.mousePos))
+        return;
     }
 
     window.onmouseup = (ev) => {
@@ -40,6 +44,9 @@ class ControlsHandler {
       this.isMouseDown = true;
 
       let pos = [ev.clientX, ev.clientY];
+
+      if (Hotbar.handleMouseDown(pos))
+        return;
 
       if (this.client.mapBuilder.handleMouseDown(pos))
         return;

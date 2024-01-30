@@ -208,6 +208,11 @@ class AI {
 
     return MathUtils.distanceBetween([...this.currentTargetPos], [...this.entity.getPosition()]) > this.entity.getMoveSpeed();
   }
+
+  clearTarget() {
+    this.currentTarget = null;
+    this.currentTargetPos = [...this.entity.getPosition()];
+  }
 }
 
 export default AI;

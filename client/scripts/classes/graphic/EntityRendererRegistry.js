@@ -1,6 +1,6 @@
 class EntityRendererRegistry {
   static register(rendererClass) {
-    this[rendererClass.Entity.id] = rendererClass;
+    this[rendererClass.Entity.empty().getFullId()] = rendererClass;
   }
 }
 

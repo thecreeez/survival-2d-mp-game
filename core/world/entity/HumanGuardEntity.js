@@ -7,7 +7,7 @@ class HumanGuardEntity extends HumanEntity {
 
   order = new SharedData("order", SharedData.JSN_T, {});
 
-  constructor({ position, health = 50, worldId, tags = [], type = "default" } = {}) {
+  constructor({ position, health = 50, worldId, tags = [], type = "default", leader = null } = {}) {
     super({
       moveSpeed: 2,
       damage: 5,
@@ -16,24 +16,26 @@ class HumanGuardEntity extends HumanEntity {
       health,
       tags,
       type,
+      viewRange: 250,
+      leader,
       ai: new PatrolAI({ targetId: "spider_entity", targetTag: "hostile", events: {
         "entityMoveInToViewDistance": (entity) => {
-          if (entity.getFullId() === "core:player_entity") {
+          if (entity.getFullId() === "core:player_entity" && this.getLeaderName() == entity.getName()) {
             this.setMessage(`Hey, ${entity.getName()}!`, 3000)
           }
         },
         "entityMoveOutFromViewDistance": (entity) => {
-          if (entity.getFullId() === "core:player_entity") {
+          if (entity.getFullId() === "core:player_entity" && this.getLeaderName() == entity.getName()) {
             this.setMessage(`Bye, ${entity.getName()}!`, 3000)
           }
         },
         "handleAttackFromEntity": (entity) => {
-          if (entity.getFullId() === "core:player_entity") {
-            this.setMessage(`What the fuck, ${entity.getName()}?!`, 3000)
+          if (entity.getFullId() === "core:player_entity" && this.getLeaderName() == entity.getName()) {
+            this.setMessage(`What the fuck, ${entity.getName()}?!`, 3000);
+            this.ai.clearTarget();
           }
         }
       } }),
-      viewRange: 250,
     })
   }
 }

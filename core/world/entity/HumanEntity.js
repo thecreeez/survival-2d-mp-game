@@ -11,16 +11,14 @@ class HumanEntity extends LivingEntity {
 
   have_leader = new SharedData("have_leader", SharedData.BUL_T, false);
   leader_name = new SharedData("leader_name", SharedData.STR_T, "no_leader");
-
-  // Default:[EMPTY_MESSAGE]
-  message = new SharedData("message", SharedData.STR_T, "Message placeholder");
+  message = new SharedData("message", SharedData.STR_T, "[EMPTY_MESSAGE]");
 
   type = new SharedData("type", SharedData.STR_T, "default");
 
   attackCooldownMax = 200;
   messageTime = 0;
 
-  constructor({ moveSpeed, position, health, worldId, states = [], tags = [], type = "default", ai = null, viewRange = 500 } = {}) {
+  constructor({ moveSpeed, position, health, worldId, states = [], tags = [], type = "default", ai = null, viewRange = 500, leader = null } = {}) {
     super({
       attackRange: 0,
       damage: 0,
@@ -37,6 +35,11 @@ class HumanEntity extends LivingEntity {
 
     this.type.setValue(type);
     this.tags.push("human");
+
+    if (leader) {
+      this.leader_name.setValue(leader.getName());
+      this.have_leader.setValue(true);
+    }
   }
 
   updateServerTick(application, deltaTick) {

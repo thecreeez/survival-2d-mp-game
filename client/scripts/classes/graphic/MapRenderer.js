@@ -230,15 +230,15 @@ class MapRenderer {
   static _renderEntityGameObject(ctx, gameObject, deltaTime) {
     let entity = gameObject.entity;
 
-    if (!EntityRendererRegistry[entity.getId()]) {
+    if (!EntityRendererRegistry[entity.getFullId()]) {
       EntityRenderer.render(ctx, entity);
       console.error(`No Renderer file for [${entity.getFullId()}] entity.`);
       return false;
     }
 
-    EntityRendererRegistry[entity.getId()].render({ctx, entity});
-    EntityRendererRegistry[entity.getId()].updateEntity({entity, deltaTime});
-    EntityRendererRegistry[entity.getId()].endUpdateEntity({entity, deltaTime});
+    EntityRendererRegistry[entity.getFullId()].render({ctx, entity});
+    EntityRendererRegistry[entity.getFullId()].updateEntity({entity, deltaTime});
+    EntityRendererRegistry[entity.getFullId()].endUpdateEntity({entity, deltaTime});
 
     return true;
   }

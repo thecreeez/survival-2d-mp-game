@@ -6,7 +6,8 @@ class EntityRegisterPacket {
   static Contexts = {
     loading: "loading",
     playerJoin: "player_join",
-    world: "world"
+    world: "world",
+    shop: "shop",
   }
 
   static serverSend(users, { context, serializedEntity }) {
@@ -27,7 +28,7 @@ class EntityRegisterPacket {
       return;
     }
 
-    if (context == EntityRegisterPacket.Contexts.playerJoin) {
+    if (context === EntityRegisterPacket.Contexts.playerJoin) {
       client.addLog(`INFO`, `Player ${entity.getName()} joined to the game.`)
     }
 

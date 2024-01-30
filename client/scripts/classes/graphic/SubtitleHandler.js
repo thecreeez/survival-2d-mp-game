@@ -4,7 +4,7 @@ class SubtitleHandler {
   static subtitles = [];
 
   static render(canvas, ctx) {
-    let pos = [canvas.width / 2, canvas.height - this.fontSize * 0.5 - this.getSubtitilesHeight()];
+    let pos = [canvas.width / 2, canvas.height - this.fontSize * 0.5 - this.getSubtitilesHeight() - 50];
 
     ctx.textAlign = `center`;
     ctx.font = `${this.fontSize}px arial`;

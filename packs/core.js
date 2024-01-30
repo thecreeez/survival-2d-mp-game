@@ -17,6 +17,7 @@ import TilesRegisterPacket from "../core/packets/TilesRegisterPacket.js";
 import TilePlacePacket from "../core/packets/TilePlacePacket.js";
 import SaveRequestPacket from "../core/packets/SaveRequestPacket.js";
 import ParticleSpawnPacket from "../core/packets/ParticleSpawnPacket.js";
+import ShopInteractPacket from "../core/packets/ShopInteractPacket.js";
 
 import props from "./core_props.js";
 
@@ -47,6 +48,7 @@ export default {
     MovementUpdatePacket,
     CommandInputPacket,
     ParticleSpawnPacket,
+    ShopInteractPacket,
   ],
   ui: [
     {
