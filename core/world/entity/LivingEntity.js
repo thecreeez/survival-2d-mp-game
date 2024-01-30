@@ -32,12 +32,13 @@ class LivingEntity extends Entity {
   currentSprite = 0;
   currentSpriteTime = 0;
 
-  constructor({ health = 100, worldId = "core:spawn", position = [0, 0], customTexture = "default", moveSpeed = 1, attackRange = 20, damage = 1, states = ["idle"], tags = [], ai = null } = {}) {
+  constructor({ health = 100, worldId = "core:spawn", position = [0, 0], customTexture = "default", moveSpeed = 1, attackRange = 20, viewRange = 200, damage = 1, states = ["idle"], tags = [], ai = null } = {}) {
     super({ position, customTexture, worldId, tags });
 
     this.health.setValue(health);
     this.move_speed.setValue(moveSpeed);
     this.attack_range.setValue(attackRange);
+    this.view_range.setValue(viewRange);
     this.damage.setValue(damage);
 
     this.ai = ai;
@@ -151,6 +152,10 @@ class LivingEntity extends Entity {
         this.getWorld().application.context.getPlayersConnections(), 
         { particle: new Particle({ pack: "core", particleType: "hit-sparks", worldId: this.getWorld().getId(), position: [this.getPosition()[0], this.getPosition()[1] - entitySize / 2] }) }
       );
+    }
+
+    if (this.ai) {
+      this.ai.handleDamage(entity);
     }
 
     if (this.getHealth() <= 0) {

@@ -17,7 +17,6 @@ class PlayerEntity extends HumanEntity {
   bWantAttack = false;
   bWantToCrawl = false;
   aimRotationFromClient = 0;
-  attackCooldownMax = 200;
 
   constructor({ name = "user", worldId = "core:spawn", health = 100, position = [0, 0]} = {}) {
     super({
@@ -46,17 +45,6 @@ class PlayerEntity extends HumanEntity {
     if (this.aimRotationFromClient != this.aim_rotation.getValue()) {
       this.aim_rotation.setValue(this.aimRotationFromClient);
     }
-
-    if (this.getState() == "attack" && this.attackCooldown < 0) {
-      let dispersion = 5;
-      let bulletPosition = [this.getPosition()[0], this.getPosition()[1] - this.getSize()[1] / 2];
-      let bulletRotation = this.aim_rotation.getValue() + (Math.random() * dispersion - dispersion * 0.5) ;
-
-      this.getWorld().application.spawnEntity(new PlasmaProjectileEntity({ ownerUuid: this.getUuid(), position: bulletPosition, worldId: this.getWorld().getId(), rotation: bulletRotation }));
-      this.attackCooldown = this.attackCooldownMax;
-    }
-
-    this.attackCooldown -= deltaTick;
   }
 
   updateServerState(application, deltaTick) {

@@ -1,5 +1,6 @@
 import LivingEntity from "./LivingEntity.js";
 import SharedData from "../../SharedData.js";
+import PlasmaProjectileEntity from "./PlasmaProjectileEntity.js";
 
 class HumanEntity extends LivingEntity {
   static size = [50,50];
@@ -16,7 +17,10 @@ class HumanEntity extends LivingEntity {
 
   type = new SharedData("type", SharedData.STR_T, "default");
 
-  constructor({ moveSpeed, position, health, worldId, states = [], tags = [], type = "default" } = {}) {
+  attackCooldownMax = 200;
+  messageTime = 0;
+
+  constructor({ moveSpeed, position, health, worldId, states = [], tags = [], type = "default", ai = null, viewRange = 500 } = {}) {
     super({
       attackRange: 0,
       damage: 0,
@@ -26,11 +30,28 @@ class HumanEntity extends LivingEntity {
       moveSpeed,
       states: ["idle", "walk", "crawl", "attack", "hurt", "dead", "throw", ...states],
       tags,
-      customTexture: type
+      customTexture: type,
+      ai,
+      viewRange,
     })
 
     this.type.setValue(type);
     this.tags.push("human");
+  }
+
+  updateServerTick(application, deltaTick) {
+    super.updateServerTick(application, deltaTick);
+    if (this.getState() == "attack" && this.attackCooldown < 0) {
+      this.shoot();
+    }
+
+    this.attackCooldown -= deltaTick;
+
+    if (this.messageTime <= 0 && this.getMessage()) {
+      this.setMessage(false);
+    }
+
+    this.messageTime -= deltaTick;
   }
 
   getAimRotation() {
@@ -69,6 +90,10 @@ class HumanEntity extends LivingEntity {
     return this.getState() == "idle" || this.getState() == "crawl";
   }
 
+  canShoot() {
+    return super.canShoot() && this.attackCooldown <= 0;
+  }
+
   getTexture() {
     if (this.type.getValue() != this.texture.getValue()) {
       this.texture.setValue(this.type.getValue());
@@ -84,13 +109,14 @@ class HumanEntity extends LivingEntity {
     return this.message.getValue();
   }
 
-  setMessage(message = false) {
+  setMessage(message = false, time = 1000) {
     if (!message) {
       this.message.setValue("[EMPTY_MESSAGE]");
       return;
     }
 
     this.message.setValue(message);
+    this.messageTime = time;
   }
 
   getLeaderName() {
@@ -99,6 +125,16 @@ class HumanEntity extends LivingEntity {
     }
 
     return this.leader_name.getValue();
+  }
+
+  shoot() {
+    let dispersion = 5;
+    //                                                                 - this.getSize()[1] / 2 <- для красоты НАДО, но нужно вычислить как это повлияет на rotation soso
+    let bulletPosition = [this.getPosition()[0], this.getPosition()[1]];
+    let bulletRotation = this.aim_rotation.getValue() + (Math.random() * dispersion - dispersion * 0.5);
+
+    this.getWorld().application.spawnEntity(new PlasmaProjectileEntity({ ownerUuid: this.getUuid(), position: bulletPosition, worldId: this.getWorld().getId(), rotation: bulletRotation }));
+    this.attackCooldown = this.attackCooldownMax;
   }
 }
 

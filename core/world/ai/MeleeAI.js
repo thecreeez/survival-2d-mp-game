@@ -1,26 +1,12 @@
 import AI from "./AI.js";
 
 class MeleeAI extends AI {
-  constructor({targetId, targetTag}) {
-    super({targetId, targetTag})
+  handleAttack(entity) {
+    entity.handleDamage(this.entity, this.entity.damage.getValue());
   }
 
-  updateServerTick() {
-    super.updateServerTick();
-    this._updateAttack();
-  }
-
-  _updateAttack() {
-    if (this.currentTarget === null) {
-      return;
-    }
-
-    if (!this.entity.canAttack(this.currentTarget)) {
-      return;
-    }
-
-    this.entity.rotation.setValue(this.currentTarget.getPosition()[0] > this.entity.getPosition()[0] ? 0 : 1);
-    this.currentTarget.handleDamage(this.entity, this.entity.damage.getValue());
+  canAttack(entity) {
+    return this.entity.canAttack(entity);
   }
 }
 
