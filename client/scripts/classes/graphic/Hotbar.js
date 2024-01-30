@@ -20,12 +20,17 @@ class Hotbar {
     if (this.selectedSlot !== -1) {
       let mousePos = client.controlsHandler.mousePos;
       
-      if (this.entities[this.selectedSlot] && EntityRendererRegistry[this.entities[this.selectedSlot]])
+      if (this.entities[this.selectedSlot] && EntityRendererRegistry[this.entities[this.selectedSlot]]) {
+        ctx.translate(mousePos[0] - 25, mousePos[1]);
+        ctx.rotate(this.client.controlsHandler.deltaMousePos[0] / 20)
         EntityRendererRegistry[this.entities[this.selectedSlot]].renderOnScreen({
           ctx,
-          pos: mousePos,
+          pos: [0,0],
           entityData: {}
         });
+        ctx.rotate(-this.client.controlsHandler.deltaMousePos[0] / 20)
+        ctx.translate(-mousePos[0] + 25, -mousePos[1]);
+      }
     }
   }
 
@@ -85,7 +90,7 @@ class Hotbar {
 
     if (this.selectedSlot !== -1 && slotOnMouse === -1) {
       ShopInteractPacket.clientSend(this.client.connectionHandler.getSocket(), 
-      { type: ShopInteractPacket.InteractType.Buy, entityId: this.entities[this.selectedSlot], position: Screen.getMousePosOnWorld(this.client) })
+        { type: ShopInteractPacket.InteractType.Buy, entityId: this.entities[this.selectedSlot], position: Screen.toWorldPos(this.client, [mousePos[0], mousePos[1] + 50]) })
     }
 
     this.selectedSlot = slotOnMouse;

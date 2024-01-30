@@ -9,7 +9,11 @@ class ControlsHandler {
     this.client = client;
 
     this.keys = {};
+
     this.mousePos = [0, 0];
+    this.prevMousePos = [0, 0];
+    this.deltaMousePos = [0, 0];
+
     this.isMouseDown = false;
     this.bAttacking = false;
 
@@ -57,6 +61,11 @@ class ControlsHandler {
     this._updateAxis(deltaTime);
     this._updateSitting(); 
     this._updateAttack();
+
+    this.deltaMousePos[0] = this.mousePos[0] - this.prevMousePos[0];
+    this.deltaMousePos[1] = this.mousePos[1] - this.prevMousePos[1];
+
+    this.prevMousePos = this.mousePos;
   }
 
   _updateAttack() {

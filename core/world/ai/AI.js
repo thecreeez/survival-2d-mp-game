@@ -165,6 +165,10 @@ class AI {
 
   // Мстить
   handleDamage(entity) {
+    if (!entity) {
+      return;
+    }
+
     this.currentTarget = entity;
     this.currentTargetPos = [...entity.getPosition()];
 
