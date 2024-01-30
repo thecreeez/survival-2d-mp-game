@@ -14,10 +14,13 @@ class LivingEntity extends Entity {
   direction = new SharedData("direction", SharedData.POS_T, [0, 0]).makeImportant();
 
   attack_range = new SharedData("attack_range", SharedData.NUM_T, 20);
+  view_range = new SharedData("view_range", SharedData.NUM_T, 1000);
   damage = new SharedData("damage", SharedData.NUM_T, 1);
+
   b_alive = new SharedData("b_alive", SharedData.BUL_T, true);
 
   effects = new SharedData("effects", SharedData.JSN_T, []);
+  ai_data = new SharedData("ai_data", SharedData.JSN_T, {});
 
   // SERVER
   lastTimeMove = 0;
@@ -29,15 +32,21 @@ class LivingEntity extends Entity {
   currentSprite = 0;
   currentSpriteTime = 0;
 
-  constructor({ health = 100, worldId = "core:spawn", position = [0, 0], customTexture = "default", moveSpeed = 1, attackRange = 20, damage = 1, states = ["idle"], tags = [] } = {}) {
+  constructor({ health = 100, worldId = "core:spawn", position = [0, 0], customTexture = "default", moveSpeed = 1, attackRange = 20, damage = 1, states = ["idle"], tags = [], ai = null } = {}) {
     super({ position, customTexture, worldId, tags });
 
     this.health.setValue(health);
     this.move_speed.setValue(moveSpeed);
     this.attack_range.setValue(attackRange);
     this.damage.setValue(damage);
-    this.states = states;
 
+    this.ai = ai;
+
+    if (this.ai) {
+      this.ai.entity = this;
+    }
+
+    this.states = states;
     this.maxHealth = health;
   }
 
@@ -45,6 +54,10 @@ class LivingEntity extends Entity {
     this.updateServerState(application, deltaTick);
     this.updateServerMovement(application, deltaTick);
     this.updateServerRotation(application, deltaTick);
+
+    if (this.ai) {
+      this.ai.updateServerTick(application, deltaTick);
+    }
   }
 
   updateServerMovement(application, deltaTick) {
@@ -104,6 +117,20 @@ class LivingEntity extends Entity {
 
     if (this.getState() == "hurt" && this.hurt_time.getValue() <= 0) {
       this.setState("idle");
+    }
+
+    if (this.ai) {
+      if (this.ai.currentTarget && this.distanceTo(this.ai.currentTarget) < this.attack_range.getValue() && this.getState() != "attack") {
+        this.setState("attack");
+      }
+
+      if (!this.ai.currentTarget && this.getState() == "attack") {
+        this.setState("idle");
+      }
+
+      if (this.ai.currentTarget && this.distanceTo(this.ai.currentTarget) > this.attack_range.getValue() && this.getState() == "attack") {
+        this.setState("idle");
+      }
     }
   }
 
@@ -199,8 +226,28 @@ class LivingEntity extends Entity {
     return this.b_alive.getValue();
   }
 
-  canAttack() {
+  canAttack(entity) {
+    if (entity.isDead()) {
+      return false;
+    }
+
+    if (this.distanceTo(entity) > this.attack_range.getValue()) {
+      return false;
+    }
+
+    if (!entity.health) {
+      return false;
+    }
+
+    if (entity.hurt_time.getValue() > 0) {
+      return false;
+    }
+
     return true;
+  }
+
+  canShoot() {
+    return this.b_alive.getValue();
   }
 
   canRotate(application) {
@@ -209,6 +256,22 @@ class LivingEntity extends Entity {
 
   isDead() {
     return !this.b_alive.getValue();
+  }
+
+  getAIData() {
+    return this.ai_data;
+  }
+
+  getViewDistance() {
+    return this.view_range.getValue();
+  }
+
+  getAttackRange() {
+    return this.attack_range.getValue();
+  }
+
+  getMoveSpeed() {
+    return this.move_speed.getValue();
   }
 }
 

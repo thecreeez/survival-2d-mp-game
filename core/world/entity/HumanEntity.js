@@ -57,10 +57,6 @@ class HumanEntity extends LivingEntity {
     }
   }
 
-  canAttack() {
-    return super.canAttack() && this.b_alive.getValue();
-  }
-
   canMove(application) {
     return super.canMove(application) && !this.bAttacking();
   }

@@ -1,6 +1,7 @@
-import EntityWithAI from "./EntityWithAI.js";
+import MeleeAI from "../ai/MeleeAI.js";
+import LivingEntity from "./LivingEntity.js";
 
-class SpiderEntity extends EntityWithAI {
+class SpiderEntity extends LivingEntity {
   static id = `spider_entity`;
   static size = [50, 50];
 
@@ -9,8 +10,10 @@ class SpiderEntity extends EntityWithAI {
       position,
       visionRange: 100,
       health: 100,
-      target_class: "core:player_entity",
-      target_tag: "human",
+      ai: new MeleeAI({
+        targetId: "core:player_entity",
+        targetTag: "human",
+      }),
       damage: 3,
       attackRange: 50,
       moveSpeed: 1,

@@ -66,11 +66,11 @@ class PlayerEntity extends HumanEntity {
       return;
     }
 
-    if (this.bAttacking() && this.canAttack() && this.getState() != "attack") {
+    if (this.bAttacking() && this.canShoot() && this.getState() != "attack") {
       this.setState("attack")
     }
 
-    if (this.getState() == "attack" && (!this.bAttacking() || !this.canAttack())) {
+    if (this.getState() == "attack" && (!this.bAttacking() || !this.canShoot())) {
       this.setState("idle")
     }
 

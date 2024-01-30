@@ -145,7 +145,7 @@ class Entity {
     let entityData = [];
 
     for (let property in this) {
-      if (this[property].needToSerialize && (this[property].bUpdated || this[property].bForcedSend)) {
+      if (this[property] && this[property].needToSerialize && (this[property].bUpdated || this[property].bForcedSend)) {
         entityData.push(this[property].serialize());
       }
     }
