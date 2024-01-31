@@ -3,7 +3,6 @@ import PlayerEntity from "/core/world/entity/PlayerEntity.js";
 
 class PlayerEntityRenderer extends HumanEntityRenderer {
   static Entity = PlayerEntity;
-  static Type = "friend";
 
   static renderMain({ ctx, entity, renderHealthBar }) {
     super.renderMain({ ctx, entity, renderHealthBar });

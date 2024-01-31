@@ -90,30 +90,31 @@ class Application {
 
     console.log(`Loading packs...`)
     for (let packId in this._packs) {
-      console.log(`Pack ${packId} loading...`)
+      console.log(`Pack [${packId}] loading...`)
       this._packs[packId].entities.forEach((entityClass) => {
-        console.log(`Entity ${entityClass.id} registering...`)
         EntityRegistry.register(packId, entityClass.id, entityClass);
         entityClass.pack = `${packId}`;
 
         entityClass.onRegister(this);
       })
+      console.log(`Loaded: ${this._packs[packId].entities.length} entities.`)
 
       this._packs[packId].packets.forEach((packetClass) => {
-        console.log(`Packet ${packetClass.type} registering...`);
         PacketRegistry.register(packId, packetClass.type, packetClass);
         packetClass.type = `${packId}:${packetClass.type}`;
       })
+      console.log(`Loaded: ${this._packs[packId].packets.length} packets.`)
 
       this._packs[packId].items.forEach((item) => {
-        console.log(`Item ${item.id} registering...`);
         ItemRegistry.register(packId, item.id, item);
         item.id = `${packId}:${item.id}`;
       })
+      console.log(`Loaded: ${this._packs[packId].items.length} items.`)
 
       this._packs[packId].props.forEach((prop) => {
         PropRegistry.register(packId, prop.id, prop);
       })
+      console.log(`Loaded: ${this._packs[packId].props.length} props.`)
 
       if (this.isClient()) {
         console.log(`Registering assets...`);
@@ -122,6 +123,7 @@ class Application {
 
       console.log(`Pack ${packId} loaded.`)
     }
+    console.log(`Pack loading end.`)
   }
 
   getPack(packId) {

@@ -1,4 +1,5 @@
 import MathUtils from "../../../../../core/utils/MathUtils.js";
+import Client from "../../Client.js";
 import PackAssetsRegistry from "../../registry/PackAssetsRegistry.js";
 import EntityRenderer from "./EntityRenderer.js";
 
@@ -8,8 +9,8 @@ class LivingEntityRenderer extends EntityRenderer {
 
   static healthBarCanvas = document.createElement("canvas");
 
-  static renderMain({ctx, entity, renderHealthBar = true}) {
-    super.renderMain({ctx, entity});
+  static renderMain({ ctx, entity, renderHealthBar = true }) {
+    super.renderMain({ ctx, entity });
     if (!this.getCurrentSprite(entity)) {
       return;
     }
@@ -18,20 +19,20 @@ class LivingEntityRenderer extends EntityRenderer {
     ctx.fillStyle = `white`;
 
     if (renderHealthBar) {
-      this.renderHealthBar({ctx, entity});
+      this.renderHealthBar({ ctx, entity });
     }
   }
 
-  static renderDebug({ctx, entity}) {
-    super.renderDebug({ctx, entity});
+  static renderDebug({ ctx, entity }) {
+    super.renderDebug({ ctx, entity });
   }
 
-  static updateEntity({entity, deltaTime}) {
-    super.updateEntity({entity, deltaTime});
+  static updateEntity({ entity, deltaTime }) {
+    super.updateEntity({ entity, deltaTime });
     this.updateState(entity);
   }
 
-  static endUpdateEntity({entity, deltaTime}) {
+  static endUpdateEntity({ entity, deltaTime }) {
     let stateData = this[entity.getState()];
 
     if (entity.currentSprite >= stateData.sprites && !stateData.repeatable) {
@@ -91,11 +92,11 @@ class LivingEntityRenderer extends EntityRenderer {
     return spriteSheet.get(entity.currentSprite, entity.getStateId(), flipped);
   }
 
-  static renderHealthBar({ctx, entity}) {
-    let healthBarBackground = this.getHealthBar(false);
+  static renderHealthBar({ ctx, entity }) {
+    let healthBarBackground = this.getHealthBar(entity, false);
     ctx.drawImage(healthBarBackground, entity.getPosition()[0] - healthBarBackground.width * 0.75, entity.getPosition()[1] - this.size[1] * 1.2, healthBarBackground.width * 1.5, healthBarBackground.height * 1.5);
 
-    let healthBarFull = this.getHealthBar(true);
+    let healthBarFull = this.getHealthBar(entity, true);
 
     this.healthBarCanvas.width = healthBarBackground.width;
     this.healthBarCanvas.height = healthBarBackground.height;
@@ -110,14 +111,30 @@ class LivingEntityRenderer extends EntityRenderer {
     ctx.drawImage(this.healthBarCanvas, entity.getPosition()[0] - healthBarBackground.width * 0.75, entity.getPosition()[1] - this.size[1] * 1.2, healthBarBackground.width * 1.5, healthBarBackground.height * 1.5);
   }
 
-  static getHealthBar(bFilled = false) {
+  static getHealthBar(entity, bFilled = false) {
     let height = bFilled ? 1 : 0;
 
-    switch (this.Type) {
+    switch (this.getEntityType(entity)) {
       case "friend": return PackAssetsRegistry.getUISheet("core", "health-bars").get(0, height);
       case "enemy": return PackAssetsRegistry.getUISheet("core", "health-bars").get(2, height);
       default: return PackAssetsRegistry.getUISheet("core", "health-bars").get(1, height);
     }
+  }
+
+  static getEntityType(entity) {
+    if (entity === Client.instance.getPlayer()) {
+      return "friend";
+    }
+
+    if (entity.getLeaderName && entity.getLeaderName() === Client.instance.getPlayer().getName()) {
+      return "friend";
+    }
+
+    if (entity.haveTag("hostile")) {
+      return "enemy";
+    }
+
+    return "neutral";
   }
 }
 

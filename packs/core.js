@@ -59,10 +59,6 @@ export default {
       name: "numbers",
       spriteSize: [8, 8]
     },
-    {
-      name: "font",
-      spriteSize: [10,10]
-    }
   ],
   props,
   particles: [

@@ -16,6 +16,8 @@ import PackAssetsRegistry from "./registry/PackAssetsRegistry.js";
 
 class Client {
   constructor(username, ip) {
+    Client.instance = this;
+
     this.username = username;
     this.lastTimeUpdate = Date.now();
 

@@ -71,8 +71,6 @@ class SpriteSheet {
           }
         }
       }
-
-      console.log(`Registering spritesheet: ${path}. SpriteSize: [${this.spriteSize}]`)
       this.loaded = true;
 
       this._onloadListeners.forEach((func) => {

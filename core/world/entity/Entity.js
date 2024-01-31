@@ -211,8 +211,26 @@ class Entity {
     return this.tags;
   }
 
+  haveTag(tag) {
+    return this.tags.indexOf(tag) !== -1;
+  }
+
   getSize() {
     return this.constructor.size;
+  }
+
+  toObject() {
+    let obj = {};
+
+    for (let property in this) {
+      if (this[property] && this[property].needToSerialize) {
+        obj[`NETWORK_${property}`] = this[property].getValue();
+      } else {
+        obj[`CLIENT_${property}`] = this[property];
+      }
+    }
+    
+    return obj;
   }
 }
 
