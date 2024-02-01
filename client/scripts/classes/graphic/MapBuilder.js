@@ -1,7 +1,8 @@
-import TilePlacePacket from "../../../../core/packets/TilePlacePacket.js";
+import TilePlacePacket from "/core/packets/TilePlacePacket.js";
 import PackAssetsRegistry from "../registry/PackAssetsRegistry.js";
 import MapRenderer from "./MapRenderer.js";
 import Screen from "./Screen.js";
+import Tile from "/core/world/Tile.js";
 
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
@@ -17,7 +18,7 @@ class MapBuilder {
     this.mouseDownSelectedPos = [0,0]
     this.mouseUpSelectedPos = [0,0];
 
-    this.bEnabled = false;
+    this.bEnabled = true;
 
     this.bPackSelectorOpened = true;
     this.bTileSelectorOpened = true;
@@ -255,7 +256,10 @@ class MapBuilder {
     for (let x = xBounds[0]; x <= xBounds[1]; x++) {
       for (let y = yBounds[0]; y <= yBounds[1]; y++) {
         tilePos = Screen.getGlobalTilePos(this.client, [pos[0] + (x - xBounds[0]) * MapRenderer.tileSize, pos[1] + (y - yBounds[0]) * MapRenderer.tileSize]);
-        TilePlacePacket.clientSend(this.client.connectionHandler.getSocket(), { pos: tilePos, pack: this.tilesets[this.selectedTilesetIndex], sheetPos: [x,y] });
+        TilePlacePacket.clientSend(this.client.connectionHandler.getSocket(), 
+          { pos: tilePos, 
+            tile: new Tile({ pack: this.tilesets[this.selectedTilesetIndex], sheetPos: [x, y] })
+          });
       }
     }
   }

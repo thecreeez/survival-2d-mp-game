@@ -21,6 +21,7 @@ import core from "../packs/core.js";
 
 class Application {
   static version = 2;
+  static playerViewDistance = 5;
 
   constructor(context) {
     this._entities = {};
@@ -39,28 +40,7 @@ class Application {
     this.loadPacks(); // Передвинуть это в сервер/клиент, чтоб можно было просунуть логику подгрузки
 
     if (!this.isClient()) {
-      for (let i = -20; i < 20; i++) {
-        for (let j = -20; j < 20; j++) {
-          this.getWorld("core:spawn").setTile(new Tile({ pack: "core", pos: [i,j], sheetPos: [0,1] }))
-        }
-      }
-
-      this.getWorld("core:spawn").setTile(new Tile({ pack: "core", pos: [0, 0], sheetPos: [0, 0] }))
-
-      for (let i = -10; i < 10; i++) {
-        let state = "default";
-
-        if (Math.random() > 0.7) {
-          state = "blue";
-        }
-
-        this.spawnEntity(new PropEntity({ position: [80 * i, 0], state }));
-      }
-
-      this.spawnEntity(new PropEntity({ position: [120,120], propId: "red_car" }));
-      this.spawnEntity(new PropEntity({ position: [200, 120], propId: "red_car", state: "top" }));
-      this.spawnEntity(new SpiderEntity({ position: [600, 300] }));
-      this.spawnEntity(new HumanGuardEntity({ position: [-300, 100] }));
+      // Spawn entities place
     }
 
     Application.instance = this;
@@ -223,6 +203,11 @@ class Application {
 
   updateServerTick() {
     let startTick = Date.now();
+
+    for (let worldId in this._worlds) {
+      this._worlds[worldId].updateServerTick();
+    }
+
     for (let uuid in this._entities) {
       this._entities[uuid].startUpdateServerTick(this);
     }

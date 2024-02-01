@@ -82,6 +82,7 @@ class Client {
   }
 
   getTileAt(x, y) {
+    return false;
     let tile = this.getPlayer().getWorld().getTile([x, y]);
 
     if (!tile) {

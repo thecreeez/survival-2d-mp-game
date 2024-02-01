@@ -109,7 +109,8 @@ class Entity {
   canBeMovedTo(position) {
     let tile = this.getWorld().getTileByWorldPos(position);
 
-    if (tile && tile.haveCollision()) {
+    // Implement back collision
+    if (tile && false) {
       return false;
     }
 

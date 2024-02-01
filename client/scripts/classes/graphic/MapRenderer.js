@@ -2,6 +2,7 @@ import MathUtils from "/core/utils/MathUtils.js";
 import PackAssetsRegistry from "../registry/PackAssetsRegistry.js";
 import EntityRendererRegistry from "./EntityRendererRegistry.js";
 import EntityRenderer from "./entity/EntityRenderer.js";
+import Chunk from "/core/world/Chunk.js";
 
 class MapRenderer {
   static tileSize = 40;
@@ -30,23 +31,48 @@ class MapRenderer {
     return gameObjects;
   }
 
-  static getTilesToRender(canvas, ctx, client) {
+  static bakeChunk(chunk) {
+    chunk.baked = true;
+
+    chunk.canvas = document.createElement("canvas");
+    chunk.canvas.width = Chunk.Size[0] * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[0];
+    chunk.canvas.height = Chunk.Size[1] * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[1];
+
+    let ctx = chunk.canvas.getContext("2d");
+
+    for (let y = 0; y < Chunk.Size[1]; y++) {
+      for (let x = 0; x < Chunk.Size[0]; x++) {
+        let tile = chunk.getTile([x, y]);
+
+        ctx.drawImage(PackAssetsRegistry.getTile(tile.pack, tile.sheetPos), x * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[0], y * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[1]);
+      }
+    }
+
+    ctx.strokeStyle = `red`;
+    ctx.strokeRect(1,1,chunk.canvas.width - 1, chunk.canvas.height - 1);
+  }
+
+  static getChunksToRender(canvas, ctx, client) {
     let cameraPos = client.getPlayer().getPosition();
 
-    let size = [canvas.width / this.tileSize, canvas.height / this.tileSize]
-    let startFrom = [Math.floor((cameraPos[0] - canvas.width / 2) / this.tileSize), Math.floor((cameraPos[1] - canvas.height / 2) / this.tileSize)]
+    let size = [canvas.width / this.tileSize / Chunk.Size[0], canvas.height / this.tileSize / Chunk.Size[1]]
+    let startFrom = [Math.floor((cameraPos[0] - canvas.width / 2) / this.tileSize / Chunk.Size[0]), Math.floor((cameraPos[1] - canvas.height / 2) / this.tileSize / Chunk.Size[1])]
 
-    let tiles = [];
+    let chunks = [];
 
     for (let y = startFrom[1]; y < startFrom[1] + size[1] + 1; y += 1) {
       for (let x = startFrom[0]; x < startFrom[0] + size[0] + 1; x += 1) {
-        let screenPos = [x * this.tileSize, y * this.tileSize]
-        let tile = client.getTileAt(x, y);
+        let screenPos = [x * this.tileSize * Chunk.Size[0], y * this.tileSize * Chunk.Size[1]]
+        let chunk = client.getPlayer().getWorld().getChunk([x,y]);
 
-        if (tile) {
-          tiles.push({
-            sprite: PackAssetsRegistry.getTile(tile.pack, tile),
-            type: "tile",
+        if (chunk) {
+          if (!chunk.baked) {
+            MapRenderer.bakeChunk(chunk)
+          }
+
+          chunks.push({
+            sprite: chunk.getCanvas(),
+            type: "chunk",
             screenPos,
 
             getPosition() {
@@ -57,7 +83,7 @@ class MapRenderer {
       }
     }
 
-    return tiles;
+    return chunks;
   }
 
   static getLightMap(canvas, ctx, client) {
@@ -184,15 +210,15 @@ class MapRenderer {
 
   static renderGameObject(ctx, gameObject, deltaTime) {
     switch (gameObject.type) {
-      case "tile": return this._renderTileGameObject(ctx, gameObject, deltaTime);
+      case "chunk": return this._renderChunkGameObject(ctx, gameObject, deltaTime);
       case "particle": return this._renderParticleGameObject(ctx, gameObject, deltaTime);
       case "entity": return this._renderEntityGameObject(ctx, gameObject, deltaTime);
       default: return false;
     }
   }
 
-  static _renderTileGameObject(ctx, gameObject, deltaTime) {
-    ctx.drawImage(gameObject.sprite, gameObject.screenPos[0] - 0.5, gameObject.screenPos[1] - 0.5, MapRenderer.tileSize + 1, MapRenderer.tileSize + 1);
+  static _renderChunkGameObject(ctx, gameObject, deltaTime) {
+    ctx.drawImage(gameObject.sprite, gameObject.screenPos[0] - 0.5, gameObject.screenPos[1] - 0.5, MapRenderer.tileSize * Chunk.Size[0] + 1, MapRenderer.tileSize * Chunk.Size[1] + 1);
     return true;
   }
 

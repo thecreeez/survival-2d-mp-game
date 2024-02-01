@@ -1,14 +1,77 @@
 import Application from "../Application.js";
+import MathUtils from "../utils/MathUtils.js";
+import Vector from "../utils/Vector.js";
+import Chunk from "./Chunk.js";
+import ChunkTileGenerator from "./generator/ChunkTileGenerator.js";
 
 class World {
+  static timePerUpdateToGenerateChunks = 20;
+
   constructor({pack = "core", id} = {}) {
     this.pack = pack;
     this.id = id;
 
     this.application = false;
 
-    this._tiles = {};
+    this._spawnChunksGenerated = false;
+    this._chunks = {};
+    this._generatingChunksPipe = [];
+
     this._particles = [];
+  }
+
+  updateServerTick() {
+    this._generateChunks();
+  }
+
+  _generateChunks() {
+    if (!this._spawnChunksGenerated) {
+      this._generateSpawnChunks();
+    }
+
+    let players = this.getEntities().filter(entity => entity.getId() === `player_entity`);
+
+
+    let start = Date.now();
+    // Есть че надо загенерить
+    if (this._generatingChunksPipe.length > 0) {
+      let generatedChunks = 0;
+      for (let i = 0; i < this._generatingChunksPipe.length && (Date.now() - start < World.timePerUpdateToGenerateChunks); i++) {
+        this._generateChunk(this._generatingChunksPipe[i]);
+        generatedChunks++;
+      }
+      console.log(`Generated ${generatedChunks} chunks`)
+      this._generatingChunksPipe = this._generatingChunksPipe.splice(generatedChunks);
+    }
+  }
+
+  _generateSpawnChunks() {
+    let playerViewDistance = this.application.constructor.playerViewDistance;
+
+    let chunksToGenerate = [];
+
+    // Spawn chunks
+    for (let x = -playerViewDistance; x < playerViewDistance; x++) {
+      for (let y = -playerViewDistance; y < playerViewDistance; y++) {
+        chunksToGenerate.push([x,y]);
+      }
+    }
+
+    chunksToGenerate.sort((a,b) => new Vector(a).getLength() > new Vector(b).getLength() ? 1 : -1);
+    this._generatingChunksPipe.push(...chunksToGenerate);
+
+    this._spawnChunksGenerated = true;
+  }
+
+  _generateChunk(position) {
+    let chunk = new Chunk({
+      worldId: this.getId(),
+      position
+    });
+    //chunk.world = this;
+    ChunkTileGenerator.generate(chunk);
+    
+    this._chunks[position.join(":")] = chunk
   }
 
   update(deltaTime) {
@@ -17,75 +80,10 @@ class World {
     })
   }
 
-  save(tilePresets) {
-    if (this.isClient())
-      return false;
-
-    let tileMap = this.generateTileMap(tilePresets)
-
-    return {
-      "world": this.getId(),
-      "tile-map": tileMap
-    }
-  }
-
-  generateTileMap(tilePresets) {
-    let tileMap = {};
-
-    for (let tilePos in this.getTiles()) {
-      let tile = this.getTiles()[tilePos];
-      let tilePreset = null;
-
-      tilePresets.forEach((tilePresetCandidate, i) => {
-        if (tilePresetCandidate[0] == tile.pack.getValue() && tilePresetCandidate[1] == tile.sheetPos.getValue()[0] && tilePresetCandidate[2] == tile.sheetPos.getValue()[1]) {
-          tilePreset = i;
-        }
-      })
-
-      if (tilePreset != null) {
-        tileMap[tilePos] = tilePreset;
-      }
-    }
-
-    return tileMap;
-  }
-
-  static load(json) {
-    if (this.isClient())
-      return false;
-
-      // TO-DO: LOADING WORLDS
-    return;
-    console.log(`Loading tiles...`)
-    let presets = json["tile-presets"];
-    let tileMap = json["tile-map"];
-
-    console.log(`Tile presets... ${presets.length}`);
-
-    let i = 0;
-    for (let tilePos in tileMap) {
-      let [x, y] = tilePos.split(":");
-
-      let preset = presets[tileMap[tilePos]];
-
-      this.setTile(new Tile({
-        pack: preset[0],
-        sheetPos: [preset[1], preset[2]],
-        pos: [x, y]
-      }));
-
-      i++;
-    }
-    console.log(`Tiles... ${i}`);
-  }
-
-  getTile(pos) {
-    return this._tiles[`${Math.floor(pos[0])}:${Math.floor(pos[1])}`];
-  }
-
   getTileByWorldPos(pos) {
     let tileSize = 40;
-    return this._tiles[`${Math.floor(pos[0] / tileSize)}:${Math.floor(pos[1] / tileSize)}`];
+
+    return this.getTile([Math.floor(pos[0] / tileSize),Math.floor(pos[1] / tileSize)]);
   }
 
   spawnParticle(particle) {
@@ -101,13 +99,42 @@ class World {
     return particle;
   }
 
-  setTile(tile) {
-    this._tiles[`${tile.getPosition()[0]}:${tile.getPosition()[1]}`] = tile;
-    tile.world = this;
+  setTile(pos, tile) {
+    let chunkPos = [Math.floor(pos[0] / Chunk.Size[0]), Math.floor(pos[1] / Chunk.Size[1])];
+
+    if (this._chunks[chunkPos.join(":")]) {
+      this._chunks[chunkPos.join(":")].setTile([pos[0] - chunkPos[0] * Chunk.Size[0], pos[1] - chunkPos[1] * Chunk.Size[1]], tile);
+      this._chunks[chunkPos.join(":")].baked = false;
+    }
   }
 
-  getTiles() {
-    return this._tiles;
+  getTile(pos) {
+    let chunkPos = [Math.floor(pos[0] / Chunk.Size[0]), Math.floor(pos[1] / Chunk.Size[1])];
+
+    let chunk = this._chunks[chunkPos.join(":")]
+
+    if (!chunk) {
+      return false;
+    }
+
+    return chunk.getTile([pos[0] % Chunk.Size[0], pos[1] % Chunk.Size[1]]);
+  }
+
+  setChunk(chunk) {
+    this._chunks[chunk.position.getValue().join(":")] = chunk;
+    chunk.world = this;
+  }
+
+  getChunk(pos) {
+    return this._chunks[pos.join(":")];
+  }
+
+  getChunks() {
+    let chunks = [];
+    for (let chunkPos in this._chunks) {
+      chunks.push(this._chunks[chunkPos]);
+    }
+    return chunks;
   }
 
   getId() {

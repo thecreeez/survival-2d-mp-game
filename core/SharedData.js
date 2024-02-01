@@ -1,3 +1,5 @@
+import Tile from "./world/Tile.js";
+
 class SharedData {
   // Строки
   static STR_T = ["STR_T"]
@@ -13,6 +15,9 @@ class SharedData {
 
   // Позиция (числовой массив)
   static POS_T = ["POS_T", (elem) => elem.split(":").map((pos) => Number(pos)), (elem) => elem.join(":")];
+
+  // Массив тайлов
+  static TILE_ARR_T = ["TILE_ARR_T", (elem) => elem.split(":").map((tileSerialized) => Tile.parse(tileSerialized)), (elem) => elem.map(tile => tile.serialize()).join(":")];
 
   static SEPARATOR = `|`
 

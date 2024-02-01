@@ -20,6 +20,7 @@ import ParticleSpawnPacket from "../core/packets/ParticleSpawnPacket.js";
 import ShopInteractPacket from "../core/packets/ShopInteractPacket.js";
 
 import props from "./core_props.js";
+import ChunkRegisterPacket from "../core/packets/ChunkRegisterPacket.js";
 
 export default {
   pack: "core",
@@ -43,7 +44,7 @@ export default {
     EntityRegisterPacket,
     EntityUpdatePacket,
     EntityRemovePacket,
-    TilesRegisterPacket,
+    ChunkRegisterPacket,
     TilePlacePacket,
     MovementUpdatePacket,
     CommandInputPacket,

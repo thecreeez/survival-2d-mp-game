@@ -4,6 +4,7 @@ import EntityRegisterPacket from "./EntityRegisterPacket.js";
 import ClientErrorPacket from "./ClientErrorPacket.js";
 import WelcomePacket from "./WelcomePacket.js";
 import TilesRegisterPacket from "./TilesRegisterPacket.js";
+import ChunkRegisterPacket from "./ChunkRegisterPacket.js";
 
 class HandshakePacket {
   static type = "handshake";
@@ -46,14 +47,11 @@ class HandshakePacket {
       EntityRegisterPacket.serverSend([conn], { context: EntityRegisterPacket.Contexts.loading, serializedEntity: entity.serialize() });
     })
 
-    let tiles = [];
+    let chunks = joinedPlayerEntity.getWorld().getChunks();
 
-    for (let tilePos in joinedPlayerEntity.getWorld().getTiles()) {
-      let tile = joinedPlayerEntity.getWorld().getTiles()[tilePos];
-      tiles.push(tile.serialize());
-    }
-
-    TilesRegisterPacket.serverSend([conn], tiles);
+    chunks.forEach((chunk,i) => {
+      ChunkRegisterPacket.serverSend([conn], chunk);
+    })
 
     server.addPlayerConnection(conn, args[1], joinedPlayerEntity);
 
