@@ -122,7 +122,7 @@ class PackAssetsRegistry extends Registry {
 
   static getTile(pack, pos) {
     if (!PackAssetsRegistry.packs[pack]) {
-      console.error(`Pack isn't exist...`);
+      console.error(`Pack isn't exist... [${pack}]`);
       return false;
     }
 

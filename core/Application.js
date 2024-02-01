@@ -15,13 +15,12 @@ import EntityRemovePacket from "./packets/EntityRemovePacket.js";
 import MovementUpdatePacket from "./packets/MovementUpdatePacket.js";
 
 import SharedData from "./SharedData.js";
-import Tile from "./world/Tile.js";
 
 import core from "../packs/core.js";
 
 class Application {
   static version = 2;
-  static playerViewDistance = 5;
+  static playerViewDistance = 1;
 
   constructor(context) {
     this._entities = {};

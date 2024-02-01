@@ -1,7 +1,7 @@
 import SharedData from "../SharedData.js";
 
 class Chunk {
-  static Size = [16,16];
+  static Size = [32,32];
 
   world_id = new SharedData("world_id", SharedData.STR_T, "core:spawn");
   position = new SharedData("position", SharedData.POS_T, [0,0]);
@@ -32,6 +32,25 @@ class Chunk {
     return this.tiles.getValue()[position[1] * Chunk.Size[0] + position[0]];
   }
 
+  getWorld() {
+    return this.world;
+  }
+
+  getCanvas() {
+    return this.canvas;
+  }
+
+  getAdjacentChunks() {
+    let [x,y] = this.position.getValue();
+
+    return {
+      left: this.world.getChunk([x - 1, y]),
+      right: this.world.getChunk([x + 1, y]),
+      top: this.world.getChunk([x, y - 1]),
+      bottom: this.world.getChunk([x, y + 1]),
+    };
+  }
+
   static parse(data) {
     let dataFragments = data.split("\\ch\\");
 
@@ -59,14 +78,6 @@ class Chunk {
     }
 
     return particleData.join("\\ch\\");
-  }
-
-  getWorld() {
-    return this.world;
-  }
-
-  getCanvas() {
-    return this.canvas;
   }
 }
 

@@ -39,12 +39,15 @@ class MapRenderer {
     chunk.canvas.height = Chunk.Size[1] * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[1];
 
     let ctx = chunk.canvas.getContext("2d");
+    ctx.fillStyle = `black`;
+    ctx.fillRect(0, 0, chunk.canvas.width, chunk.canvas.height);
 
     for (let y = 0; y < Chunk.Size[1]; y++) {
       for (let x = 0; x < Chunk.Size[0]; x++) {
         let tile = chunk.getTile([x, y]);
 
-        ctx.drawImage(PackAssetsRegistry.getTile(tile.pack, tile.sheetPos), x * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[0], y * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[1]);
+        if (tile.pack === "core" && tile.sheetPos)
+          ctx.drawImage(PackAssetsRegistry.getTile(tile.pack, tile.sheetPos), x * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[0], y * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[1]);
       }
     }
 

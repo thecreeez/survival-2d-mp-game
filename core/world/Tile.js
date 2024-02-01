@@ -15,6 +15,10 @@ class Tile {
     return new Tile({ pack: args[0], sheetPos: [Number(args[1]), Number(args[2])] })
   }
 
+  static parseFromArray(args) {
+    return new Tile({ pack: args[0], sheetPos: [Number(args[1]), Number(args[2])] })
+  }
+
   serialize() {
     return [this.pack, ...this.sheetPos].join(";");
   }
