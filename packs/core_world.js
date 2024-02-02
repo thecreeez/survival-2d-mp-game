@@ -85,100 +85,65 @@ let commonRule = WorldRules.addRule("common", [
   .addLeft()
   .addRight();
 
-/**
- * VERTICAL
- */
-let roadVerticalLeftRule = WorldRules.addRule("road_vertical_left", [
-  ["core", 1, 6]
-]).addTop()
-  .addDown()
-  .addLeft(commonRule);
-
-let roadVerticalRightRule = WorldRules.addRule("road_vertical_right", [
-  ["core", 2, 6]
-]).addTop()
-  .addDown()
-  .addLeft(roadVerticalLeftRule)
-  .addRight(commonRule);
-
-/**
- * VERTICAL ROAD ENDS
- */
-let roadVerticalLeftTopEndRule = WorldRules.addRule("road_vertical_left_top_end", [
-  ["core", 0, 8]
-]).addTop(commonRule)
-  .addLeft(commonRule)
-  .addDown(roadVerticalLeftRule)
-
-let roadVerticalRightTopEndRule = WorldRules.addRule("road_vertical_right_top_end", [
-  ["core", 1, 8]
-]).addTop(commonRule)
+let verticalRoad = WorldRules.addRule("vertical_road", [
+  ["core", 1, 6, "0:0"], ["core", 2, 6, "1:0"],
+  ["core", 1, 6, "0:1"], ["core", 2, 6, "1:1"],
+]).addLeft(commonRule)
   .addRight(commonRule)
-  .addDown(roadVerticalRightRule)
-  .addLeft(roadVerticalLeftTopEndRule);
+  .addTop()
+  .addDown();
 
-let roadVerticalLeftBottomEndRule = WorldRules.addRule("road_vertical_left_bottom_end", [
-  ["core", 1, 7]
-]).addDown(commonRule)
+let horizontalRoad = WorldRules.addRule("horizontal_road", [
+  ["core", 0, 6, "0:0"], ["core", 0, 6, "1:0"],
+  ["core", 0, 7, "0:1"], ["core", 0, 7, "1:1"],
+]).addLeft()
+  .addRight()
+  .addTop(commonRule)
+  .addDown(commonRule);
+
+let rotateRightToDown = WorldRules.addRule("road_rotate_right_to_down", [
+  ["core", 4, 5, "0:0"], ["core", 5, 5, "1:0"],
+  ["core", 4, 6, "0:1"], ["core", 5, 6, "1:1"],
+]).addRight(horizontalRoad)
   .addLeft(commonRule)
-  .addTop(roadVerticalLeftRule)
+  .addTop(commonRule);
 
-let roadVerticalRightBottomEndRule = WorldRules.addRule("road_vertical_right_bottom_end", [
-  ["core", 2, 7]
-]).addDown(commonRule)
+let rotateRightToTop = WorldRules.addRule("road_rotate_right_to_top", [
+  ["core", 4, 7, "0:0"], ["core", 5, 7, "1:0"],
+  ["core", 4, 8, "0:1"], ["core", 5, 8, "1:1"],
+]).addRight(horizontalRoad)
+  .addTop(verticalRoad)
+  .addLeft(commonRule)
+  .addDown(horizontalRoad)
+  .addDown(commonRule);
+
+let rotateLeftToDown = WorldRules.addRule("road_rotate_left_to_down", [
+  ["core", 6, 5, "0:0"], ["core", 7, 5, "1:0"],
+  ["core", 6, 6, "0:1"], ["core", 7, 6, "1:1"],
+]).addLeft(horizontalRoad)
+  .addDown(verticalRoad)
   .addRight(commonRule)
-  .addTop(roadVerticalRightRule)
-  .addLeft(roadVerticalLeftBottomEndRule);
+  .addTop(commonRule)
+  .addLeft(rotateRightToTop)
 
-/**
- * HORIZONTAL
- */
-let roadHorizontalTopRule = WorldRules.addRule("road_horizontal_top", [
-  ["core", 0, 6]
-]).addTop(commonRule)
-  .addLeft()
-  .addRight();
-
-let roadHorizontalBottomRule = WorldRules.addRule("road_horizontal_bottom", [
-  ["core", 0, 7]
-]).addTop(roadHorizontalTopRule)
+let rotateLeftToTop = WorldRules.addRule("road_rotate_left_to_top", [
+  ["core", 6, 7, "0:0"], ["core", 7, 7, "1:0"],
+  ["core", 6, 8, "0:1"], ["core", 7, 8, "1:1"],
+]).addRight(commonRule)
   .addDown(commonRule)
-  .addLeft()
-  .addRight();
+  .addLeft(horizontalRoad)
+  .addTop(rotateLeftToDown)
+  .addTop(verticalRoad)
+  .addTop(rotateRightToDown);
 
-/**
- * HORIZONTAL ROAD ENDS
- */
-
-/**
- * CROSSROADS
- */
-let roadCrossroadTopLeftRule = WorldRules.addRule("road_crossroad_top_left", [
-  ["core", 8, 5]
-]).addTop(roadVerticalLeftRule)
-  .addTop(roadVerticalLeftTopEndRule)
-  .addLeft(roadHorizontalTopRule)
-
-let roadCrossroadTopRightRule = WorldRules.addRule("road_crossroad_top_right", [
-  ["core", 9, 5]
-]).addTop(roadVerticalRightRule)
-  .addTop(roadVerticalRightTopEndRule)
-  .addLeft(roadCrossroadTopLeftRule)
-  .addRight(roadHorizontalTopRule);
-
-let roadCrossroadBottomLeftRule = WorldRules.addRule("road_crossroad_bottom_left", [
-  ["core", 8, 6]
-]).addTop(roadCrossroadTopLeftRule)
-  .addDown(roadVerticalLeftRule)
-  .addDown(roadVerticalLeftBottomEndRule)
-  .addLeft(roadHorizontalBottomRule);
-
-let roadCrossroadBottomRightRule = WorldRules.addRule("road_crossroad_bottom_right", [
-  ["core", 9, 6]
-]).addTop(roadCrossroadTopRightRule)
-  .addLeft(roadCrossroadBottomLeftRule)
-  .addDown(roadVerticalRightRule)
-  .addDown(roadVerticalRightBottomEndRule)
-  .addRight(roadHorizontalBottomRule);
+let crossroad = WorldRules.addRule("crossroad", [
+  ["core", 8, 5, "0:0"], ["core", 9, 5, "1:0"],
+  ["core", 8, 6, "0:1"], ["core", 9, 6, "1:1"],
+]).addLeft(horizontalRoad)
+  .addRight(horizontalRoad)
+  .addTop(verticalRoad)
+  .addDown(verticalRoad)
+  .addDown(rotateLeftToTop)
+  .addTop(rotateRightToDown);
 
 export default WorldRules.rules;

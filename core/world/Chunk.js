@@ -1,7 +1,7 @@
 import SharedData from "../SharedData.js";
 
 class Chunk {
-  static Size = [32,32];
+  static Size = [8,8];
 
   world_id = new SharedData("world_id", SharedData.STR_T, "core:spawn");
   position = new SharedData("position", SharedData.POS_T, [0,0]);
@@ -38,6 +38,10 @@ class Chunk {
 
   getCanvas() {
     return this.canvas;
+  }
+
+  getPosition() {
+    return this.position.getValue();
   }
 
   getAdjacentChunks() {

@@ -34,6 +34,33 @@ class World {
 
     let players = this.getEntities().filter(entity => entity.getId() === `player_entity`);
 
+    players.forEach(player => {
+      return;
+      let chunkPosition = [Math.floor(player.getPosition()[0] / Chunk.Size[0]), Math.floor(player.getPosition()[1] / Chunk.Size[1])];
+      let playerViewDistance = this.application.constructor.playerViewDistance;
+      let chunksToGenerate = [];
+
+      // Spawn chunks
+      for (let x = -playerViewDistance; x < playerViewDistance; x++) {
+        for (let y = -playerViewDistance; y < playerViewDistance; y++) {
+          if (!this.getChunk([x + chunkPosition[0], y + chunkPosition[1]])) {
+            let needToPush = true;
+            this._generatingChunksPipe.forEach((pos) => {
+              if (pos[0] == x && pos[1] == y) {
+                needToPush = false;
+              }
+            })
+
+            if (needToPush)
+              chunksToGenerate.push([x, y]);
+          }
+        }
+      }
+
+      chunksToGenerate.sort((a, b) => new Vector([a[0] - chunkPosition[0], a[1] - chunkPosition[1]]).getLength() > new Vector([b[0] - chunkPosition[0], b[1] - chunkPosition[1]]).getLength() ? 1 : -1);
+      this._generatingChunksPipe.push(...chunksToGenerate);
+    })
+
 
     let start = Date.now();
     // Есть че надо загенерить
@@ -41,10 +68,11 @@ class World {
       let generatedChunks = 0;
       for (let i = 0; i < this._generatingChunksPipe.length && (Date.now() - start < World.timePerUpdateToGenerateChunks); i++) {
         this._generateChunk(this._generatingChunksPipe[i]);
+        console.log(this._generatingChunksPipe[i])
         generatedChunks++;
       }
-      console.log(`Generated ${generatedChunks} chunks`)
-      this._generatingChunksPipe = this._generatingChunksPipe.splice(generatedChunks);
+      console.log(`Generated ${generatedChunks} chunk ${Date.now() - start}`)
+      this._generatingChunksPipe.splice(0, generatedChunks);
     }
   }
 

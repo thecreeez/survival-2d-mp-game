@@ -60,22 +60,12 @@ class Screen {
   static renderWorld(client, deltaTime) {
     ctx.save();
     ctx.translate(canvas.width / 2 - client.getPlayer().getPosition()[0], canvas.height / 2 - client.getPlayer().getPosition()[1]);
-
-    let lightMap = false;
-    if (client.lightEngineOn) {
-      lightMap = MapRenderer.getLightMap(canvas, ctx, client);
-    }
-
     let chunksQueue = MapRenderer.getChunksToRender(canvas, ctx, client);
 
     // Chunks
     chunksQueue.forEach((gameObject) => {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
-
-    if (client.lightEngineOn) {
-      MapRenderer.renderLightSources(ctx, lightMap);
-    }
 
     let queue = []
     queue.push(...MapRenderer.getEntitiesToRender(canvas, ctx, client));
@@ -86,10 +76,6 @@ class Screen {
     queue.forEach((gameObject, i) => {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
-
-    if (client.lightEngineOn) {
-      MapRenderer.renderFog(ctx, lightMap);
-    }
 
     ctx.restore();
 

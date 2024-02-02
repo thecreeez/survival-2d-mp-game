@@ -3,6 +3,7 @@ import PackAssetsRegistry from "../registry/PackAssetsRegistry.js";
 import EntityRendererRegistry from "./EntityRendererRegistry.js";
 import EntityRenderer from "./entity/EntityRenderer.js";
 import Chunk from "/core/world/Chunk.js";
+import Application from "/core/Application.js";
 
 class MapRenderer {
   static tileSize = 40;
@@ -12,7 +13,6 @@ class MapRenderer {
   static minLightLevel = 3;
 
   static getEntitiesToRender(canvas, ctx, client) {
-
     let gameObjects = [];
 
     let nearEntities = client.application.getEntities().filter((entity) => entity.distanceTo(client.getPlayer()) < Math.max(canvas.width / 2, canvas.height / 2));
@@ -46,13 +46,59 @@ class MapRenderer {
       for (let x = 0; x < Chunk.Size[0]; x++) {
         let tile = chunk.getTile([x, y]);
 
-        if (tile.pack === "core" && tile.sheetPos)
+        if (tile && PackAssetsRegistry.getTile(tile.pack, tile.sheetPos))
           ctx.drawImage(PackAssetsRegistry.getTile(tile.pack, tile.sheetPos), x * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[0], y * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[1]);
+        //ctx.fillText(tile.generatingQueue, x * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[0], y * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[1] + 10);
       }
     }
 
-    ctx.strokeStyle = `red`;
-    ctx.strokeRect(1,1,chunk.canvas.width - 1, chunk.canvas.height - 1);
+    this.bakeLightChunk(chunk);
+  }
+
+  static bakeLightChunk(chunk) {
+    let lightSources = this.getLightSources(Application.instance.context);
+
+    chunk.canvasLight = document.createElement("canvas");
+    chunk.canvasLight.width = Chunk.Size[0];
+    chunk.canvasLight.height = Chunk.Size[1];
+
+    let ctx = chunk.canvasLight.getContext("2d");
+
+    for (let y = 0; y < Chunk.Size[1]; y++) {
+      for (let x = 0; x < Chunk.Size[0]; x++) {
+        let worldPos = [(chunk.getPosition()[0] * Chunk.Size[0] + x) * this.tileSize, (chunk.getPosition()[1] * Chunk.Size[1] + y) * this.tileSize];
+
+        let light = 0;
+        let lightColor = [0, 0, 0];
+        let amountOfLightColors = 0;
+
+        lightSources.forEach((gameObject) => {
+          let lightSource = gameObject;
+          let lightImpact = lightSource.lightLevel - MathUtils.getDistance(worldPos, [lightSource.getPosition()[0], lightSource.getPosition()[1] - MapRenderer.tileSize / 3]);
+
+          if (lightImpact > light) {
+            light = lightImpact;
+          }
+
+          if (lightImpact > 0 && lightSource.lightColor) {
+            lightColor[0] = (lightColor[0] + (lightSource.lightColor[0] * lightImpact));
+            lightColor[1] = (lightColor[1] + (lightSource.lightColor[1] * lightImpact));
+            lightColor[2] = (lightColor[2] + (lightSource.lightColor[2] * lightImpact));
+
+            amountOfLightColors++;
+          }
+        })
+
+        ctx.fillStyle = `rgba(30,30,30,${1 - (Math.max(light, MapRenderer.minLightLevel) / MapRenderer.maxLightLevel)})`
+        ctx.fillRect(worldPos[0], worldPos[1], this.tileSize, this.tileSize);
+
+        if (amountOfLightColors > 0) {
+          lightColor[0] /= amountOfLightColors;
+          lightColor[1] /= amountOfLightColors;
+          lightColor[2] /= amountOfLightColors;
+        }
+      }
+    }
   }
 
   static getChunksToRender(canvas, ctx, client) {
@@ -74,7 +120,9 @@ class MapRenderer {
           }
 
           chunks.push({
-            sprite: chunk.getCanvas(),
+            texture: chunk.getCanvas(),
+            light: chunk.canvasLight,
+            chunk: chunk,
             type: "chunk",
             screenPos,
 
@@ -87,84 +135,6 @@ class MapRenderer {
     }
 
     return chunks;
-  }
-
-  static getLightMap(canvas, ctx, client) {
-    let cameraPos = client.getPlayer().getPosition();
-
-    let size = [canvas.width / this.lightTileSize, canvas.height / this.lightTileSize];
-    let startFrom = [Math.floor((cameraPos[0] - canvas.width / 2) / this.lightTileSize), Math.floor((cameraPos[1] - canvas.height / 2) / this.lightTileSize)];
-
-    let lightSources = this.getLightSources(client);
-
-    let lightMap = [];
-
-    for (let y = startFrom[1]; y < startFrom[1] + size[1] + 1; y += 1) {
-      for (let x = startFrom[0]; x < startFrom[0] + size[0] + 1; x += 1) {
-        let worldPos = [x * this.lightTileSize, y * this.lightTileSize]
-
-        let light = 0;
-        let lightColor = [0, 0, 0];
-        let amountOfLightColors = 0;
-
-        lightSources.forEach((gameObject) => {          
-          let lightSource = gameObject;
-          let lightImpact = lightSource.lightLevel - MathUtils.getDistance(worldPos, [lightSource.getPosition()[0], lightSource.getPosition()[1] - MapRenderer.tileSize / 3]) / (MapRenderer.lightTileSize);
-
-          if (lightImpact > light) {
-            light = lightImpact;
-          }
-
-          if (lightImpact > 0 && lightSource.lightColor) {
-            lightColor[0] = (lightColor[0] + (lightSource.lightColor[0] * lightImpact));
-            lightColor[1] = (lightColor[1] + (lightSource.lightColor[1] * lightImpact));
-            lightColor[2] = (lightColor[2] + (lightSource.lightColor[2] * lightImpact));
-
-            amountOfLightColors++;
-          }
-        })
-
-        if (amountOfLightColors > 0) {
-          lightColor[0] /= amountOfLightColors;
-          lightColor[1] /= amountOfLightColors;
-          lightColor[2] /= amountOfLightColors;
-        }
-
-        lightMap.push({
-          worldPos,
-          lightColor,
-          light
-        })
-      }
-    }
-
-    return lightMap;
-  }
-
-  static renderLightSources(ctx, lightMap) {
-    lightMap.forEach((lightData) => {
-      let light = lightData.light;
-      let lightColor = lightData.lightColor;
-      let worldPos = lightData.worldPos;
-
-      ctx.fillStyle = `rgba(${lightColor[0] / 2}, ${lightColor[1] / 2}, ${lightColor[2] / 2},${Math.min((light / MapRenderer.maxLightLevel) - 0.2), 0.3})`;
-      ctx.fillRect(worldPos[0], worldPos[1], MapRenderer.lightTileSize + 0.5, MapRenderer.lightTileSize);
-    })
-  }
-
-  static renderFog(ctx, lightMap) {
-    lightMap.forEach((lightData) => {
-      let light = lightData.light;
-      let worldPos = lightData.worldPos;
-
-      ctx.fillStyle = `rgba(30,30,30,${1 - (Math.max(light, MapRenderer.minLightLevel) / MapRenderer.maxLightLevel)})`;
-      ctx.fillRect(worldPos[0], worldPos[1], this.lightTileSize + 0.5, this.lightTileSize);
-    })
-  }
-
-  static getLightLevel(client, worldPos) {
-    let cameraPos = client.getPlayer().getPosition();
-    return MathUtils.getDistance(worldPos, [cameraPos[0] - 20, cameraPos[1] - 20]) / 300;
   }
 
   static getLightSources(client) {
@@ -221,7 +191,9 @@ class MapRenderer {
   }
 
   static _renderChunkGameObject(ctx, gameObject, deltaTime) {
-    ctx.drawImage(gameObject.sprite, gameObject.screenPos[0] - 0.5, gameObject.screenPos[1] - 0.5, MapRenderer.tileSize * Chunk.Size[0] + 1, MapRenderer.tileSize * Chunk.Size[1] + 1);
+    ctx.drawImage(gameObject.texture, gameObject.screenPos[0], gameObject.screenPos[1], MapRenderer.tileSize * Chunk.Size[0] + 1, MapRenderer.tileSize * Chunk.Size[1] + 1);
+    //ctx.drawImage(gameObject.light, gameObject.screenPos[0], gameObject.screenPos[1], MapRenderer.tileSize * Chunk.Size[0] + 1, MapRenderer.tileSize * Chunk.Size[1] + 1);
+
     return true;
   }
 
