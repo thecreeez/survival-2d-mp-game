@@ -31,21 +31,25 @@ class ChunkTileGenerator {
       tilesToGenerate = tilesToGenerate.sort((a, b) => this.getTileVariants(adjacentChunks, chunk, a).length > this.getTileVariants(adjacentChunks, chunk, b).length ? 1 : -1);
 
       let tileVariants = this.getTileVariants(adjacentChunks, chunk, tilesToGenerate[0]);
-
-      let variant = tileVariants[Math.floor(Math.random() * tileVariants.length)];
+      let variant = this.getRandomTileVariant(tileVariants);
 
       let tilePosition = tilesToGenerate[0];
       for (let y = 0; y < ChunkTileGenerator.amountOfTilesPerGenerate; y++) {
         for (let x = 0; x < ChunkTileGenerator.amountOfTilesPerGenerate; x++) {
           let tile = new Tile({ pack: "core", sheetPos: [14 + x, 9 + y] });
+          tile.generateData = {
+            left: "common",
+            right: "common",
+            top: "common",
+            bottom: "common"
+          };
 
-          tile.generatedTag = "common";
           if (variant) {
             let tileVariants = this.getTileVariantsByGeneratingPosition(variant, x, y);
             let randomTile = tileVariants[Math.floor(tileVariants.length * Math.random())];
             
             tile = Tile.parseFromArray(randomTile);
-            tile.generatedTag = variant;
+            tile.generateData = core_world[variant].tags;
           }
 
           tile.generatingQueue = ++ChunkTileGenerator.generatingQueue;
@@ -62,21 +66,32 @@ class ChunkTileGenerator {
 
     let variants = [];
 
+    let oppositeSides = {
+      left: "right",
+      top: "bottom",
+      bottom: "top",
+      right: "left"
+    };
+
     for (let variant in core_world) {
-      let isVariantCanBeUsed = true;
+      let checks = [];
 
       for (let side in adjacentTiles) {
         if (adjacentTiles[side]) {
-          let tag = adjacentTiles[side].generatedTag;
-          let connections = core_world[variant].connections[side];
+          let variantTags = core_world[variant].tags[side];
+          let adjacentTags = adjacentTiles[side].generateData[oppositeSides[side]];
 
-          if (connections.indexOf(tag) === -1) {
-            isVariantCanBeUsed = false;
-          }
+          variantTags.forEach((variantTag) => {
+            if (adjacentTags.indexOf(variantTag) !== -1) {
+              checks.push(true);
+            }
+          })
+        } else {
+          checks.push(true);
         }
       }
 
-      if (isVariantCanBeUsed) {
+      if (checks.length === 4) {
         variants.push(variant);
       }
     }
@@ -177,6 +192,27 @@ class ChunkTileGenerator {
     })
 
     return tileVariants;
+  }
+
+  static getRandomTileVariant(variantsNames) {
+    let allWeights = 0;
+
+    variantsNames.forEach((name) => {
+      allWeights += core_world[name].weight;
+    })
+
+    let pickedWeight = Math.floor(Math.random() * allWeights);
+
+    let currentWeight = 0;
+    let pickedVariant = null;
+    variantsNames.forEach((variant) => {
+      currentWeight += core_world[variant].weight;
+
+      if (!pickedVariant && currentWeight > pickedWeight) {
+        pickedVariant = variant;
+      }
+    })
+    return pickedVariant;
   }
 }
 

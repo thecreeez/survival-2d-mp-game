@@ -59,8 +59,10 @@ class HandshakePacket {
     let welcomeMessage = server.getWelcomeMessage();
     welcomeMessage = welcomeMessage.replaceAll(`{player}`, args[1]);
     welcomeMessage = welcomeMessage.replaceAll(`{version}`, args[2]);
-
+    Application.instance.getWorld("core:spawn")._spawnChunksGenerated = false;
+    Application.instance.getWorld("core:spawn")._chunks = {};
     WelcomePacket.serverSend([conn], { message: welcomeMessage });
+
     //server.saveGame(`save_001.json`);
   }
 }
