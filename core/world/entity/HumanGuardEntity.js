@@ -32,10 +32,13 @@ class HumanGuardEntity extends HumanEntity {
         "handleAttackFromEntity": (entity) => {
           if (entity.getFullId() === "core:player_entity" && this.getLeaderName() == entity.getName()) {
             this.setMessage(`What the fuck, ${entity.getName()}?!`, 3000);
+          }
+
+          if (this.ai.isAlly(entity)) {
             this.ai.clearTarget();
           }
         }
-      } }),
+      }}),
     })
   }
 }

@@ -20,7 +20,7 @@ import core from "../packs/core.js";
 
 class Application {
   static version = 2;
-  static playerViewDistance = 5;
+  static playerViewDistance = 1;
 
   constructor(context) {
     this._entities = {};

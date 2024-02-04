@@ -27,14 +27,13 @@ class HumanEntity extends LivingEntity {
       position,
       moveSpeed,
       states: ["idle", "walk", "crawl", "attack", "hurt", "dead", "throw", ...states],
-      tags,
+      tags: ["human", ...tags],
       customTexture: type,
       ai,
       viewRange,
     })
 
     this.type.setValue(type);
-    this.tags.push("human");
 
     if (leader) {
       this.leader_name.setValue(leader.getName());

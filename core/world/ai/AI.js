@@ -217,6 +217,26 @@ class AI {
     this.currentTarget = null;
     this.currentTargetPos = [...this.entity.getPosition()];
   }
+
+  getAllies() {
+    let importantTag = this.entity.getTags()[0];
+
+    if (!importantTag) {
+      return [];
+    }
+
+    return this.entity.getWorld().getEntities().filter(entity => entity !== this.entity && entity.haveTag(importantTag));
+  }
+
+  isAlly(entity) {
+    let importantTag = this.entity.getTags()[0];
+
+    if (!importantTag) {
+      return false;
+    }
+
+    return entity.haveTag(importantTag);
+  }
 }
 
 export default AI;
