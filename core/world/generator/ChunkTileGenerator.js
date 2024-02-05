@@ -2,6 +2,7 @@ import Chunk from "../Chunk.js";
 import Tile from "../Tile.js";
 
 import core_world from "../../../packs/core_world.js";
+import EntityRegistry from "../../registry/EntityRegistry.js";
 
 class ChunkTileGenerator {
   static generatingQueue = 0;
@@ -54,6 +55,31 @@ class ChunkTileGenerator {
 
           tile.generatingQueue = ++ChunkTileGenerator.generatingQueue;
           chunk.setTile([tilePosition[0] + x, tilePosition[1] + y], tile);
+        }
+      }
+
+      if (variant && core_world[variant].spawnOnceRules && core_world[variant].spawnOnceRules.length > 0) {
+        let x = chunk.getPosition()[0] * Chunk.Size[0] * 40 + (tilePosition[0] + Math.floor(Math.random() * ChunkTileGenerator.amountOfTilesPerGenerate)) * 40 + 20;
+        let y = chunk.getPosition()[1] * Chunk.Size[1] * 40 + (tilePosition[1] + Math.floor(Math.random() * ChunkTileGenerator.amountOfTilesPerGenerate)) * 40 + 40;
+
+        let needToSpawn = Math.random() > 0.8;
+
+        if (needToSpawn) {
+          let spawnEntityIndex = Math.floor(Math.random() * core_world[variant].spawnOnceRules.length);
+          let spawnEntityRule = core_world[variant].spawnOnceRules[spawnEntityIndex];
+
+          const ruleArgs = spawnEntityRule.split("/");
+          let id = ruleArgs[0];
+          
+          let data = {
+            worldId: chunk.world.getId(),
+            position: [x,y]
+          };
+          if (id === "core:prop_entity" && ruleArgs.length > 1) {
+            data["propId"] = ruleArgs[1];
+          }
+
+          chunk.world.application.spawnEntity(new EntityRegistry[id](data));
         }
       }
 

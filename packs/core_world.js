@@ -1,7 +1,7 @@
 class GenerateRules {
   static rules = [];
 
-  static addRule(weight = 1, tiles, { left = ["common"], right = ["common"], top = ["common"], bottom = ["common"] } = {}) {
+  static addRule(weight = 1, tiles, { left = ["common"], right = ["common"], top = ["common"], bottom = ["common"] } = {}, { spawnOnceRules = [], spawnRules = [] } = {}) {
     this.rules.push({
       tiles,
       weight,
@@ -10,8 +10,10 @@ class GenerateRules {
         right,
         top,
         bottom
-      }
-    })
+      },
+      spawnOnceRules,
+      spawnRules
+    });
   }
 }
 
@@ -137,7 +139,10 @@ GenerateRules.addRule(600, [
   ["core", 0, 3],
   ["core", 1, 2],
   ["core", 1, 3]
-]);
+], {}, {
+  spawnOnceRules: ["core:prop_entity/rock"],
+  spawnRules: ["core:spider-entity"]
+});
 
 /**
  * 
@@ -154,6 +159,8 @@ GenerateRules.addRule(15, [
 ], {
   left: ["road"],
   right: ["road"]
+}, {
+  spawnOnceRules: ["core:prop_entity/barrel", "core:prop_entity/red_car"]
 });
 
 // Vertical
@@ -163,6 +170,8 @@ GenerateRules.addRule(15, [
 ], {
   top: ["road"],
   bottom: ["road"]
+}, {
+  spawnOnceRules: ["core:prop_entity/barrel", "core:prop_entity/red_car"]
 });
 
 // Crossroad
@@ -174,6 +183,8 @@ GenerateRules.addRule(2, [
   left: ["road"],
   right: ["road"],
   bottom: ["road"]
+}, {
+  spawnOnceRules: ["core:prop_entity/barrel", "core:prop_entity/red_car"]
 });
 
 // Right end
@@ -182,6 +193,8 @@ GenerateRules.addRule(1, [
   ["core", 0, 7, "0:1"], ["core", 3, 6, "1:1"],
 ], {
   left: ["road"]
+}, {
+  spawnOnceRules: ["core:prop_entity/barrel", "core:prop_entity/red_car"]
 });
 
 // Left end
@@ -190,6 +203,8 @@ GenerateRules.addRule(1, [
   ["core", 3, 8, "0:1"], ["core", 0, 7, "1:1"],
 ], {
   right: ["road"]
+}, {
+  spawnOnceRules: ["core:prop_entity/barrel", "core:prop_entity/red_car"]
 });
 
 // Top end
@@ -198,6 +213,8 @@ GenerateRules.addRule(1, [
   ["core", 1, 6, "0:1"], ["core", 2, 6, "1:1"],
 ], {
   bottom: ["road"]
+}, {
+  spawnOnceRules: ["core:prop_entity/barrel", "core:prop_entity/red_car"]
 });
 
 // Bottom end
@@ -206,6 +223,8 @@ GenerateRules.addRule(1, [
   ["core", 1, 7, "0:1"], ["core", 2, 7, "1:1"],
 ], {
   top: ["road"]
+}, {
+  spawnOnceRules: ["core:prop_entity/barrel", "core:prop_entity/red_car"]
 });
 
 // Rotates
@@ -215,6 +234,8 @@ GenerateRules.addRule(1, [
 ], {
   bottom: ["road"],
   right: ["road"]
+}, {
+  spawnOnceRules: ["core:prop_entity/barrel", "core:prop_entity/red_car"]
 });
 
 GenerateRules.addRule(1, [
@@ -231,6 +252,8 @@ GenerateRules.addRule(1, [
 ], {
   top: ["road"],
   right: ["road"]
+}, {
+  spawnOnceRules: ["core:prop_entity/barrel", "core:prop_entity/red_car"]
 });
 
 GenerateRules.addRule(1, [
@@ -239,6 +262,8 @@ GenerateRules.addRule(1, [
 ], {
   top: ["road"],
   left: ["road"]
+}, {
+  spawnOnceRules: ["core:prop_entity/barrel", "core:prop_entity/red_car"]
 });
 
 export default GenerateRules.rules;
