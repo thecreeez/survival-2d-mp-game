@@ -45,8 +45,12 @@ class MapBuilder {
     this.renderPackSelector(ctx);
     this.renderTileSelector(ctx);
     
-    if (!this.isMouseOnMenu())
+    if (!this.isMouseOnMenu() && this.shouldRenderTileOnMouse())
       this.renderTileOnMouse(ctx);
+  }
+
+  shouldRenderTileOnMouse() {
+    return this.client.getHotbar().selectedSlot === -1;
   }
 
   renderPackSelector(ctx) {

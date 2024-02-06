@@ -3,6 +3,7 @@ import ConnectionHandler from "./ConnectionHandler.js";
 import ControlsHandler from "./ControlsHandler.js";
 import MapBuilder from "./graphic/MapBuilder.js";
 import Screen from "./graphic/Screen.js";
+import Hotbar from "./graphic/Hotbar.js";
 
 import PlasmaProjectileEntityRenderer from "./graphic/entity/PlasmaProjectileEntityRenderer.js";
 import EntityRendererRegistry from "./graphic/EntityRendererRegistry.js";
@@ -98,6 +99,10 @@ class Client {
 
   getScreen() {
     return Screen;
+  }
+
+  getHotbar() {
+    return Hotbar;
   }
 }
 

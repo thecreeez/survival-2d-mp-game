@@ -87,15 +87,18 @@ class Hotbar {
 
   static handleMouseDown(mousePos) {
     let slotOnMouse = this.getSlot(mousePos);
+    let isHandled = slotOnMouse !== -1;
 
     if (this.selectedSlot !== -1 && slotOnMouse === -1) {
       ShopInteractPacket.clientSend(this.client.connectionHandler.getSocket(), 
-        { type: ShopInteractPacket.InteractType.Buy, entityId: this.entities[this.selectedSlot], position: Screen.toWorldPos(this.client, [mousePos[0], mousePos[1] + 50]) })
+        { type: ShopInteractPacket.InteractType.Buy, entityId: this.entities[this.selectedSlot], position: Screen.toWorldPos(this.client, [mousePos[0], mousePos[1] + 50]) });
+
+      isHandled = true;
     }
 
     this.selectedSlot = slotOnMouse;
 
-    return this.selectedSlot !== -1;
+    return isHandled;
   }
 }
 
