@@ -23,6 +23,50 @@ class LivingEntityRenderer extends EntityRenderer {
     }
   }
 
+  static isCollideWithEntity({ entity, position}) {
+    let boundsWidth = [entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[0] + this.size[0] / 2];
+    let boundsHeight = [entity.getPosition()[1] - this.size[1], entity.getPosition()[1]];
+
+    if (boundsWidth[0] > position[0]) {
+      return false;
+    }
+
+    if (boundsWidth[1] < position[0]) {
+      return false;
+    }
+
+    if (boundsHeight[0] > position[1]) {
+      return false;
+    }
+
+    if (boundsHeight[1] < position[1]) {
+      return false;
+    }
+
+    return true;
+  }
+
+  static renderSelection({ entity, ctx }) {
+    let client = entity.getWorld().application.context;
+    let mousePos = client.getScreen().getMousePosOnWorld(client);
+
+    let uiSheet = PackAssetsRegistry.getUISheet("core", "selection-cursor");
+
+    if (this.isCollideWithEntity({ entity, position: mousePos, ctx })) {
+      let uiSize = this.size[0] / 4;
+
+      for (let i = 0; i < 4; i++) {
+        let positions = [
+          [entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - this.size[1]],
+          [entity.getPosition()[0] + this.size[0] / 2 - uiSize, entity.getPosition()[1] - this.size[1]],
+          [entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - uiSize],
+          [entity.getPosition()[0] + this.size[0] / 2 - uiSize, entity.getPosition()[1] - uiSize],
+        ]
+        ctx.drawImage(uiSheet.get(i, 0), positions[i][0], positions[i][1], uiSize, uiSize);
+      }
+    }
+  }
+
   static renderDebug({ ctx, entity }) {
     super.renderDebug({ ctx, entity });
   }

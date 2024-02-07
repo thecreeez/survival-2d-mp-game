@@ -7,6 +7,7 @@ class EntityRenderer {
 
   static render({ctx, entity}) {
     this.renderMain({ctx, entity});
+    this.renderSelection({ ctx, entity });
     //this.renderDebug(ctx, entity);
   }
 
@@ -43,6 +44,10 @@ class EntityRenderer {
     });
   }
 
+  static renderSelection({ctx, entity}) {
+    return;
+  }
+
   static updateEntity({entity, deltaTime}) {
     this.calculateDistance(entity);
   }
@@ -67,6 +72,10 @@ class EntityRenderer {
 
     entity.distanceAfterLastRender += MathUtils.distanceBetween(entity.lastRenderedPosition, entity.getPosition());
     entity.lastRenderedPosition = entity.getPosition();
+  }
+
+  static isCollideWithEntity({ entity, position }) {
+    return false;
   }
 }
 

@@ -60,6 +60,10 @@ export default {
       name: "numbers",
       spriteSize: [8, 8]
     },
+    {
+      name: "selection-cursor",
+      spriteSize: [8,8],
+    }
   ],
   props,
   particles: [
