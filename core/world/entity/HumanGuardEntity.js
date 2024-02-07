@@ -40,6 +40,9 @@ class HumanGuardEntity extends HumanEntity {
         }
       }}),
     })
+
+    if (position)
+      this.order.position = [...position];
   }
 }
 
