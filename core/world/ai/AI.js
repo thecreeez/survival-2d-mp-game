@@ -169,6 +169,10 @@ class AI {
       return;
     }
 
+    if (entity.getOwner) {
+      entity = entity.getOwner();
+    }
+
     this.currentTarget = entity;
     this.currentTargetPos = [...entity.getPosition()];
 

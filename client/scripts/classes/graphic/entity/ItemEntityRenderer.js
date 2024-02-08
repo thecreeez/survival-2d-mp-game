@@ -10,7 +10,7 @@ class ItemEntityRenderer extends EntityRenderer {
 
   static renderMain({ctx, entity}) {
     super.renderMain({ctx, entity});
-    ctx.drawImage(this.ItemSpriteSheet.get(entity.getItem().spritePos[0], entity.getItem().spritePos[1]), entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - this.size[1] / 2 - entity.spriteUp, this.size[0], this.size[1]);
+    ctx.drawImage(this.ItemSpriteSheet.get(entity.getItem().spritePos[0], entity.getItem().spritePos[1]), entity.getPosition()[0] - entity.getSize()[0] / 2, entity.getPosition()[1] - entity.getSize()[1] / 2 - entity.spriteUp, entity.getSize()[0], entity.getSize()[1]);
   }
 
   static renderDebug({ctx, entity}) {

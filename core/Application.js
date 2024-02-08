@@ -5,11 +5,7 @@ import PropRegistry from "./registry/PropRegistry.js";
 
 import World from "./world/World.js";
 
-import SpiderEntity from "./world/entity/SpiderEntity.js";
 import PlayerEntity from "./world/entity/PlayerEntity.js";
-import PropEntity from "./world/entity/PropEntity.js";
-import HumanGuardEntity from "./world/entity/HumanGuardEntity.js";
-
 import EntityRegisterPacket from "./packets/EntityRegisterPacket.js";
 import EntityRemovePacket from "./packets/EntityRemovePacket.js";
 import MovementUpdatePacket from "./packets/MovementUpdatePacket.js";
@@ -20,7 +16,7 @@ import core from "../packs/core.js";
 
 class Application {
   static version = 2;
-  static playerViewDistance = 1;
+  static playerViewDistance = 2;
 
   constructor(context) {
     this._entities = {};

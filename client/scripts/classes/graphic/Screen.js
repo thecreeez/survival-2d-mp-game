@@ -70,7 +70,7 @@ class Screen {
     let queue = []
     queue.push(...MapRenderer.getEntitiesToRender(canvas, ctx, client));
     queue.push(...MapRenderer.getParticlesToRender(client.getPlayer().getWorld()));
-    queue = queue.sort((a, b) => a.getPosition()[1] > b.getPosition()[1] ? 1 : -1);
+    queue = queue.sort((a, b) => (a.getPosition()[1] - b.getPosition()[1]));
 
     // Entities & Particles
     queue.forEach((gameObject, i) => {

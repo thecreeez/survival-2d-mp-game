@@ -13,7 +13,7 @@ class PlasmaProjectileEntityRenderer extends EntityRenderer {
       return;
     }
 
-    ctx.drawImage(this.getSpriteSheet(entity).get(entity.currentSprite,0), entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - this.size[1], this.size[0], this.size[1]);
+    ctx.drawImage(this.getSpriteSheet(entity).get(entity.currentSprite,0), entity.getPosition()[0] - entity.getSize()[0] / 2, entity.getPosition()[1] - entity.getSize()[1], entity.getSize()[0], entity.getSize()[1]);
   }
 
   static renderDebug({ctx, entity}) {
@@ -30,7 +30,7 @@ class PlasmaProjectileEntityRenderer extends EntityRenderer {
     entity.currentSpriteTime += deltaTime;
     entity.lastTimeRendered = Date.now();
 
-    if (entity.distanceAfterLastRender > this.size[0] / 2 && false) {
+    if (entity.distanceAfterLastRender > entity.getSize()[0] / 2 && false) {
       entity.getWorld().spawnParticle(new Particle({ pack: "core", worldId: entity.getWorld().getId(), position: entity.lastRenderedPosition, lifeTime: 2000, particleType: "smoke", size: [20,20] }));
       entity.distanceAfterLastRender = 0;
     }

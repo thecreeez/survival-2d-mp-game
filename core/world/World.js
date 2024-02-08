@@ -172,8 +172,35 @@ class World {
     return `${this.pack}:${this.id}`;
   }
 
+  getEntitiesOnPos(position) {
+    let entities = this.getEntities();
+
+    return entities.filter((entity) => {
+      let boundsWidth = [entity.getPosition()[0] - entity.getSize()[0] / 2, entity.getPosition()[0] + entity.getSize()[0] / 2];
+      let boundsHeight = [entity.getPosition()[1] - entity.getSize()[1], entity.getPosition()[1]];
+
+      if (boundsWidth[0] > position[0]) {
+        return false;
+      }
+
+      if (boundsWidth[1] < position[0]) {
+        return false;
+      }
+
+      if (boundsHeight[0] > position[1]) {
+        return false;
+      }
+
+      if (boundsHeight[1] < position[1]) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+
   getEntities() {
-    return Application.instance.getEntities().filter(entity => entity.getWorld() == this);
+    return Application.instance.getEntities().filter(entity => entity.getWorld() === this);
   }
 
   getParticles() {

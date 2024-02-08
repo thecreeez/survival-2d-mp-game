@@ -16,8 +16,8 @@ class PlayerEntityRenderer extends HumanEntityRenderer {
     if (entity.getMessage()) {
       offset += 15;
     }
-
-    ctx.fillText(entity.getName(), entity.getPosition()[0], entity.getPosition()[1] - this.size[1] - offset)
+    
+    ctx.fillText(entity.getName(), entity.getPosition()[0], entity.getPosition()[1] - entity.getSize()[1] - offset)
   }
 
   static renderDebug({ ctx, entity }) {

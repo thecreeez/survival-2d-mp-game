@@ -1,11 +1,9 @@
-import MathUtils from "../../../../../core/utils/MathUtils.js";
 import Client from "../../Client.js";
 import PackAssetsRegistry from "../../registry/PackAssetsRegistry.js";
 import EntityRenderer from "./EntityRenderer.js";
 
 class LivingEntityRenderer extends EntityRenderer {
   static Entity = null;
-  static size = [50, 50];
 
   static healthBarCanvas = document.createElement("canvas");
 
@@ -14,56 +12,12 @@ class LivingEntityRenderer extends EntityRenderer {
     if (!this.getCurrentSprite(entity)) {
       return;
     }
-    ctx.drawImage(this.getCurrentSprite(entity), entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - this.size[1], this.size[0], this.size[1]);
+    ctx.drawImage(this.getCurrentSprite(entity), entity.getPosition()[0] - entity.getSize()[0] / 2, entity.getPosition()[1] - entity.getSize()[1], entity.getSize()[0], entity.getSize()[1]);
     ctx.font = `15px arial`;
     ctx.fillStyle = `white`;
 
-    if (renderHealthBar) {
+    if (renderHealthBar && !entity.isDead()) {
       this.renderHealthBar({ ctx, entity });
-    }
-  }
-
-  static isCollideWithEntity({ entity, position}) {
-    let boundsWidth = [entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[0] + this.size[0] / 2];
-    let boundsHeight = [entity.getPosition()[1] - this.size[1], entity.getPosition()[1]];
-
-    if (boundsWidth[0] > position[0]) {
-      return false;
-    }
-
-    if (boundsWidth[1] < position[0]) {
-      return false;
-    }
-
-    if (boundsHeight[0] > position[1]) {
-      return false;
-    }
-
-    if (boundsHeight[1] < position[1]) {
-      return false;
-    }
-
-    return true;
-  }
-
-  static renderSelection({ entity, ctx }) {
-    let client = entity.getWorld().application.context;
-    let mousePos = client.getScreen().getMousePosOnWorld(client);
-
-    let uiSheet = PackAssetsRegistry.getUISheet("core", "selection-cursor");
-
-    if (this.isCollideWithEntity({ entity, position: mousePos, ctx })) {
-      let uiSize = this.size[0] / 4;
-
-      for (let i = 0; i < 4; i++) {
-        let positions = [
-          [entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - this.size[1]],
-          [entity.getPosition()[0] + this.size[0] / 2 - uiSize, entity.getPosition()[1] - this.size[1]],
-          [entity.getPosition()[0] - this.size[0] / 2, entity.getPosition()[1] - uiSize],
-          [entity.getPosition()[0] + this.size[0] / 2 - uiSize, entity.getPosition()[1] - uiSize],
-        ]
-        ctx.drawImage(uiSheet.get(i, 0), positions[i][0], positions[i][1], uiSize, uiSize);
-      }
     }
   }
 
@@ -138,7 +92,7 @@ class LivingEntityRenderer extends EntityRenderer {
 
   static renderHealthBar({ ctx, entity }) {
     let healthBarBackground = this.getHealthBar(entity, false);
-    ctx.drawImage(healthBarBackground, entity.getPosition()[0] - healthBarBackground.width * 0.75, entity.getPosition()[1] - this.size[1] * 1.2, healthBarBackground.width * 1.5, healthBarBackground.height * 1.5);
+    ctx.drawImage(healthBarBackground, entity.getPosition()[0] - healthBarBackground.width * 0.75, entity.getPosition()[1] - entity.getSize()[1] * 1.2, healthBarBackground.width * 1.5, healthBarBackground.height * 1.5);
 
     let healthBarFull = this.getHealthBar(entity, true);
 
@@ -152,7 +106,7 @@ class LivingEntityRenderer extends EntityRenderer {
     healthBarContext.drawImage(healthBarFull, 0, 0);
     healthBarContext.clearRect(healthBarFull.width * hpModifier, 0, healthBarFull.width, healthBarFull.height);
 
-    ctx.drawImage(this.healthBarCanvas, entity.getPosition()[0] - healthBarBackground.width * 0.75, entity.getPosition()[1] - this.size[1] * 1.2, healthBarBackground.width * 1.5, healthBarBackground.height * 1.5);
+    ctx.drawImage(this.healthBarCanvas, entity.getPosition()[0] - healthBarBackground.width * 0.75, entity.getPosition()[1] - entity.getSize()[1] * 1.2, healthBarBackground.width * 1.5, healthBarBackground.height * 1.5);
   }
 
   static getHealthBar(entity, bFilled = false) {

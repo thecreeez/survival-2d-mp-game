@@ -84,6 +84,23 @@ class PropEntity extends Entity {
             ParticleSpawnPacket.serverSend(server, server.getPlayersConnections(), { particle })
             return;
           }
+          case "spawn_particle_damager": {
+            let server = this.getWorld().application.context;
+
+            if (!entity) {
+              console.log(`no entity`)
+              return;
+            }
+
+            let particle = this.getWorld().spawnParticle(new Particle({
+              pack: args[1],
+              particleType: args[2],
+              position: [...entity.getPosition()],
+              worldId: this.getWorld().getId(),
+            }))
+            ParticleSpawnPacket.serverSend(server, server.getPlayersConnections(), { particle })
+            return;
+          }
           case "death": this.getWorld().application.removeEntity(this.getUuid()); return;
         }
       })

@@ -54,7 +54,7 @@ class HumanEntityRenderer extends LivingEntityRenderer {
     ctx.fillStyle = `white`;
     
     if (entity.getMessage()) {
-      ctx.fillText(entity.getMessage(), entity.getPosition()[0], entity.getPosition()[1] - this.size[1] - 15)
+      ctx.fillText(entity.getMessage(), entity.getPosition()[0], entity.getPosition()[1] - entity.getSize()[1] - 15)
     }
   }
 

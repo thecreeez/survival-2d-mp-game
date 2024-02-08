@@ -98,28 +98,28 @@ export default [
       default: {
         spritePos: [0, 8],
         spriteSize: [2, 2],
-        offset: [0, 30]
+        offset: [0, 30],
       },
       left: {
         spritePos: [0, 8],
         spriteSize: [2, 2],
-        offset: [0, 30]
+        offset: [0, 30],
       },
       right: {
         spritePos: [2, 8],
         spriteSize: [2, 2],
-        offset: [0, 30]
+        offset: [0, 30],
       },
       top: {
         spritePos: [4, 8],
         spriteSize: [2, 2],
-        offset: [0, 15]
+        offset: [0, 15],
       },
       bottom: {
         spritePos: [6, 8],
         spriteSize: [2, 2],
       }
     },
-    onDamage: "death/spawn_particle:core:big-fragments"
+    onDamage: "spawn_particle_damager:core:big-fragments"
   },
 ]

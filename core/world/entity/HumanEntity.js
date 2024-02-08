@@ -15,7 +15,7 @@ class HumanEntity extends LivingEntity {
 
   type = new SharedData("type", SharedData.STR_T, "default");
 
-  attackCooldownMax = 200;
+  attackCooldownMax = 100;
   messageTime = 0;
 
   constructor({ moveSpeed, position, health, worldId, states = [], tags = [], type = "default", ai = null, viewRange = 500, leader = null } = {}) {

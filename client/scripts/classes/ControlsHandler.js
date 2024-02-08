@@ -54,6 +54,12 @@ class ControlsHandler {
 
       if (this.client.mapBuilder.handleMouseDown(pos))
         return;
+
+      let entitiesOnPos = this.client.getPlayer().getWorld().getEntitiesOnPos(this.client.getScreen().getMousePosOnWorld(this.client));
+
+      if (entitiesOnPos.length > 0) {
+        console.log(entitiesOnPos[0].toObject());
+      }
     }
   }
 
