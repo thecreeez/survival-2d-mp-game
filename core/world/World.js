@@ -1,6 +1,4 @@
-import core_world from "../../packs/core_world.js";
 import Application from "../Application.js";
-import MathUtils from "../utils/MathUtils.js";
 import Vector from "../utils/Vector.js";
 import Chunk from "./Chunk.js";
 import ChunkTileGenerator from "./generator/ChunkTileGenerator.js";
@@ -9,7 +7,6 @@ class World {
   static timePerUpdateToGenerateChunks = 200;
 
   constructor({pack = "core", id} = {}) {
-    console.log(core_world);
     this.pack = pack;
     this.id = id;
 

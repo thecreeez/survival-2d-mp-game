@@ -1,7 +1,7 @@
 import Registry from "/core/utils/Registry.js";
 import SpriteSheet from "../graphic/SpriteSheet.js";
 
-const DEFAULT_PATH_TO_ASSETS = `/client/assets`;
+const DEFAULT_PATH_TO_ASSETS = `/packs/{packId}/assets`;
 
 class PackAssetsRegistry extends Registry {
   static packs = {};
@@ -31,8 +31,9 @@ class PackAssetsRegistry extends Registry {
 
   static _registerProps(packId, packData) {
     let props = this.packs[packId].textures.props;
+    let customPath = `/props.png`;
 
-    let path = `${DEFAULT_PATH_TO_ASSETS}/${packId}/props.png`;
+    let path = (DEFAULT_PATH_TO_ASSETS + customPath).replaceAll("{packId}", packId);
     let spriteSheet = new SpriteSheet({ path, spriteSize: this.DEFAULT_TILE_SPRITE_SIZE });
 
     packData.props.forEach((prop) => {
@@ -72,7 +73,8 @@ class PackAssetsRegistry extends Registry {
         return;
       }
 
-      let path = `${DEFAULT_PATH_TO_ASSETS}/${packId}/entities/${entityClass.id}/default.png`;
+      let customPath = `/entities/${entityClass.id}/default.png`;
+      let path = (DEFAULT_PATH_TO_ASSETS + customPath).replaceAll("{packId}", packId);
 
       entities[entityClass.id] = {
         default: new SpriteSheet({ path, spriteSize: this.DEFAULT_ENTITY_SPRITE_SIZE, makeAlsoReversed: true })
@@ -80,7 +82,8 @@ class PackAssetsRegistry extends Registry {
 
       if (packData.entitiesTextures[entityClass.id]) {
         packData.entitiesTextures[entityClass.id].forEach(entityTexture => {
-          let path = `${DEFAULT_PATH_TO_ASSETS}/${packId}/entities/${entityClass.id}/${entityTexture}.png`;
+          let customPath = `/entities/${entityClass.id}/${entityTexture}.png`;
+          let path = (DEFAULT_PATH_TO_ASSETS + customPath).replaceAll("{packId}", packId);
           entities[entityClass.id][entityTexture] = new SpriteSheet({ path, spriteSize: this.DEFAULT_ENTITY_SPRITE_SIZE, makeAlsoReversed: true });
         })
       }
@@ -88,7 +91,8 @@ class PackAssetsRegistry extends Registry {
   }
 
   static _registerTileset(packId, packData) {
-    let path = `${DEFAULT_PATH_TO_ASSETS}/${packId}/tileset.png`;
+    let customPath = `/tileset.png`;
+    let path = (DEFAULT_PATH_TO_ASSETS + customPath).replaceAll("{packId}", packId);
     this.packs[packId].textures.tileset = new SpriteSheet({ path, spriteSize: this.DEFAULT_TILE_SPRITE_SIZE });
   }
 
@@ -96,7 +100,8 @@ class PackAssetsRegistry extends Registry {
     let pathToParticles = `${DEFAULT_PATH_TO_ASSETS}/${packId}/particles`;
 
     packData.particles.forEach((particleTexture) => {
-      let path = pathToParticles+`/${particleTexture}.png`;
+      let customPath = `/particles/${particleTexture}.png`;
+      let path = (DEFAULT_PATH_TO_ASSETS + customPath).replaceAll("{packId}", packId);
       this.packs[packId].textures.particles[particleTexture] = new SpriteSheet({ path, spriteSize: "height" });
     })
   }
@@ -104,7 +109,8 @@ class PackAssetsRegistry extends Registry {
   static _registerUI(packId, packData) {
     let uis = this.packs[packId].textures.ui;
     packData.ui.forEach((ui) => {
-      let path = `${DEFAULT_PATH_TO_ASSETS}/${packId}/ui/${ui.name}.png`;
+      let customPath = `/ui/${ui.name}.png`;
+      let path = (DEFAULT_PATH_TO_ASSETS + customPath).replaceAll("{packId}", packId);
 
       uis[ui.name] = new SpriteSheet({ path, spriteSize: ui.spriteSize, makeAlsoReversed: true })
     });
@@ -154,6 +160,39 @@ class PackAssetsRegistry extends Registry {
     }
 
     return PackAssetsRegistry.packs[pack].textures.props[id].states[state];
+  }
+  
+  static isLoaded() {
+    if (this.loaded === true) {
+      return true;
+    }
+
+    let loaded = true;
+
+    PackAssetsRegistry.getPacksId().forEach((packId) => {
+      let textures = PackAssetsRegistry.packs[packId]["textures"];
+
+      for (let textureName in textures) {
+        if (textures[textureName]["loaded"] === false) {
+          loaded = false;
+          return;
+        }
+
+        if (textures[textureName].type !== "spriteSheet") {
+          for (let textureId in textures[textureName]) {
+            if (textures[textureName][textureId]["loaded"] === false) {
+              loaded = false
+            }
+          }
+        }
+      }
+    })
+
+    if (loaded === true) {
+      this.loaded = true;
+    }
+
+    return loaded;
   }
 }
 

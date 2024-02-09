@@ -12,7 +12,7 @@ import MovementUpdatePacket from "./packets/MovementUpdatePacket.js";
 
 import SharedData from "./SharedData.js";
 
-import core from "../packs/core.js";
+import core from "../packs/core/scripts/init.js";
 
 class Application {
   static version = 2;

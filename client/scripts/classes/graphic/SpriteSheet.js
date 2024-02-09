@@ -12,6 +12,8 @@ class SpriteSheet {
 
     this.haveReversedSprites = makeAlsoReversed;
 
+    this.type = "spriteSheet";
+
     this._onloadListeners = [];
 
     this.img.onload = () => {

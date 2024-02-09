@@ -3,7 +3,6 @@ import PlayerEntity from "../world/entity/PlayerEntity.js";
 import EntityRegisterPacket from "./EntityRegisterPacket.js";
 import ClientErrorPacket from "./ClientErrorPacket.js";
 import WelcomePacket from "./WelcomePacket.js";
-import TilesRegisterPacket from "./TilesRegisterPacket.js";
 import ChunkRegisterPacket from "./ChunkRegisterPacket.js";
 
 class HandshakePacket {

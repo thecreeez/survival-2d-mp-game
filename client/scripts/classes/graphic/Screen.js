@@ -2,7 +2,6 @@ import Client from "../Client.js";
 import PackAssetsRegistry from "../registry/PackAssetsRegistry.js";
 import MapRenderer from "./MapRenderer.js";
 import SubtitleHandler from "./SubtitleHandler.js";
-import HumanGuardEntityRenderer from "./entity/HumanGuardEntityRenderer.js";
 import Hotbar from "./Hotbar.js";
 
 
@@ -44,6 +43,13 @@ class Screen {
 
     if (!client.getPlayer())
       return;
+
+    if (!PackAssetsRegistry.isLoaded()) {
+      ctx.font = `40px arial`;
+      ctx.fillStyle = `black`;
+      ctx.fillText(`[Loading assets]`, canvas.width / 2 - ctx.measureText(`[Loading assets]`).width / 2, canvas.height / 2 - 20);
+      return;
+    }
 
     let amountOfRenderObjects = this.renderWorld(client, deltaTime);
 

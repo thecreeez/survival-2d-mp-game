@@ -1,7 +1,7 @@
 import Chunk from "../Chunk.js";
 import Tile from "../Tile.js";
 
-import core_world from "../../../packs/core_world.js";
+import core_world from "../../../packs/core/scripts/world.js";
 import EntityRegistry from "../../registry/EntityRegistry.js";
 
 class ChunkTileGenerator {
