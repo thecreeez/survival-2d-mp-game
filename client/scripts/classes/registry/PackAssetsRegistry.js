@@ -1,5 +1,6 @@
 import Registry from "/core/utils/Registry.js";
 import SpriteSheet from "../graphic/SpriteSheet.js";
+import Client from "../Client.js";
 
 const DEFAULT_PATH_TO_ASSETS = `/packs/{packId}/assets`;
 
@@ -190,6 +191,8 @@ class PackAssetsRegistry extends Registry {
 
     if (loaded === true) {
       this.loaded = true;
+      let loadTime = Date.now() - Client.instance.startTime;
+      Client.instance.addLog(`INFO`, `Assets loaded. It tooks: ${loadTime}ms`)
     }
 
     return loaded;

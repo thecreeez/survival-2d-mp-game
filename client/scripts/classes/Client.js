@@ -19,6 +19,8 @@ class Client {
   constructor(username, ip) {
     Client.instance = this;
 
+    this.startTime = Date.now();
+
     this.username = username;
     this.lastTimeUpdate = Date.now();
 
