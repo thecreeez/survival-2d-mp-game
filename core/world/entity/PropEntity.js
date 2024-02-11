@@ -88,7 +88,6 @@ class PropEntity extends Entity {
             let server = this.getWorld().application.context;
 
             if (!entity) {
-              console.log(`no entity`)
               return;
             }
 

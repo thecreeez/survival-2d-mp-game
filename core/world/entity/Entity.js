@@ -59,6 +59,10 @@ class Entity {
     let pos = this.getPosition();
     let size = this.getSize();
 
+    if (!size) {
+      return;
+    }
+
     application.getEntities().forEach((otherEntity) => {
       if (otherEntity == this) {
         return;
@@ -67,8 +71,9 @@ class Entity {
       let otherPos = otherEntity.getPosition();
       let otherSize = otherEntity.getSize();
 
-      if (!size)
-        console.log(otherEntity);
+      if (!otherSize) {
+        return;
+      }
 
       if (pos[0] - size[0] / 2 < otherPos[0] + otherSize[0] / 2 &&
           pos[0] + size[0] / 2 > otherPos[0] - otherSize[0] / 2 &&

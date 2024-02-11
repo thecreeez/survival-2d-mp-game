@@ -167,7 +167,6 @@ class LivingEntity extends Entity {
       return true;
     }
 
-    console.log(entity.getUuid()+" hurted "+this.getUuid()+" on "+damage+" damage");
     return true;
   }
 
