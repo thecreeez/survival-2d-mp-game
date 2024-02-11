@@ -1,5 +1,6 @@
 import Chunk from "../Chunk.js";
 import Tile from "../Tile.js";
+import Logger from "../../utils/Logger.js";
 
 import core_world from "../../../packs/core/scripts/world.js";
 import EntityRegistry from "../../registry/EntityRegistry.js";
@@ -7,6 +8,8 @@ import EntityRegistry from "../../registry/EntityRegistry.js";
 class ChunkTileGenerator {
   static generatingQueue = 0;
   static amountOfTilesPerGenerate = 2;
+
+  static Logger = new Logger(`WorldGenerator`);
 
   static generate(chunk) {
     /**
@@ -51,6 +54,8 @@ class ChunkTileGenerator {
             
             tile = Tile.parseFromArray(randomTile);
             tile.generateData = core_world[variant].tags;
+          } else {
+            ChunkTileGenerator.Logger.log(`Error when creating tile`, ChunkTileGenerator.getAdjacentTiles(adjacentChunks, chunk, tilesToGenerate[0]))
           }
 
           tile.generatingQueue = ++ChunkTileGenerator.generatingQueue;

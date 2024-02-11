@@ -13,6 +13,7 @@ import MovementUpdatePacket from "./packets/MovementUpdatePacket.js";
 import SharedData from "./SharedData.js";
 
 import core from "../packs/core/scripts/init.js";
+import Logger from "./utils/Logger.js";
 
 class Application {
   static version = 2;
@@ -25,9 +26,10 @@ class Application {
     this._packs = {};
     this.state = 0;
 
-    this.setWorld(new World({ id: "spawn" }))
+    this.setWorld(new World({ id: "spawn" }));
 
     this.context = context;
+    Application.Logger = new Logger(`Application${(this.context.type[0].toUpperCase() + this.context.type.slice(1).toLowerCase())}`);
     this.lastTickTime = Date.now();
     
     this.registerPack(core);
@@ -39,12 +41,12 @@ class Application {
     }
 
     Application.instance = this;
-    console.log(`Load app. Context: ${this.context.type}`);
+    Application.Logger.log(`Initializing complete.`);
   }
 
   registerPack({ pack, entities = [], entitiesTextures = {}, packets = [], items = [], tilesetData = {}, particles = [], ui = [], props = [] }) {
     if (this.state != 0) {
-      console.error(`Packs cannot be registered on this state.`)
+      Application.Logger.log(`Can't register ${pack}. This is not state of registering.`);
       return;
     }
 
@@ -63,42 +65,42 @@ class Application {
   loadPacks() {
     this.state = 1;
 
-    console.log(`Loading packs...`)
+    Application.Logger.log(`=== Starting loading packs ===`)
     for (let packId in this._packs) {
-      console.log(`Pack [${packId}] loading...`)
+      Application.Logger.log(`--- Loading ${packId} pack ---`);
       this._packs[packId].entities.forEach((entityClass) => {
         EntityRegistry.register(packId, entityClass.id, entityClass);
         entityClass.pack = `${packId}`;
 
         entityClass.onRegister(this);
       })
-      console.log(`Loaded: ${this._packs[packId].entities.length} entities.`)
+      Application.Logger.log(`Loaded: ${this._packs[packId].entities.length} entities.`);
 
       this._packs[packId].packets.forEach((packetClass) => {
         PacketRegistry.register(packId, packetClass.type, packetClass);
         packetClass.type = `${packId}:${packetClass.type}`;
       })
-      console.log(`Loaded: ${this._packs[packId].packets.length} packets.`)
+      Application.Logger.log(`Loaded: ${this._packs[packId].packets.length} packets.`)
 
       this._packs[packId].items.forEach((item) => {
         ItemRegistry.register(packId, item.id, item);
         item.id = `${packId}:${item.id}`;
       })
-      console.log(`Loaded: ${this._packs[packId].items.length} items.`)
+      Application.Logger.log(`Loaded: ${this._packs[packId].items.length} items.`)
 
       this._packs[packId].props.forEach((prop) => {
         PropRegistry.register(packId, prop.id, prop);
       })
-      console.log(`Loaded: ${this._packs[packId].props.length} props.`)
+      Application.Logger.log(`Loaded: ${this._packs[packId].props.length} props.`)
 
       if (this.isClient()) {
-        console.log(`Registering assets...`);
+        Application.Logger.log(`Registering assets...`);
         this.context.registerAssetPack(packId, this._packs[packId]);
       }
 
-      console.log(`Pack ${packId} loaded.`)
+      Application.Logger.log(`--- Pack ${packId} loaded ---`);
     }
-    console.log(`Pack loading end.`)
+    Application.Logger.log(`=== Packs loaded ===`);
   }
 
   getPack(packId) {
@@ -161,7 +163,7 @@ class Application {
 
   removeEntity(uuid) {
     if (!this._entities[uuid])
-      return console.error(`ERROR: ENTITY DELETED ALREADY.`)
+      Application.Logger.log(`ERROR: Entity deleted already`);
 
     if (!this.isClient()) {
       EntityRemovePacket.serverSend(this.context.getPlayersConnections(), uuid);

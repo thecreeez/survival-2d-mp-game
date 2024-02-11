@@ -1,10 +1,13 @@
 import Application from "../Application.js";
 import Vector from "../utils/Vector.js";
+import Logger from "../utils/Logger.js";
 import Chunk from "./Chunk.js";
 import ChunkTileGenerator from "./generator/ChunkTileGenerator.js";
 
 class World {
   static timePerUpdateToGenerateChunks = 200;
+
+  static Logger = new Logger("World");
 
   constructor({pack = "core", id} = {}) {
     this.pack = pack;
@@ -60,15 +63,13 @@ class World {
 
 
     let start = Date.now();
-    // Есть че надо загенерить
     if (this._generatingChunksPipe.length > 0) {
       let generatedChunks = 0;
       for (let i = 0; i < this._generatingChunksPipe.length && (Date.now() - start < World.timePerUpdateToGenerateChunks); i++) {
         this._generateChunk(this._generatingChunksPipe[i]);
-        console.log(this._generatingChunksPipe[i])
         generatedChunks++;
       }
-      console.log(`Generated ${generatedChunks} chunk ${Date.now() - start}`)
+      World.Logger.log(`[${this.getId()}]`, `Generated ${generatedChunks} chunks (It took ${Date.now() - start}ms)`)
       this._generatingChunksPipe.splice(0, generatedChunks);
     }
   }
