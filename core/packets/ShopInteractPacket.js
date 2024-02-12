@@ -38,7 +38,10 @@ class ShopInteractPacket {
       return false;
     }
 
-    console.log(`Followers: ${player.getFollowers()}`)
+    
+    if (player.getFollowers() < 1) {
+      // TO-DO: Сделать проверку и отсылку исключения
+    }
 
     let entity = new entityClass({
       position: position,

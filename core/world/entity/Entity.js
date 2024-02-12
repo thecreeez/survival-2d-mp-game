@@ -41,14 +41,6 @@ class Entity {
     return new this();
   }
 
-  logData() {
-    console.log(`-----${this.type.getValue()}-${this.uuid.getValue() }-----`)
-    this.getAllDatas().forEach((data) => {
-      console.log(`>${data.getId()}:`, data.getValue());
-    })
-    console.log(`-----${this.type.getValue() }-${this.uuid.getValue() }-----`)
-  }
-
   startUpdateServerTick() {
     this.getAllDatas().forEach((data) => {
       data.bUpdated = false;

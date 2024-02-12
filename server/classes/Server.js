@@ -7,10 +7,13 @@ import EntityUpdatePacket from "../../core/packets/EntityUpdatePacket.js";
 import sockjs from "sockjs";
 import http from 'http';
 import fs from 'fs';
+import Logger from "../../core/utils/Logger.js";
 
 class Server {
   static type = "server"
   static _TPS = 60;
+
+  static Logger = new Logger("Server");
 
   static socket = sockjs.createServer({ prefix: "/socket", disable_cors: true})
   static http = http.createServer();
@@ -42,7 +45,7 @@ class Server {
   static saveGame(file) {
     let json = JSON.stringify(this.application.toJSON(),null, 2);
 
-    console.log(`Игра сохранена в ${file}`);
+    this.Logger.log(`Игра сохранена в ${file}`)
     fs.writeFileSync("./saves/"+file, json);
   }
 
@@ -92,11 +95,11 @@ class Server {
     let args = data.split("/");
 
     if (!PacketRegistry[args[0]]) {
-      return console.log(`packet is not exist: `+data);
+      return this.Logger.log(`Packet is not exist`, data);
     }
 
     if (!PacketRegistry[args[0]].serverHandle) {
-      return console.log(`server cant handle this packet: ` + data);
+      return this.Logger.log(`Server cant handle packet`, data);
     }
 
     PacketRegistry[args[0]].serverHandle(this, conn, data)

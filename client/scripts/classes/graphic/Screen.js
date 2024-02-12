@@ -160,7 +160,7 @@ class Screen {
       }
 
       if (!uiNumberSheet.get(fixedNumber, colorId)) {
-        console.log(numberSymbol);
+        
       }
 
       ctx.drawImage(uiNumberSheet.get(fixedNumber, colorId), position[0] + (i - 1.5) * symbolSize + symbolSize, position[1] - symbolSize, symbolSize, symbolSize)
