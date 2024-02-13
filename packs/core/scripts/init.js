@@ -17,9 +17,10 @@ import TilePlacePacket from "../../../core/packets/TilePlacePacket.js";
 import SaveRequestPacket from "../../../core/packets/SaveRequestPacket.js";
 import ParticleSpawnPacket from "../../../core/packets/ParticleSpawnPacket.js";
 import ShopInteractPacket from "../../../core/packets/ShopInteractPacket.js";
+import ChunkRegisterPacket from "../../../core/packets/ChunkRegisterPacket.js";
+import SyncApplicationPacket from "../../../core/packets/SyncApplicationPacket.js";
 
 import props from "./props.js";
-import ChunkRegisterPacket from "../../../core/packets/ChunkRegisterPacket.js";
 
 export default {
   pack: "core",
@@ -49,6 +50,7 @@ export default {
     CommandInputPacket,
     ParticleSpawnPacket,
     ShopInteractPacket,
+    SyncApplicationPacket,
   ],
   ui: [
     {

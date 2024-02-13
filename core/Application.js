@@ -14,6 +14,7 @@ import SharedData from "./SharedData.js";
 
 import core from "../packs/core/scripts/init.js";
 import Logger from "./utils/Logger.js";
+import SyncApplicationPacket from "./packets/SyncApplicationPacket.js";
 
 class Application {
   static version = 2;
@@ -25,12 +26,14 @@ class Application {
 
     this._packs = {};
     this.state = 0;
+    this.time = 0;
 
     this.setWorld(new World({ id: "spawn" }));
 
     this.context = context;
-    Application.Logger = new Logger(`Application${(this.context.type[0].toUpperCase() + this.context.type.slice(1).toLowerCase())}`);
     this.lastTickTime = Date.now();
+    this.lastSyncState = Date.now();
+    this.Logger = new Logger(`Application${(this.context.type[0].toUpperCase() + this.context.type.slice(1).toLowerCase())}`);
     
     this.registerPack(core);
 
@@ -40,13 +43,13 @@ class Application {
       // Spawn entities place
     }
 
+    this.Logger.log(`Initializing complete.`);
     Application.instance = this;
-    Application.Logger.log(`Initializing complete.`);
   }
 
   registerPack({ pack, entities = [], entitiesTextures = {}, packets = [], items = [], tilesetData = {}, particles = [], ui = [], props = [] }) {
     if (this.state != 0) {
-      Application.Logger.log(`Can't register ${pack}. This is not state of registering.`);
+      this.Logger.log(`Can't register ${pack}. This is not state of registering.`);
       return;
     }
 
@@ -65,42 +68,42 @@ class Application {
   loadPacks() {
     this.state = 1;
 
-    Application.Logger.log(`=== Starting loading packs ===`)
+    this.Logger.log(`=== Starting loading packs ===`)
     for (let packId in this._packs) {
-      Application.Logger.log(`--- Loading ${packId} pack ---`);
+      this.Logger.log(`--- Loading ${packId} pack ---`);
       this._packs[packId].entities.forEach((entityClass) => {
         EntityRegistry.register(packId, entityClass.id, entityClass);
         entityClass.pack = `${packId}`;
 
         entityClass.onRegister(this);
       })
-      Application.Logger.log(`Loaded: ${this._packs[packId].entities.length} entities.`);
+      this.Logger.log(`Loaded: ${this._packs[packId].entities.length} entities.`);
 
       this._packs[packId].packets.forEach((packetClass) => {
         PacketRegistry.register(packId, packetClass.type, packetClass);
         packetClass.type = `${packId}:${packetClass.type}`;
       })
-      Application.Logger.log(`Loaded: ${this._packs[packId].packets.length} packets.`)
+      this.Logger.log(`Loaded: ${this._packs[packId].packets.length} packets.`)
 
       this._packs[packId].items.forEach((item) => {
         ItemRegistry.register(packId, item.id, item);
         item.id = `${packId}:${item.id}`;
       })
-      Application.Logger.log(`Loaded: ${this._packs[packId].items.length} items.`)
+      this.Logger.log(`Loaded: ${this._packs[packId].items.length} items.`)
 
       this._packs[packId].props.forEach((prop) => {
         PropRegistry.register(packId, prop.id, prop);
       })
-      Application.Logger.log(`Loaded: ${this._packs[packId].props.length} props.`)
+      this.Logger.log(`Loaded: ${this._packs[packId].props.length} props.`)
 
       if (this.isClient()) {
-        Application.Logger.log(`Registering assets...`);
+        this.Logger.log(`Registering assets...`);
         this.context.registerAssetPack(packId, this._packs[packId]);
       }
 
-      Application.Logger.log(`--- Pack ${packId} loaded ---`);
+      this.Logger.log(`--- Pack ${packId} loaded ---`);
     }
-    Application.Logger.log(`=== Packs loaded ===`);
+    this.Logger.log(`=== Packs loaded ===`);
   }
 
   getPack(packId) {
@@ -163,7 +166,7 @@ class Application {
 
   removeEntity(uuid) {
     if (!this._entities[uuid])
-      Application.Logger.log(`ERROR: Entity deleted already`);
+      this.Logger.log(`ERROR: Entity deleted already`);
 
     if (!this.isClient()) {
       EntityRemovePacket.serverSend(this.context.getPlayersConnections(), uuid);
@@ -199,8 +202,6 @@ class Application {
   }
 
   updateServerTick() {
-    let startTick = Date.now();
-
     for (let worldId in this._worlds) {
       this._worlds[worldId].updateServerTick();
     }
@@ -210,9 +211,15 @@ class Application {
     }
 
     for (let uuid in this._entities) {
-      this._entities[uuid].updateServerTick(this, startTick - this.lastTickTime);
+      this._entities[uuid].updateServerTick(this, Date.now() - this.lastTickTime);
     }
 
+    if (Date.now() - this.lastSyncState > 1000) {
+      SyncApplicationPacket.serverSend(this.context, this.context.getPlayersConnections(), { time: this.time });
+      this.lastSyncState = Date.now();
+    }
+
+    this.time += Date.now() - this.lastTickTime;
     this.lastTickTime = Date.now();
   }
 
@@ -221,6 +228,9 @@ class Application {
 
     if (!this.context.getPlayer())
       return;
+
+    // TO-DO: Сделать плавный переход
+    this.time = this.serverTime;
 
     if (this.clientNeedToUpdateControls()) {
       MovementUpdatePacket.clientSend(this.context.connectionHandler.getSocket(), 
