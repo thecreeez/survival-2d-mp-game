@@ -165,8 +165,10 @@ class Application {
   }
 
   removeEntity(uuid) {
-    if (!this._entities[uuid])
+    if (!this._entities[uuid]) {
       this.Logger.log(`ERROR: Entity deleted already`);
+      return;
+    }
 
     if (!this.isClient()) {
       EntityRemovePacket.serverSend(this.context.getPlayersConnections(), uuid);

@@ -16,6 +16,8 @@ class AI {
     this.targetToAttack.id = targetId;
     this.targetToAttack.tag = targetTag;
 
+    this.needToSaveInObject = false;
+
     this.events = events;
     this.prevEntitiesInViewDistance = [];
   }
@@ -240,6 +242,10 @@ class AI {
     }
 
     return entity.haveTag(importantTag);
+  }
+
+  toObject() {
+
   }
 }
 

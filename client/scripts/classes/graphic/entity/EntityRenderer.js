@@ -7,8 +7,7 @@ class EntityRenderer {
 
   static render({ctx, entity}) {
     this.renderMain({ctx, entity});
-    this.renderSelection({ ctx, entity });
-    //this.renderDebug(ctx, entity);
+    this.renderDebug({ctx, entity});
   }
 
   static renderMain({ctx, entity}) {
@@ -16,20 +15,10 @@ class EntityRenderer {
   }
 
   static renderDebug({ctx, entity}) {
-    if (entity.getSize()) {
-      ctx.strokeStyle = `black`;
+    if (entity.getSize) {
+      ctx.strokeStyle = `rgba(100,100,100,0.3)`;
       ctx.strokeRect(entity.getPosition()[0] - entity.getSize()[0] / 2, entity.getPosition()[1] - entity.getSize()[1], entity.getSize()[0], entity.getSize()[1])
     }
-
-    ctx.fillStyle = `red`
-    ctx.beginPath();
-    ctx.arc(entity.getPosition()[0], entity.getPosition()[1], 5, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.font = `15px arial`;
-    ctx.fillStyle = `white`
-    ctx.textAlign = "center";
-    ctx.fillText(`[${entity.getPosition()}]`, entity.getPosition()[0], entity.getPosition()[1] - entity.getSize()[1])
   }
 
   static renderOnScreen({ctx, pos, entityData}) {
@@ -69,22 +58,50 @@ class EntityRenderer {
 
   static renderSelection({ entity, ctx }) {
     let client = entity.getWorld().application.context;
-    let mousePos = client.getScreen().getMousePosOnWorld(client);
-
     let uiSheet = PackAssetsRegistry.getUISheet("core", "selection-cursor");
 
-    if (this.isCollideWithEntity({ entity, position: mousePos })) {
+    if (client.controlsHandler.hoverEntity === entity) {
       let uiSize = entity.getSize()[0] / 4;
+      let positions = [
+        [entity.getPosition()[0] - entity.getSize()[0] / 2, entity.getPosition()[1] - entity.getSize()[1]],
+        [entity.getPosition()[0] + entity.getSize()[0] / 2 - uiSize, entity.getPosition()[1] - entity.getSize()[1]],
+        [entity.getPosition()[0] - entity.getSize()[0] / 2, entity.getPosition()[1] - uiSize],
+        [entity.getPosition()[0] + entity.getSize()[0] / 2 - uiSize, entity.getPosition()[1] - uiSize],
+      ]
+
+      let selectionType = 0;
+
+      if (client.controlsHandler.hoverEntityPinned) {
+        selectionType = 2;
+      }
 
       for (let i = 0; i < 4; i++) {
-        let positions = [
-          [entity.getPosition()[0] - entity.getSize()[0] / 2, entity.getPosition()[1] - entity.getSize()[1]],
-          [entity.getPosition()[0] + entity.getSize()[0] / 2 - uiSize, entity.getPosition()[1] - entity.getSize()[1]],
-          [entity.getPosition()[0] - entity.getSize()[0] / 2, entity.getPosition()[1] - uiSize],
-          [entity.getPosition()[0] + entity.getSize()[0] / 2 - uiSize, entity.getPosition()[1] - uiSize],
-        ]
-        ctx.drawImage(uiSheet.get(i, 0), positions[i][0], positions[i][1], uiSize, uiSize);
+        ctx.drawImage(uiSheet.get(selectionType * 4 + i, 0), positions[i][0], positions[i][1], uiSize, uiSize);
       }
+
+      let dataFontSize = 15;
+      ctx.font = `arial ${dataFontSize}px`;
+
+      let values = [];
+      let entityObj = entity.toObject();
+      for (let value in entityObj) {
+        if (!client.controlsHandler.hoverEntityDataTag || value.includes(client.controlsHandler.hoverEntityDataTag)) {
+          values.push([value, entityObj[value]]);
+        }
+      }
+
+      let heightCenter = entity.getPosition()[1] - entity.getSize()[1] / 2 + dataFontSize / 2;
+      let heightTop = heightCenter - values.length / 2 * dataFontSize;
+
+      ctx.textAlign = "left";
+      values.forEach((valueContainer, i) => {
+        ctx.fillStyle = `rgba(255,255,255, ${(client.controlsHandler.hoverEntityTime - i * 50) / 50})`;
+        ctx.fillText(
+          `${valueContainer[0]}:${valueContainer[1]}`, 
+          entity.getPosition()[0] + entity.getSize()[0], 
+          heightTop + dataFontSize * i
+        );
+      })
     }
   }
 

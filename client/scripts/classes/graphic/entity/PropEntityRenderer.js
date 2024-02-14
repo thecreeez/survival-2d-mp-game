@@ -4,7 +4,6 @@ import PropEntity from "/core/world/entity/PropEntity.js";
 
 class PropEntityRenderer extends EntityRenderer {
   static Entity = PropEntity;
-  static size = [20, 20];
 
   static spriteTime = 50;
 
@@ -16,8 +15,7 @@ class PropEntityRenderer extends EntityRenderer {
       return;
     }
 
-    let offset = propData.offset ? propData.offset : [0,0]
-
+    let offset = propData.offset ? propData.offset : [0,0];
     ctx.drawImage(propData.canvas, entity.getPosition()[0] - propData.worldSize[0] / 2 + offset[0], entity.getPosition()[1] - propData.worldSize[1] + offset[1], propData.worldSize[0], propData.worldSize[1])
   }
 

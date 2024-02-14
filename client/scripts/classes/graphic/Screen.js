@@ -3,6 +3,7 @@ import PackAssetsRegistry from "../registry/PackAssetsRegistry.js";
 import MapRenderer from "./MapRenderer.js";
 import SubtitleHandler from "./SubtitleHandler.js";
 import Hotbar from "./Hotbar.js";
+import EntityRenderer from "./entity/EntityRenderer.js";
 
 
 const canvas = document.querySelector("canvas");
@@ -82,6 +83,13 @@ class Screen {
     queue.forEach((gameObject, i) => {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
+
+    if (client.controlsHandler.hoverEntity !== null) {
+      EntityRenderer.renderSelection({
+        entity: client.controlsHandler.hoverEntity,
+        ctx
+      });
+    }
 
     ctx.restore();
 

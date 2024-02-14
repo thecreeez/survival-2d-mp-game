@@ -221,10 +221,18 @@ class Entity {
     let obj = {};
 
     for (let property in this) {
+      if (property === "application") {
+        continue;
+      }
+
       if (this[property] && this[property].needToSerialize) {
-        obj[`NETWORK_${property}`] = this[property].getValue();
+        obj[`NETWORK_${property}`] = JSON.stringify(this[property].getValue());
       } else {
-        obj[`CLIENT_${property}`] = this[property];
+        if (this[property] && !this[property].needToSaveInObject) {
+          continue;
+        }
+
+        obj[`CLIENT_${property}`] = JSON.stringify(this[property]);
       }
     }
     

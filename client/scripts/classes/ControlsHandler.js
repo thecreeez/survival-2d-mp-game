@@ -14,6 +14,11 @@ class ControlsHandler {
     this.prevMousePos = [0, 0];
     this.deltaMousePos = [0, 0];
 
+    this.hoverEntity = null;
+    this.hoverEntityTime = 0;
+    this.hoverEntityDataTag = "NETWORK"
+    this.hoverEntityPinned = false;
+
     this.isMouseDown = false;
     this.bAttacking = false;
 
@@ -33,6 +38,21 @@ class ControlsHandler {
 
       if (Hotbar.handleMouseMove(this.mousePos))
         return;
+
+      if (!this.client.getPlayer()) {
+        return;
+      }
+
+      let entitiesOnPos = this.client.getPlayer().getWorld().getEntitiesOnPos(this.client.getScreen().getMousePosOnWorld(this.client));
+
+      if (this.hoverEntity === null && entitiesOnPos.length > 0) {
+        this.hoverEntity = entitiesOnPos[0];
+      }
+
+      if (!this.hoverEntityPinned && !entitiesOnPos.includes(this.hoverEntity)) {
+        this.hoverEntityTime = 0;
+        this.hoverEntity = null;
+      }
     }
 
     window.onmouseup = (ev) => {
@@ -55,10 +75,8 @@ class ControlsHandler {
       if (this.client.mapBuilder.handleMouseDown(pos))
         return;
 
-      let entitiesOnPos = this.client.getPlayer().getWorld().getEntitiesOnPos(this.client.getScreen().getMousePosOnWorld(this.client));
-
-      if (entitiesOnPos.length > 0) {
-        console.log(entitiesOnPos[0].toObject());
+      if (this.hoverEntity) {
+        this.hoverEntityPinned = !this.hoverEntityPinned;
       }
     }
   }
@@ -72,6 +90,10 @@ class ControlsHandler {
     this.deltaMousePos[1] = this.mousePos[1] - this.prevMousePos[1];
 
     this.prevMousePos = this.mousePos;
+
+    if (this.hoverEntity !== null) {
+      this.hoverEntityTime += deltaTime;
+    }
   }
 
   _updateAttack() {
