@@ -246,9 +246,8 @@ class Application {
       );
     }
 
-    let startTick = Date.now();
-
     for (let uuid in this._entities) {
+      let startTick = Date.now();
       this._entities[uuid].updateClientTick(this, startTick - this.lastTickTime);
     }
   }

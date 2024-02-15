@@ -131,19 +131,25 @@ class ControlsHandler {
       axis[0]++;
     }
 
-    this.horizontal = axis[0];
-    this.vertical = axis[1];
-    return;
+    if (axis[0] > 0) {
+      this.horizontal = Math.min(this.horizontal + deltaTime / 200, 1);
+    } else if (axis[0] < 0) {
+      this.horizontal = Math.max(this.horizontal - deltaTime / 200, -1);
+    } else if (this.horizontal > 0) {
+      this.horizontal = Math.max(this.horizontal - deltaTime / 200, 0);
+    } else if (this.horizontal < 0) {
+      this.horizontal = Math.min(this.horizontal + deltaTime / 200, 0);
+    }
 
-    if (axis[0] > 0)
-      this.horizontal = Math.min(this.horizontal + deltaTime * 5, 1);
-    else if (axis[0] < 0)
-      this.horizontal = Math.max(this.horizontal - deltaTime * 5, -1);
-
-    if (axis[1] > 0)
-      this.vertical = Math.min(this.vertical + deltaTime * 5, 1);
-    else if (axis[1] < 0)
-      this.vertical = Math.max(this.vertical - deltaTime * 5, -1);
+    if (axis[1] > 0) {
+      this.vertical = Math.min(this.vertical + deltaTime / 200, 1);
+    } else if (axis[1] < 0) {
+      this.vertical = Math.max(this.vertical - deltaTime / 200, -1);
+    } else if (this.vertical > 0) {
+      this.vertical = Math.max(this.vertical - deltaTime / 200, 0);
+    } else if (this.vertical < 0) {
+      this.vertical = Math.min(this.vertical + deltaTime / 200, 0);
+    }
   }
 
   calculateAimRotation() {

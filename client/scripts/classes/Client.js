@@ -84,17 +84,6 @@ class Client {
     return this.controlsHandler;
   }
 
-  getTileAt(x, y) {
-    return false;
-    let tile = this.getPlayer().getWorld().getTile([x, y]);
-
-    if (!tile) {
-      return false;
-    }
-
-    return tile.getSpriteData();
-  }
-
   getMapBuilder() {
     return this.mapBuilder;
   }
