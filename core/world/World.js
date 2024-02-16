@@ -3,6 +3,7 @@ import Vector from "../utils/Vector.js";
 import Logger from "../utils/Logger.js";
 import Chunk from "./Chunk.js";
 import ChunkTileGenerator from "./generator/ChunkTileGenerator.js";
+import ChunkRegisterPacket from "../packets/ChunkRegisterPacket.js";
 
 class World {
   static timePerUpdateToGenerateChunks = 200;
@@ -35,29 +36,32 @@ class World {
     let players = this.getEntities().filter(entity => entity.getId() === `player_entity`);
 
     players.forEach(player => {
-      return;
-      let chunkPosition = [Math.floor(player.getPosition()[0] / Chunk.Size[0]), Math.floor(player.getPosition()[1] / Chunk.Size[1])];
       let playerViewDistance = this.application.constructor.playerViewDistance;
       let chunksToGenerate = [];
+
+      let tileSize = 40;
+      let playerChunk = [Math.floor(player.getPosition()[0] / tileSize / Chunk.Size[0]), Math.floor(player.getPosition()[1] / tileSize / Chunk.Size[1])];
 
       // Spawn chunks
       for (let x = -playerViewDistance; x < playerViewDistance; x++) {
         for (let y = -playerViewDistance; y < playerViewDistance; y++) {
-          if (!this.getChunk([x + chunkPosition[0], y + chunkPosition[1]])) {
+          let chunkCandidate = [playerChunk[0] + x, playerChunk[1] + y];
+          if (this.getChunk(chunkCandidate) === undefined) {
             let needToPush = true;
             this._generatingChunksPipe.forEach((pos) => {
-              if (pos[0] == x && pos[1] == y) {
+              if (pos[0] === chunkCandidate[0] && pos[1] === chunkCandidate[1]) {
                 needToPush = false;
               }
             })
 
-            if (needToPush)
-              chunksToGenerate.push([x, y]);
+            if (needToPush) {
+              chunksToGenerate.push(chunkCandidate);
+            }
           }
         }
       }
 
-      chunksToGenerate.sort((a, b) => new Vector([a[0] - chunkPosition[0], a[1] - chunkPosition[1]]).getLength() > new Vector([b[0] - chunkPosition[0], b[1] - chunkPosition[1]]).getLength() ? 1 : -1);
+      chunksToGenerate.sort((a, b) => new Vector([a[0] - playerChunk[0], a[1] - playerChunk[1]]).getLength() > new Vector([b[0] - playerChunk[0], b[1] - playerChunk[1]]).getLength() ? 1 : -1);
       this._generatingChunksPipe.push(...chunksToGenerate);
     })
 
@@ -99,8 +103,10 @@ class World {
     });
     chunk.world = this;
     ChunkTileGenerator.generate(chunk);
+
+    ChunkRegisterPacket.serverSend(this.application.context.getPlayersConnections(), chunk);
     
-    this._chunks[position.join(":")] = chunk
+    this._chunks[position.join(":")] = chunk;
   }
 
   update(deltaTime) {
