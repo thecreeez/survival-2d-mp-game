@@ -1,40 +1,45 @@
 import ShopInteractPacket from "../../../../core/packets/ShopInteractPacket.js";
 import EntityRendererRegistry from "./EntityRendererRegistry.js";
-import Screen from "./Screen.js";
+
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
 
 class Hotbar {
-  static size = [200, 50];
-  static entities = ["core:human_guard_entity", "core:spider_entity", null, null];
-  static highlightedSlot = -1;
-  static selectedSlot = -1;
+  constructor(screen) {
+    this.screen = screen;
+    this.size = [200, 50];
+    this.entities = ["core:human_guard_entity", "core:spider_entity", null, null];
+    this.highlightedSlot = -1;
+    this.selectedSlot = -1;
+  }
 
-  static client = false;
-
-  static render(canvas, ctx, client) {
-    this._renderHotbar(canvas, ctx, client);
-
-    if (!this.client) {
-      this.client = client;
-    }
+  render() {
+    this._renderHotbar();
+    let client = this.screen.client;
 
     if (this.selectedSlot !== -1) {
       let mousePos = client.controlsHandler.mousePos;
       
       if (this.entities[this.selectedSlot] && EntityRendererRegistry[this.entities[this.selectedSlot]]) {
         ctx.translate(mousePos[0] - 25, mousePos[1]);
-        ctx.rotate(this.client.controlsHandler.deltaMousePos[0] / 20)
+        ctx.rotate(client.controlsHandler.deltaMousePos[0] / 20)
         EntityRendererRegistry[this.entities[this.selectedSlot]].renderOnScreen({
           ctx,
           pos: [0,0],
           entityData: {}
         });
-        ctx.rotate(-this.client.controlsHandler.deltaMousePos[0] / 20)
+        ctx.rotate(-client.controlsHandler.deltaMousePos[0] / 20)
         ctx.translate(-mousePos[0] + 25, -mousePos[1]);
       }
     }
   }
 
-  static _renderHotbar(canvas, ctx, client) {
+  update(deltaTime) {
+    
+  }
+
+  _renderHotbar() {
+    let client = this.screen.client;
     let pos = [canvas.width / 2 - this.size[0] / 2, canvas.height - this.size[1] - 5];
 
     ctx.fillStyle = `black`;
@@ -57,12 +62,11 @@ class Hotbar {
         });
     }
 
-    Screen.renderNumber([pos[0] + 5, canvas.height - this.size[1]], client.getPlayer().getFollowers(), 3);
-    Screen.renderNumber([pos[0] + this.size[0] - 10, canvas.height - this.size[1]], client.getPlayer().getMoney(), 4);
+    this.screen.renderNumber([pos[0] + 5, canvas.height - this.size[1]], client.getPlayer().getFollowers(), 3);
+    this.screen.renderNumber([pos[0] + this.size[0] - 10, canvas.height - this.size[1]], client.getPlayer().getMoney(), 4);
   }
 
-  static getSlot(mousePos) {
-    let canvas = document.querySelector("canvas");
+  getSlot(mousePos) {
     let pos = [canvas.width / 2 - this.size[0] / 2, canvas.height - this.size[1] - 5];
 
     for (let i = 0; i < 4; i++) {
@@ -79,19 +83,20 @@ class Hotbar {
     return -1;
   }
 
-  static handleMouseMove(mousePos) {
+  handleMouseMove(mousePos) {
     this.highlightedSlot = this.getSlot(mousePos);
 
     return this.highlightedSlot !== -1;
   }
 
-  static handleMouseDown(mousePos) {
+  handleMouseDown(mousePos) {
+    let client = this.screen.client;
     let slotOnMouse = this.getSlot(mousePos);
     let isHandled = slotOnMouse !== -1;
 
     if (this.selectedSlot !== -1 && slotOnMouse === -1) {
-      ShopInteractPacket.clientSend(this.client.connectionHandler.getSocket(), 
-        { type: ShopInteractPacket.InteractType.Buy, entityId: this.entities[this.selectedSlot], position: Screen.toWorldPos(this.client, [mousePos[0], mousePos[1] + 50]) });
+      ShopInteractPacket.clientSend(client.connectionHandler.getSocket(), 
+        { type: ShopInteractPacket.InteractType.Buy, entityId: this.entities[this.selectedSlot], position: Screen.toWorldPos(client, [mousePos[0], mousePos[1] + 50]) });
 
       isHandled = true;
     }

@@ -31,6 +31,8 @@ class Client {
     this.controlsHandler = new ControlsHandler(this);
     this.mapBuilder = new MapBuilder(this);
 
+    this.screen = new Screen(this);
+
     this.lightEngineOn = true;
 
     setInterval(() => {
@@ -45,9 +47,7 @@ class Client {
       let deltaTime = Date.now() - this.lastTimeUpdate;
       Application.instance.updateTick();
       this.controlsHandler.update(deltaTime);
-      Screen.SubtitleHandler.update(deltaTime);
-      
-      Screen.renderFrame(this, deltaTime);
+      this.screen.renderFrame(deltaTime);
 
       this.lastTimeUpdate = Date.now();
     }, 1000 / 60);

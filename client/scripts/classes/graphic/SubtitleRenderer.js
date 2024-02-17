@@ -1,9 +1,16 @@
-class SubtitleHandler {
-  static fontSize = 25;
-  static padding = 10;
-  static subtitles = [];
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext("2d");
 
-  static render(canvas, ctx) {
+class SubtitleHandler {
+  constructor(screen) {
+    this.screen = screen;
+
+    this.fontSize = 25;
+    this.padding = 10;
+    this.subtitles = [];
+  }
+
+  render() {
     let pos = [canvas.width / 2, canvas.height - this.fontSize * 0.5 - this.getSubtitilesHeight() - 50];
 
     ctx.textAlign = `center`;
@@ -19,7 +26,7 @@ class SubtitleHandler {
     })
   }
 
-  static addSubtitle(invoker = "Unknown", text = "Empty", lifeTime = 3000) {
+  addSubtitle(invoker = "Unknown", text = "Empty", lifeTime = 3000) {
     this.subtitles.push({
       invoker,
       text,
@@ -28,7 +35,7 @@ class SubtitleHandler {
     });
   }
 
-  static update(deltaTime) {
+  update(deltaTime) {
     this.subtitles.forEach((subtitle) => {
       subtitle.lifeTime -= deltaTime;
     })
@@ -36,7 +43,7 @@ class SubtitleHandler {
     this.subtitles = this.subtitles.filter(subtitle => subtitle.lifeTime > 0);
   }
 
-  static getSubtitilesHeight() {
+  getSubtitilesHeight() {
     return this.fontSize * this.subtitles.length;
   }
 }

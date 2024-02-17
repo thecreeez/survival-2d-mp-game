@@ -9,6 +9,7 @@ class HandshakePacket {
   static type = "handshake";
 
   static clientSend(socket, { username, coreVersion }) {
+    console.log(this.type);
     socket.send(`${this.type}/${username}/${coreVersion}`);
   }
 

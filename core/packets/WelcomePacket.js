@@ -8,7 +8,7 @@ class WelcomePacket {
   }
 
   static clientHandle(client, data) {
-    client.getScreen().SubtitleHandler.addSubtitle(`Server`, data.split("/")[1], 5000);
+    client.screen.subtitleRenderer.addSubtitle(`Server`, data.split("/")[1], 5000);
   }
 }
 

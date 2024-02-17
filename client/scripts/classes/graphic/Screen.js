@@ -1,9 +1,10 @@
 import Client from "../Client.js";
 import PackAssetsRegistry from "../registry/PackAssetsRegistry.js";
 import MapRenderer from "./MapRenderer.js";
-import SubtitleHandler from "./SubtitleHandler.js";
+import SubtitleRenderer from "./SubtitleRenderer.js";
 import Hotbar from "./Hotbar.js";
 import EntityRenderer from "./entity/EntityRenderer.js";
+import LogsRenderer from "./LogsRenderer.js";
 
 
 const canvas = document.querySelector("canvas");
@@ -29,21 +30,20 @@ window.onresize = (ev) => {
 }
 
 class Screen {
-  static SubtitleHandler = SubtitleHandler;
+  constructor(client) {
+    this.client = client;
 
-  static clear() {
+    this.logsRenderer = new LogsRenderer(this);
+    this.subtitleRenderer = new SubtitleRenderer(this);
+    this.hotbar = new Hotbar(this);
+  }
+
+  clear() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
-  /**
-   * 
-   * @param {Client} client 
-   */
-  static renderFrame(client, deltaTime) {
+  renderFrame(deltaTime) {
     this.clear();
-
-    if (!client.getPlayer())
-      return;
 
     if (!PackAssetsRegistry.isLoaded()) {
       ctx.font = `40px arial`;
@@ -52,19 +52,31 @@ class Screen {
       return;
     }
 
-    let amountOfRenderObjects = this.renderWorld(client, deltaTime);
-
-    if (client.getMapBuilder().bEnabled) {
-      client.getMapBuilder().render(ctx, deltaTime);
+    if (!this.client.getPlayer()) {
+      ctx.font = `40px arial`;
+      ctx.fillStyle = `black`;
+      ctx.fillText(`[Waiting player]`, canvas.width / 2 - ctx.measureText(`[Loading assets]`).width / 2, canvas.height / 2 - 20);
+      return;
     }
 
-    this.renderLogs(client, deltaTime);
-    SubtitleHandler.render(canvas, ctx);
+    let amountOfRenderObjects = this.renderWorld(deltaTime);
 
-    Hotbar.render(canvas, ctx, client);
+    if (this.client.getMapBuilder().bEnabled) {
+      this.client.getMapBuilder().render(ctx, deltaTime);
+    }
+
+    this.logsRenderer.render();
+    this.logsRenderer.update(deltaTime);
+    this.subtitleRenderer.render();
+    this.subtitleRenderer.update(deltaTime);
+
+    this.hotbar.render();
+    this.hotbar.update(deltaTime);
   }
 
-  static renderWorld(client, deltaTime) {
+  renderWorld(deltaTime) {
+    let client = this.client;
+
     ctx.save();
     ctx.translate(canvas.width / 2 - client.getPlayer().getPosition()[0], canvas.height / 2 - client.getPlayer().getPosition()[1]);
     let chunksQueue = MapRenderer.getChunksToRender(canvas, ctx, client);
@@ -74,13 +86,13 @@ class Screen {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
 
-    let queue = []
-    queue.push(...MapRenderer.getEntitiesToRender(canvas, ctx, client));
-    queue.push(...MapRenderer.getParticlesToRender(client.getPlayer().getWorld()));
-    queue = queue.sort((a, b) => (a.getPosition()[1] - b.getPosition()[1]));
+    let entitiesQueue = []
+    entitiesQueue.push(...MapRenderer.getEntitiesToRender(canvas, ctx, client));
+    entitiesQueue.push(...MapRenderer.getParticlesToRender(client.getPlayer().getWorld()));
+    entitiesQueue = entitiesQueue.sort((a, b) => (a.getPosition()[1] - b.getPosition()[1]));
 
     // Entities & Particles
-    queue.forEach((gameObject, i) => {
+    entitiesQueue.forEach((gameObject, i) => {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
 
@@ -93,71 +105,34 @@ class Screen {
 
     ctx.restore();
 
-    return queue.length + chunksQueue.length;
+    return entitiesQueue.length + chunksQueue.length;
   }
 
-  /**
-   * 
-   * @param {Client} client 
-   */
-  static renderLogs(client, deltaTime) {
-    let fontSize = 20;
-    ctx.textAlign = "left";
-    ctx.font = `${fontSize}px arial`;
-
-    let logsHeight = client.logs.length * fontSize + fontSize / 2;
-    let logsWidth = Math.max(...client.logs.map(value => ctx.measureText(`[${value.type}] ${value.message}`).width));
-
-    if (logsWidth < 0) {
-      logsWidth = 0;
-    }
-
-    ctx.fillStyle = `black`;
-    ctx.fillRect(0,0,logsWidth, logsHeight);
-
-    client.logs.forEach((log, i) => {
-      let transition = log.lifeTime / log.transition;
-
-      switch (log.type) {
-        case "INFO": ctx.fillStyle = `rgba(255,255,255,${transition})`; break;
-        case "ERROR": ctx.fillStyle = `rgba(255,0,0,${transition})`; break;
-        case "WARNING": ctx.fillStyle = `rgba(255,223,0,${transition})`; break;
-      }
-
-      let height = i * fontSize;
-
-      ctx.fillText(`[${log.type}] ${log.message}`, 0, fontSize + height);
-      log.lifeTime -= deltaTime;
-    })
-
-    client.logs = client.logs.filter((log) => log.lifeTime > 0)
+  getMousePosOnWorld() {
+    let mousePosOnScreen = this.client.controlsHandler.mousePos;
+    return this.toWorldPos(mousePosOnScreen)
   }
 
-  static getMousePosOnWorld(client) {
-    let mousePosOnScreen = client.controlsHandler.mousePos;
-    return this.toWorldPos(client, mousePosOnScreen)
-  }
-
-  static getLocalTilePos(pos) {
+  getLocalTilePos(pos) {
     return [Math.floor(pos[0] / MapRenderer.tileSize), Math.floor(pos[1] / MapRenderer.tileSize)];
   }
 
-  static getGlobalTilePos(client, pos) {
-    let playerPos = client.getPlayer().getPosition();
+  getGlobalTilePos(pos) {
+    let playerPos = this.client.getPlayer().getPosition();
     return [Math.floor((pos[0] + playerPos[0] - canvas.width / 2) / MapRenderer.tileSize), Math.floor((pos[1] + playerPos[1] - canvas.height / 2) / MapRenderer.tileSize)];
   }
 
-  static toLocalPos(client, pos) {
-    let playerPos = client.getPlayer().getPosition();
+  toLocalPos(pos) {
+    let playerPos = this.client.getPlayer().getPosition();
     return [pos[0] - playerPos[0] + canvas.width / 2, pos[1] - playerPos[1] + canvas.height / 2]
   }
 
-  static toWorldPos(client, pos) {
-    let playerPos = client.getPlayer().getPosition();
+  toWorldPos(pos) {
+    let playerPos = this.client.getPlayer().getPosition();
     return [pos[0] + playerPos[0] - canvas.width / 2, pos[1] + playerPos[1] - canvas.height / 2]
   }
 
-  static renderNumber(position = [0,0], number, colorId = 0) {
+  renderNumber(position = [0, 0], number, colorId = 0) {
     let symbolSize = 20;
     let uiNumberSheet = PackAssetsRegistry.getUISheet("core", "numbers");
     ("" + number).split("").forEach((numberSymbol, i) => {
@@ -168,12 +143,11 @@ class Screen {
       }
 
       if (!uiNumberSheet.get(fixedNumber, colorId)) {
-        
+
       }
 
       ctx.drawImage(uiNumberSheet.get(fixedNumber, colorId), position[0] + (i - 1.5) * symbolSize + symbolSize, position[1] - symbolSize, symbolSize, symbolSize)
     })
   }
 }
-
 export default Screen;

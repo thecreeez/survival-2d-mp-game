@@ -36,14 +36,14 @@ class ControlsHandler {
     window.onmousemove = (ev) => {
       this.mousePos = [ev.clientX, ev.clientY];
 
-      if (Hotbar.handleMouseMove(this.mousePos))
+      if (this.client.screen.hotbar.handleMouseMove(this.mousePos))
         return;
 
       if (!this.client.getPlayer()) {
         return;
       }
 
-      let entitiesOnPos = this.client.getPlayer().getWorld().getEntitiesOnPos(this.client.getScreen().getMousePosOnWorld(this.client));
+      let entitiesOnPos = this.client.getPlayer().getWorld().getEntitiesOnPos(this.client.screen.getMousePosOnWorld());
 
       if (this.hoverEntity === null && entitiesOnPos.length > 0) {
         this.hoverEntity = entitiesOnPos[0];
@@ -69,7 +69,7 @@ class ControlsHandler {
 
       let pos = [ev.clientX, ev.clientY];
 
-      if (Hotbar.handleMouseDown(pos))
+      if (this.client.screen.hotbar.handleMouseDown(pos))
         return;
 
       if (this.client.mapBuilder.handleMouseDown(pos))
