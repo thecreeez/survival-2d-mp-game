@@ -5,6 +5,7 @@ import SubtitleRenderer from "./SubtitleRenderer.js";
 import Hotbar from "./Hotbar.js";
 import EntityRenderer from "./entity/EntityRenderer.js";
 import LogsRenderer from "./LogsRenderer.js";
+import Profiler from "./Profiler.js";
 
 
 const canvas = document.querySelector("canvas");
@@ -36,6 +37,7 @@ class Screen {
     this.logsRenderer = new LogsRenderer(this);
     this.subtitleRenderer = new SubtitleRenderer(this);
     this.hotbar = new Hotbar(this);
+    this.profiler = new Profiler(this);
   }
 
   clear() {
@@ -43,6 +45,7 @@ class Screen {
   }
 
   renderFrame(deltaTime) {
+    this.profiler.start("frame_render");
     this.clear();
 
     if (!PackAssetsRegistry.isLoaded()) {
@@ -61,6 +64,7 @@ class Screen {
 
     let amountOfRenderObjects = this.renderWorld(deltaTime);
 
+    this.profiler.start("ui_rendering");
     if (this.client.getMapBuilder().bEnabled) {
       this.client.getMapBuilder().render(ctx, deltaTime);
     }
@@ -72,6 +76,10 @@ class Screen {
 
     this.hotbar.render();
     this.hotbar.update(deltaTime);
+    this.profiler.stop("ui_rendering");
+
+    this.profiler.stop("frame_render");
+    this.profiler.render();
   }
 
   renderWorld(deltaTime) {
@@ -79,19 +87,26 @@ class Screen {
 
     ctx.save();
     ctx.translate(canvas.width / 2 - client.getPlayer().getPosition()[0], canvas.height / 2 - client.getPlayer().getPosition()[1]);
+    this.profiler.start("chunks_preparing");
     let chunksQueue = MapRenderer.getChunksToRender(canvas, ctx, client);
+    this.profiler.stop("chunks_preparing");
 
     // Chunks
+    this.profiler.start("chunks_render");
     chunksQueue.forEach((gameObject) => {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
+    this.profiler.stop("chunks_render");
 
+    this.profiler.start("entities_preparing");
     let entitiesQueue = []
     entitiesQueue.push(...MapRenderer.getEntitiesToRender(canvas, ctx, client));
     entitiesQueue.push(...MapRenderer.getParticlesToRender(client.getPlayer().getWorld()));
     entitiesQueue = entitiesQueue.sort((a, b) => (a.getPosition()[1] - b.getPosition()[1]));
+    this.profiler.stop("entities_preparing");
 
     // Entities & Particles
+    this.profiler.start("entities_render");
     entitiesQueue.forEach((gameObject, i) => {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
@@ -102,6 +117,7 @@ class Screen {
         ctx
       });
     }
+    this.profiler.stop("entities_render");
 
     ctx.restore();
 

@@ -33,6 +33,9 @@ class Client {
 
     this.screen = new Screen(this);
 
+    this.fps = 0;
+    this.fpsC = 0;
+
     this.lightEngineOn = true;
 
     setInterval(() => {
@@ -48,9 +51,16 @@ class Client {
       Application.instance.updateTick();
       this.controlsHandler.update(deltaTime);
       this.screen.renderFrame(deltaTime);
+      this.fpsC++;
 
       this.lastTimeUpdate = Date.now();
     }, 1000 / 60);
+
+    setInterval(() => {
+      this.screen.profiler.set("fps", this.fps);
+      this.fps = this.fpsC;
+      this.fpsC = 0;
+    }, 1000)
   }
 
   addLog(type, message) {

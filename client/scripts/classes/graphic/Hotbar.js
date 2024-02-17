@@ -96,7 +96,7 @@ class Hotbar {
 
     if (this.selectedSlot !== -1 && slotOnMouse === -1) {
       ShopInteractPacket.clientSend(client.connectionHandler.getSocket(), 
-        { type: ShopInteractPacket.InteractType.Buy, entityId: this.entities[this.selectedSlot], position: Screen.toWorldPos(client, [mousePos[0], mousePos[1] + 50]) });
+        { type: ShopInteractPacket.InteractType.Buy, entityId: this.entities[this.selectedSlot], position: this.screen.toWorldPos([mousePos[0], mousePos[1] + 50]) });
 
       isHandled = true;
     }
