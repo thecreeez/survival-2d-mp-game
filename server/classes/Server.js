@@ -22,9 +22,10 @@ class Server {
   static welcomeMessage = `Welcome to the game, {player} (Version {version})`;
   static bLoaded = false;
 
+  static packs = {};
   static players = [];
 
-  static start() {
+  static async start() {
     this._initSocketEvents();
     this._initClientFiles();
     this.http.listen(3000);
@@ -32,6 +33,10 @@ class Server {
     Server.bLoaded = true;
 
     setInterval(() => {
+      if (this.application.state === 0) {
+        return;
+      }
+
       Application.instance.updateTick();
       
       let updatedEntities = Application.instance.getEntities().filter(entity => entity.needToUpdate());
@@ -42,24 +47,30 @@ class Server {
     }, 1000 / this._TPS);
   }
 
-  static saveGame(file) {
-    let json = JSON.stringify(this.application.toJSON(),null, 2);
+  static async registerPacks() {
+    let directories = fs.readdirSync("../packs/");
 
-    this.Logger.log(`Игра сохранена в ${file}`)
-    fs.writeFileSync("./saves/"+file, json);
-  }
+    for (let packId of directories) {
+      let commonInit = await import(`../../packs/${packId}/scripts/CommonInit.js`);
+      this.application.registerPack(commonInit.default)
+    }
 
-  static loadSave(file) {
-    let json = JSON.parse(fs.readFileSync("./saves/"+file));
-
-    this.welcomeMessage = json["welcome-message"];
-
-    this.application.fromJSON(json);
+    this.application.loadPacks();
   }
 
   static _initClientFiles() {
     this.http.addListener('request', (request, response) => {
       const filePath = request.url.substring(1);
+
+      switch (filePath) {
+        case "getPacks": {
+          let packs = fs.readdirSync("../packs/");
+
+          response.write(JSON.stringify(packs));
+          response.end();
+          return
+        };
+      }
 
       let formedPath = "../" + filePath;
       fs.access(formedPath, fs.constants.R_OK, (error) => {

@@ -6,9 +6,11 @@ class ConnectionHandler {
     this._client = client;
 
     this._socket = new SockJS("http://" + ip + "/socket");
+    this.opened = false;
+    this.handshaked = false;
 
     this._socket.onopen = () => {
-      this.handshake();
+      this.opened = true;
     }
 
     this._socket.onmessage = (e) => {
@@ -17,6 +19,7 @@ class ConnectionHandler {
 
     this._socket.onclose = () => {
       this.disconnect();
+      this.opened = false;
     }
   }
 
@@ -27,6 +30,7 @@ class ConnectionHandler {
   handshake() {
     HandshakePacket.clientSend(this._socket, { username: this._client.username, coreVersion: this._client.application.getCoreVersion() });
     this._client.addLog(`INFO`,`Connection with server established. Handshaking...`);
+    this.handshaked = true;
   }
 
   message(data) {

@@ -33,9 +33,15 @@ class Client {
 
     this.lightEngineOn = true;
 
-    this.register();
-
     setInterval(() => {
+      if (this.application.state === 0) {
+        return;
+      }
+
+      if (this.connectionHandler.opened && !this.connectionHandler.handshaked) {
+        this.connectionHandler.handshake();
+      }
+
       let deltaTime = Date.now() - this.lastTimeUpdate;
       Application.instance.updateTick();
       this.controlsHandler.update(deltaTime);
@@ -78,6 +84,19 @@ class Client {
     EntityRendererRegistry.register(PlasmaProjectileEntityRenderer);
     EntityRendererRegistry.register(PropEntityRenderer);
     EntityRendererRegistry.register(HumanGuardEntityRenderer);
+  }
+
+  async registerPacks() {
+    const packsRequest = await fetch("/getPacks");
+    const packsJSON = await packsRequest.json();
+    
+    for (let packId of packsJSON) {
+      let commonInit = await import(`../../../packs/${packId}/scripts/CommonInit.js`);
+      this.application.registerPack(commonInit.default);
+    }
+
+    this.application.loadPacks();
+    this.register();
   }
 
   getControlsHandler() {

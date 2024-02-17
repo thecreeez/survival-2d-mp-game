@@ -56,27 +56,27 @@ export default {
     {
       name: "health-bars",
       spriteSize: [48, 6]
-    }, 
+    },
     {
       name: "numbers",
       spriteSize: [8, 8]
     },
     {
       name: "selection-cursor",
-      spriteSize: [8,8],
+      spriteSize: [8, 8],
     }
   ],
   props,
   particles: [
-    "big-explosion", 
-    "big-fragments", 
-    "bullet-impacts", 
-    "hit-sparks", 
-    "hit-spatters", 
-    "laser-flash", 
-    "muzzle-flashes", 
-    "small-explosion", 
-    "small-fragments", 
+    "big-explosion",
+    "big-fragments",
+    "bullet-impacts",
+    "hit-sparks",
+    "hit-spatters",
+    "laser-flash",
+    "muzzle-flashes",
+    "small-explosion",
+    "small-fragments",
     "smoke"
   ]
 }

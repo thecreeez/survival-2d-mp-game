@@ -12,7 +12,6 @@ import MovementUpdatePacket from "./packets/MovementUpdatePacket.js";
 
 import SharedData from "./SharedData.js";
 
-import core from "../packs/core/scripts/init.js";
 import Logger from "./utils/Logger.js";
 import SyncApplicationPacket from "./packets/SyncApplicationPacket.js";
 
@@ -35,9 +34,7 @@ class Application {
     this.lastSyncState = Date.now();
     this.Logger = new Logger(`Application${(this.context.type[0].toUpperCase() + this.context.type.slice(1).toLowerCase())}`);
     
-    this.registerPack(core);
-
-    this.loadPacks(); // Передвинуть это в сервер/клиент, чтоб можно было просунуть логику подгрузки
+    this.context.registerPacks()
 
     if (!this.isClient()) {
       // Spawn entities place
