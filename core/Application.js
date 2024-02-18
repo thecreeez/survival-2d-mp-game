@@ -18,6 +18,7 @@ import SyncApplicationPacket from "./packets/SyncApplicationPacket.js";
 class Application {
   static version = 2;
   static playerViewDistance = 2;
+  static simulationDistance = 40 * 20; // 20 tiles
 
   constructor(context) {
     this._entities = {};
@@ -201,18 +202,30 @@ class Application {
   }
 
   updateServerTick() {
+    this.context.serverProfiler.start("update_world");
     for (let worldId in this._worlds) {
       this._worlds[worldId].updateServerTick();
     }
+    this.context.serverProfiler.end("update_world");
 
+    this.context.serverProfiler.start("update_entities");
     for (let uuid in this._entities) {
       this._entities[uuid].startUpdateServerTick(this);
     }
 
     for (let uuid in this._entities) {
-      this._entities[uuid].updateServerTick(this, Date.now() - this.lastTickTime);
+      if (this._entities[uuid].getFullId() === "core:player_entity") {
+        this._entities[uuid].updateServerTick(this, Date.now() - this.lastTickTime);
+        for (let uuidEntity in this._entities) {
+          if (this._entities[uuid].distanceTo(this._entities[uuidEntity]) < 1000) {
+            this._entities[uuidEntity].updateServerTick(this, Date.now() - this.lastTickTime);
+          }
+        }
+      }
     }
+    this.context.serverProfiler.end("update_entities");
 
+    this.context.serverProfiler.start("update_state");
     if (Date.now() - this.lastSyncState > 1000) {
       SyncApplicationPacket.serverSend(this.context, this.context.getPlayersConnections(), { time: this.time });
       this.lastSyncState = Date.now();
@@ -220,6 +233,7 @@ class Application {
 
     this.time += Date.now() - this.lastTickTime;
     this.lastTickTime = Date.now();
+    this.context.serverProfiler.end("update_state");
   }
 
   updateClientTick() {

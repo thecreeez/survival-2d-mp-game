@@ -16,3 +16,6 @@ To-do:
 3.2. Wasp/Hornet (Going throw the walls)
 3.3. Scarab (?)
 3.4. (Extra): Centipede (Like boss)
+
+4. Fixes:
+4.1. Fix big lags becoz of too many entities (on client and server)

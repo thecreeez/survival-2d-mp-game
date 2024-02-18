@@ -238,6 +238,17 @@ class Entity {
     
     return obj;
   }
+
+  getNearestPlayer() {
+    if (this.getFullId() === "core:player_entity") {
+      return this;
+    }
+
+    return this.getWorld()
+      .getEntities()
+      .filter(entity => entity.getFullId() === "core:player_entity")
+      .sort((a,b) => a.distanceTo(this) - b.distanceTo(this))[0];
+  }
 }
 
 export default Entity;

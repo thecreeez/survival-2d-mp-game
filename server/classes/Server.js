@@ -11,7 +11,30 @@ import Logger from "../../core/utils/Logger.js";
 
 class Server {
   static type = "server"
-  static _TPS = 60;
+  static _TPS = 25;
+
+  static _currentTPS = 0;
+  static _tpsC = 0;
+
+  static serverProfiler = {
+    profiles: {},
+    start(name) {
+      this.profiles[name] = Date.now();
+    },
+    end(name) {
+      this.profiles[name] = Date.now() - this.profiles[name];
+    },
+    log() {
+      console.log(`===== Start =====`)
+      for (let name in this.profiles) {
+        console.log(`${name}: ${this.profiles[name]}`);
+      }
+      console.log(`=====  End  =====`)
+    },
+    set(field, value) {
+      this.profiles[field] = value;
+    }
+  }
 
   static Logger = new Logger("Server");
 
@@ -38,13 +61,23 @@ class Server {
       }
 
       Application.instance.updateTick();
-      
       let updatedEntities = Application.instance.getEntities().filter(entity => entity.needToUpdate());
+      this.serverProfiler.set("entities", Application.instance.getEntities().length);
+      this.serverProfiler.log();
 
       updatedEntities.forEach((entity) => {
         EntityUpdatePacket.serverSend(this.getPlayersConnections(), { data: entity.serializeLazy() })
       })
+      this._tpsC++;
     }, 1000 / this._TPS);
+
+    setInterval(() => {
+      this._currentTPS = this._tpsC;
+      this._tpsC = 0;
+
+      console.log(this._currentTPS);
+      this._updatedEntities = 0;
+    }, 1000);
   }
 
   static async registerPacks() {
