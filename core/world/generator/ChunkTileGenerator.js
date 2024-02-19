@@ -67,7 +67,7 @@ class ChunkTileGenerator {
         let x = chunk.getPosition()[0] * Chunk.Size[0] * 40 + (tilePosition[0] + Math.floor(Math.random() * ChunkTileGenerator.amountOfTilesPerGenerate)) * 40 + 20;
         let y = chunk.getPosition()[1] * Chunk.Size[1] * 40 + (tilePosition[1] + Math.floor(Math.random() * ChunkTileGenerator.amountOfTilesPerGenerate)) * 40 + 40;
 
-        let needToSpawn = Math.random() > 0.8;
+        let needToSpawn = Math.random() > 0.99;
 
         if (needToSpawn) {
           let spawnEntityIndex = Math.floor(Math.random() * core_world[variant].spawnOnceRules.length);

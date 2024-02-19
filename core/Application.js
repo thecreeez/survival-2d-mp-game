@@ -227,7 +227,7 @@ class Application {
 
     this.context.serverProfiler.start("update_state");
     if (Date.now() - this.lastSyncState > 1000) {
-      SyncApplicationPacket.serverSend(this.context, this.context.getPlayersConnections(), { time: this.time });
+      SyncApplicationPacket.serverSend(this.context, this.context.getPlayersConnections(), { time: this.time, tps: this.context._currentTPS });
       this.lastSyncState = Date.now();
     }
 

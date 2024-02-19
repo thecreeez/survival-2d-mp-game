@@ -63,7 +63,6 @@ class Server {
       Application.instance.updateTick();
       let updatedEntities = Application.instance.getEntities().filter(entity => entity.needToUpdate());
       this.serverProfiler.set("entities", Application.instance.getEntities().length);
-      this.serverProfiler.log();
 
       updatedEntities.forEach((entity) => {
         EntityUpdatePacket.serverSend(this.getPlayersConnections(), { data: entity.serializeLazy() })
@@ -75,7 +74,6 @@ class Server {
       this._currentTPS = this._tpsC;
       this._tpsC = 0;
 
-      console.log(this._currentTPS);
       this._updatedEntities = 0;
     }, 1000);
   }
