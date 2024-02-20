@@ -38,6 +38,9 @@ class Screen {
     this.subtitleRenderer = new SubtitleRenderer(this);
     this.hotbar = new Hotbar(this);
     this.profiler = new Profiler(this);
+
+    this._entitiesToRender = [];
+    this._lastEntitiesToRenderUpdate = Date.now();
   }
 
   clear() {
@@ -91,6 +94,10 @@ class Screen {
     let chunksQueue = MapRenderer.getChunksToRender(canvas, ctx, client);
     this.profiler.stop("chunks_preparing");
 
+    if (Date.now() - this._lastEntitiesToRenderUpdate > 200) {
+      this.updateEntitiesPool();
+    }
+
     // Chunks
     this.profiler.start("chunks_render");
     chunksQueue.forEach((gameObject) => {
@@ -98,16 +105,9 @@ class Screen {
     })
     this.profiler.stop("chunks_render");
 
-    this.profiler.start("entities_preparing");
-    let entitiesQueue = []
-    entitiesQueue.push(...MapRenderer.getEntitiesToRender(canvas, ctx, client));
-    entitiesQueue.push(...MapRenderer.getParticlesToRender(client.getPlayer().getWorld()));
-    entitiesQueue = entitiesQueue.sort((a, b) => (a.getPosition()[1] - b.getPosition()[1]));
-    this.profiler.stop("entities_preparing");
-
     // Entities & Particles
     this.profiler.start("entities_render");
-    entitiesQueue.forEach((gameObject, i) => {
+    this._entitiesToRender.forEach((gameObject, i) => {
       MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
     })
 
@@ -121,7 +121,18 @@ class Screen {
 
     ctx.restore();
 
-    return entitiesQueue.length + chunksQueue.length;
+    return this._entitiesToRender.length + chunksQueue.length;
+  }
+
+  updateEntitiesPool() {
+    let client = this.client;
+    this._entitiesToRender = []
+    this._entitiesToRender.push(...MapRenderer.getEntitiesToRender(canvas, ctx, client));
+    this._entitiesToRender.push(...MapRenderer.getParticlesToRender(client.getPlayer().getWorld()));
+    this._entitiesToRender = this._entitiesToRender.sort((a, b) => (a.getPosition()[1] - b.getPosition()[1]));
+
+    console.log(`entities to render updated... `, this._entitiesToRender.length)
+    this._lastEntitiesToRenderUpdate = Date.now();
   }
 
   getMousePosOnWorld() {

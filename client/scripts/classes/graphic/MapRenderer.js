@@ -15,7 +15,7 @@ class MapRenderer {
   static getEntitiesToRender(canvas, ctx, client) {
     let gameObjects = [];
 
-    let nearEntities = client.application.getEntities().filter((entity) => entity.distanceTo(client.getPlayer()) < Math.max(canvas.width / 2, canvas.height / 2));
+    let nearEntities = client.application.getEntities().filter((entity) => entity.distanceTo(client.getPlayer()) * 1.5 < Math.max(canvas.width / 2, canvas.height / 2));
 
     nearEntities.forEach((entity) => {
       gameObjects.push({
