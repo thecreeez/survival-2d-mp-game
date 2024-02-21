@@ -1,11 +1,11 @@
-import Client from "../Client.js";
+import EntityRendererRegistry from "./EntityRendererRegistry.js";
 import PackAssetsRegistry from "../registry/PackAssetsRegistry.js";
-import MapRenderer from "./MapRenderer.js";
 import SubtitleRenderer from "./SubtitleRenderer.js";
 import Hotbar from "./Hotbar.js";
 import EntityRenderer from "./entity/EntityRenderer.js";
 import LogsRenderer from "./LogsRenderer.js";
 import Profiler from "./Profiler.js";
+import ChunkRenderer from "./ChunkRenderer.js";
 
 
 const canvas = document.querySelector("canvas");
@@ -39,8 +39,9 @@ class Screen {
     this.hotbar = new Hotbar(this);
     this.profiler = new Profiler(this);
 
-    this._entitiesToRender = [];
-    this._lastEntitiesToRenderUpdate = Date.now();
+    this.chunkRenderer = new ChunkRenderer(this);
+
+    this.entitiesToRender = [];
   }
 
   clear() {
@@ -90,25 +91,25 @@ class Screen {
 
     ctx.save();
     ctx.translate(canvas.width / 2 - client.getPlayer().getPosition()[0], canvas.height / 2 - client.getPlayer().getPosition()[1]);
-    this.profiler.start("chunks_preparing");
-    let chunksQueue = MapRenderer.getChunksToRender(canvas, ctx, client);
-    this.profiler.stop("chunks_preparing");
-
-    if (Date.now() - this._lastEntitiesToRenderUpdate > 200) {
-      this.updateEntitiesPool();
-    }
 
     // Chunks
     this.profiler.start("chunks_render");
-    chunksQueue.forEach((gameObject) => {
-      MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
-    })
+    this.chunkRenderer.render();
     this.profiler.stop("chunks_render");
 
     // Entities & Particles
     this.profiler.start("entities_render");
-    this._entitiesToRender.forEach((gameObject, i) => {
-      MapRenderer.renderGameObject(ctx, gameObject, deltaTime);
+    this.entitiesToRender = this.entitiesToRender.sort((a, b) => (a.getPosition()[1] - b.getPosition()[1]));
+    this.entitiesToRender.forEach((entity, i) => {
+      if (!EntityRendererRegistry[entity.getFullId()]) {
+        EntityRenderer.render(ctx, entity);
+        console.error(`No Renderer file for [${entity.getFullId()}] entity.`);
+        return false;
+      }
+
+      EntityRendererRegistry[entity.getFullId()].render({ ctx, entity });
+      EntityRendererRegistry[entity.getFullId()].updateEntity({ entity, deltaTime });
+      EntityRendererRegistry[entity.getFullId()].endUpdateEntity({ entity, deltaTime });
     })
 
     if (client.controlsHandler.hoverEntity !== null) {
@@ -121,18 +122,7 @@ class Screen {
 
     ctx.restore();
 
-    return this._entitiesToRender.length + chunksQueue.length;
-  }
-
-  updateEntitiesPool() {
-    let client = this.client;
-    this._entitiesToRender = []
-    this._entitiesToRender.push(...MapRenderer.getEntitiesToRender(canvas, ctx, client));
-    this._entitiesToRender.push(...MapRenderer.getParticlesToRender(client.getPlayer().getWorld()));
-    this._entitiesToRender = this._entitiesToRender.sort((a, b) => (a.getPosition()[1] - b.getPosition()[1]));
-
-    console.log(`entities to render updated... `, this._entitiesToRender.length)
-    this._lastEntitiesToRenderUpdate = Date.now();
+    return this.entitiesToRender.length;
   }
 
   getMousePosOnWorld() {

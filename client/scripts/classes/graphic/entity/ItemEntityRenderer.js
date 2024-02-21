@@ -1,10 +1,8 @@
 import ItemEntity from "/core/world/entity/ItemEntity.js";
 import EntityRenderer from "./EntityRenderer.js";
-import MapRenderer from "../MapRenderer.js";
 
 class ItemEntityRenderer extends EntityRenderer {
   static Entity = ItemEntity;
-  static size = [MapRenderer.tileSize, MapRenderer.tileSize];
 
   static showed = false;
 

@@ -1,6 +1,5 @@
 import TilePlacePacket from "/core/packets/TilePlacePacket.js";
 import PackAssetsRegistry from "../registry/PackAssetsRegistry.js";
-import MapRenderer from "./MapRenderer.js";
 import Screen from "./Screen.js";
 import Tile from "/core/world/Tile.js";
 

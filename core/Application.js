@@ -137,6 +137,10 @@ class Application {
       EntityRegisterPacket.serverSend(this.context.getPlayersConnections(), { context, serializedEntity: entity.serialize() })
     }
 
+    if (this.isClient()) {
+      this.context.screen.entitiesToRender.push(entity);
+    }
+
     return entity;
   }
 
@@ -176,6 +180,8 @@ class Application {
 
         this.context.getPlayerByName(newEntity.getName()).entity = newEntity;
       }
+    } else {
+      this.context.screen.entitiesToRender = this.context.screen.entitiesToRender.filter(entityCandidate => entityCandidate !== this._entities[uuid]);
     }
 
     delete this._entities[uuid];

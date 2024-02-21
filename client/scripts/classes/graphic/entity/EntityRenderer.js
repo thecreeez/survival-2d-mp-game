@@ -1,6 +1,5 @@
 import PackAssetsRegistry from "../../registry/PackAssetsRegistry.js";
 import MathUtils from "../../../../../core/utils/MathUtils.js";
-import MapRenderer from "../MapRenderer.js";
 
 class EntityRenderer {
   static Entity = null;
