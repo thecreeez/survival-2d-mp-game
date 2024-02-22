@@ -87,12 +87,12 @@ class SpriteSheet {
     }
 
     if (x >= this.sheetSize[0]) {
-      console.error(`x out of bounds of spritesheet`);
+      console.error(`x out of bounds of spritesheet: ${x}/${this.sheetSize[0]}`);
       x = this.sheetSize[0] - 1;
     }
 
     if (y >= this.sheetSize[1]) {
-      console.error(`y out of bounds of spritesheet`);
+      console.error(`y out of bounds of spritesheet: ${y}/${this.sheetSize[1]}`);
       y = this.sheetSize[1] - 1;
     }
 

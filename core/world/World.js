@@ -134,6 +134,10 @@ class World {
     return particle;
   }
 
+  removeParticle(particle) {
+    this._particles = this._particles.filter(particleCandidate => particleCandidate !== particle);
+  }
+
   setTile(pos, tile) {
     let chunkPos = [Math.floor(pos[0] / Chunk.Size[0]), Math.floor(pos[1] / Chunk.Size[1])];
 

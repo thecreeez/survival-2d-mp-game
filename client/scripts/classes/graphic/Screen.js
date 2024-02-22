@@ -6,6 +6,7 @@ import EntityRenderer from "./entity/EntityRenderer.js";
 import LogsRenderer from "./LogsRenderer.js";
 import Profiler from "./Profiler.js";
 import ChunkRenderer from "./ChunkRenderer.js";
+import ParticleRenderer from "./ParticleRenderer.js";
 
 
 const canvas = document.querySelector("canvas");
@@ -36,6 +37,7 @@ class Screen {
 
     this.logsRenderer = new LogsRenderer(this);
     this.subtitleRenderer = new SubtitleRenderer(this);
+    this.particleRenderer = new ParticleRenderer(this);
     this.hotbar = new Hotbar(this);
     this.profiler = new Profiler(this);
 
@@ -66,7 +68,7 @@ class Screen {
       return;
     }
 
-    let amountOfRenderObjects = this.renderWorld(deltaTime);
+    this.renderWorld(deltaTime)
 
     this.profiler.start("ui_rendering");
     if (this.client.getMapBuilder().bEnabled) {
@@ -97,7 +99,7 @@ class Screen {
     this.chunkRenderer.render();
     this.profiler.stop("chunks_render");
 
-    // Entities & Particles
+    // Entities
     this.profiler.start("entities_render");
     this.entitiesToRender = this.entitiesToRender.sort((a, b) => (a.getPosition()[1] - b.getPosition()[1]));
     this.entitiesToRender.forEach((entity, i) => {
@@ -120,9 +122,15 @@ class Screen {
     }
     this.profiler.stop("entities_render");
 
+    // Particles
+    this.profiler.start("particles_render");
+    this.particleRenderer.render();
+    this.particleRenderer.update();
+    this.profiler.stop("particles_render");
+
     ctx.restore();
 
-    return this.entitiesToRender.length;
+    this.profiler.set("game_objects", `e:${this.entitiesToRender.length} c:${this.chunkRenderer.lastChunksRenderedSize} p:${this.particleRenderer.getParticlesLength() }`);
   }
 
   getMousePosOnWorld() {

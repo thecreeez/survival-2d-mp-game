@@ -13,6 +13,8 @@ class ChunkRenderer {
     this.minLightLevel = 3;
     this.maxLightLevel = 16;
 
+    this.lastChunksRenderedSize = 0;
+
     this.tileGrid = document.createElement("canvas");
     this.tileGrid.width = Chunk.Size[0] * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[0];
     this.tileGrid.height = Chunk.Size[1] * PackAssetsRegistry.DEFAULT_TILE_SPRITE_SIZE[1];
@@ -72,6 +74,7 @@ class ChunkRenderer {
       }
     }
 
+    this.lastChunksRenderedSize = chunks.length;
     return chunks;
   }
 

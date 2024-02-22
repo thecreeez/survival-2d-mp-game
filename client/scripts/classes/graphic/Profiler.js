@@ -4,12 +4,14 @@ const ctx = canvas.getContext("2d");
 export default class Profiler {
   constructor(screen) {
     this.screen = screen;
-    this.pos = [10,canvas.height / 2];
+    this.pos = [10, canvas.height / 2];
 
     this.profiles = {};
   }
 
   render() {
+    this.pos = [10, canvas.height / 2];
+
     let dataFontSize = 15;
     ctx.font = `arial ${dataFontSize}px`;
     ctx.textAlign = "left";
