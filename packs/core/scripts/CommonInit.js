@@ -19,6 +19,7 @@ import ParticleSpawnPacket from "../../../core/packets/ParticleSpawnPacket.js";
 import ShopInteractPacket from "../../../core/packets/ShopInteractPacket.js";
 import ChunkRegisterPacket from "../../../core/packets/ChunkRegisterPacket.js";
 import SyncApplicationPacket from "../../../core/packets/SyncApplicationPacket.js";
+import EventInvokePacket from "../../../core/packets/EventInvokePacket.js";
 
 import props from "./props.js";
 
@@ -51,6 +52,7 @@ export default {
     ParticleSpawnPacket,
     ShopInteractPacket,
     SyncApplicationPacket,
+    EventInvokePacket
   ],
   ui: [
     {

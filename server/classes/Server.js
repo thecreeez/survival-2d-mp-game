@@ -11,7 +11,7 @@ import Logger from "../../core/utils/Logger.js";
 
 class Server {
   static type = "server"
-  static _TPS = 25;
+  static _TPS = 120;
 
   static _currentTPS = 0;
   static _tpsC = 0;

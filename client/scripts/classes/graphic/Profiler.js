@@ -13,7 +13,7 @@ export default class Profiler {
     this.pos = [10, canvas.height / 2];
 
     let dataFontSize = 15;
-    ctx.font = `arial ${dataFontSize}px`;
+    ctx.font = `${dataFontSize}px arial`;
     ctx.textAlign = "left";
     ctx.fillStyle = `white`;
 

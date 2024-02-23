@@ -1,5 +1,6 @@
 const canvas = document.querySelector("canvas");
 
+import EventInvokePacket from "../../../core/packets/EventInvokePacket.js";
 import Hotbar from "./graphic/Hotbar.js";
 import MathUtils from "/core/utils/MathUtils.js"
 import Vector from "/core/utils/Vector.js"
@@ -9,6 +10,7 @@ class ControlsHandler {
     this.client = client;
 
     this.keys = {};
+    this.prevKeys = {};
 
     this.mousePos = [0, 0];
     this.prevMousePos = [0, 0];
@@ -86,6 +88,10 @@ class ControlsHandler {
     this._updateSitting(); 
     this._updateAttack();
 
+    if (this.keys["KeyP"] && !this.prevKeys["KeyP"]) {
+      EventInvokePacket.clientSend(this.client.connectionHandler.getSocket(), "pause");
+    }
+
     this.deltaMousePos[0] = this.mousePos[0] - this.prevMousePos[0];
     this.deltaMousePos[1] = this.mousePos[1] - this.prevMousePos[1];
 
@@ -93,6 +99,10 @@ class ControlsHandler {
 
     if (this.hoverEntity !== null) {
       this.hoverEntityTime += deltaTime;
+    }
+
+    for (let key in this.keys) {
+      this.prevKeys[key] = this.keys[key];
     }
   }
 

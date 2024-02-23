@@ -18,6 +18,15 @@ class PlasmaProjectileEntityRenderer extends EntityRenderer {
 
   static renderDebug({ctx, entity}) {
     super.renderDebug({ctx, entity});
+
+    let center = [entity.getPosition()[0], entity.getPosition()[1] - entity.getSize()[1] / 2]
+
+    ctx.strokeStyle = `red`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(center[0], center[1]);
+    ctx.lineTo(center[0] + entity.getDirection()[0] * (entity.getMoveSpeed() / 20), center[1] + entity.getDirection()[1] * (entity.getMoveSpeed() / 20));
+    ctx.stroke();
   }
 
   static updateEntity({entity, deltaTime}) {
@@ -30,7 +39,7 @@ class PlasmaProjectileEntityRenderer extends EntityRenderer {
     entity.currentSpriteTime += deltaTime;
     entity.lastTimeRendered = Date.now();
 
-    if (entity.distanceAfterLastRender > entity.getSize()[0] / 2 && false) {
+    if (entity.distanceAfterLastRender > entity.getSize()[0] / 2) {
       entity.getWorld().spawnParticle(new Particle({ pack: "core", worldId: entity.getWorld().getId(), position: entity.lastRenderedPosition, lifeTime: 2000, particleType: "smoke", size: [20,20] }));
       entity.distanceAfterLastRender = 0;
     }

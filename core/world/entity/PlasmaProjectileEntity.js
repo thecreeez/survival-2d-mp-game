@@ -5,7 +5,7 @@ class PlasmaProjectileEntity extends ProjectileEntity {
   static size = [20,20];
 
   constructor({ ownerUuid = "world", position = [0, 0], worldId = "core:spawn", rotation = 90, maxDistance = 1000 } = {}) {
-    super({ ownerUuid, damage: 5, position, worldId, rotation, moveSpeed: 10, maxDistance, tags: ["light-source", "light-color:120,120,0", "light-level:3"] });
+    super({ ownerUuid, damage: 5, position, worldId, rotation, moveSpeed: 40 * 15, maxDistance, tags: ["light-source", "light-color:120,120,0", "light-level:3"] });
   }
 
   onCollide(application, entity) {

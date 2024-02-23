@@ -48,8 +48,7 @@ class ShopInteractPacket {
       leader: player,
     });
 
-    player.application.spawnEntity(entity);
-    EntityRegisterPacket.serverSend(server.getPlayersConnections(), { context: EntityRegisterPacket.Contexts.shop, serializedEntity: entity.serialize() });
+    player.application.spawnEntity(entity, EntityRegisterPacket.Contexts.shop);
   }
 }
 

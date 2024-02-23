@@ -82,6 +82,12 @@ class Screen {
 
     this.hotbar.render();
     this.hotbar.update(deltaTime);
+
+    if (this.client.application.paused) {
+      ctx.font = `40px arial`;
+      ctx.fillStyle = `black`;
+      ctx.fillText(`[Game paused] [P] to unpause`, canvas.width / 2, canvas.height / 4);
+    }
     this.profiler.stop("ui_rendering");
 
     this.profiler.stop("frame_render");
@@ -96,7 +102,7 @@ class Screen {
 
     // Chunks
     this.profiler.start("chunks_render");
-    this.chunkRenderer.render();
+    this.chunkRenderer.render({ bRenderChunkGrid: true });
     this.profiler.stop("chunks_render");
 
     // Entities

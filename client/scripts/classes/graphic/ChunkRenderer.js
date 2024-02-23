@@ -35,11 +35,11 @@ class ChunkRenderer {
     this._getChunksToRender().forEach(chunkHandler => {
       ctx.drawImage(chunkHandler.chunk.getCanvas(), chunkHandler.position[0], chunkHandler.position[1], this.tileSize * Chunk.Size[0], this.tileSize * Chunk.Size[1]);
 
-      if (bRenderChunkGrid) {
+      if (bRenderTileGrid) {
         ctx.drawImage(this.tileGrid, chunkHandler.position[0], chunkHandler.position[1], this.tileSize * Chunk.Size[0], this.tileSize * Chunk.Size[1]);
       }
 
-      if (bRenderTileGrid) {
+      if (bRenderChunkGrid) {
         ctx.lineWidth = 10;
         ctx.strokeStyle = `green`;
         ctx.strokeRect(chunkHandler.position[0], chunkHandler.position[1], this.tileSize * Chunk.Size[0], this.tileSize * Chunk.Size[1]);

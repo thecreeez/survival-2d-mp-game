@@ -6,7 +6,7 @@ import ChunkTileGenerator from "./generator/ChunkTileGenerator.js";
 import ChunkRegisterPacket from "../packets/ChunkRegisterPacket.js";
 
 class World {
-  static timePerUpdateToGenerateChunks = 200;
+  static timePerUpdateToGenerateChunks = 100;
 
   static Logger = new Logger("World");
 
@@ -43,8 +43,8 @@ class World {
       let playerChunk = [Math.floor(player.getPosition()[0] / tileSize / Chunk.Size[0]), Math.floor(player.getPosition()[1] / tileSize / Chunk.Size[1])];
 
       // Spawn chunks
-      for (let x = -playerViewDistance; x < playerViewDistance; x++) {
-        for (let y = -playerViewDistance; y < playerViewDistance; y++) {
+      for (let x = -playerViewDistance + 1; x < playerViewDistance; x++) {
+        for (let y = -playerViewDistance + 1; y < playerViewDistance; y++) {
           let chunkCandidate = [playerChunk[0] + x, playerChunk[1] + y];
           if (this.getChunk(chunkCandidate) === undefined) {
             let needToPush = true;
@@ -84,8 +84,8 @@ class World {
     let chunksToGenerate = [];
 
     // Spawn chunks
-    for (let x = -playerViewDistance; x < playerViewDistance; x++) {
-      for (let y = -playerViewDistance; y < playerViewDistance; y++) {
+    for (let x = -playerViewDistance + 1; x < playerViewDistance; x++) {
+      for (let y = -playerViewDistance + 1; y < playerViewDistance; y++) {
         chunksToGenerate.push([x,y]);
       }
     }

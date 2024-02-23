@@ -20,7 +20,7 @@ class PlayerEntity extends HumanEntity {
 
   constructor({ name = "user", worldId = "core:spawn", health = 100, position = [0, 0]} = {}) {
     super({
-      moveSpeed: 5,
+      moveSpeed: 40 * 5,
       position,
       health,
       worldId,

@@ -17,8 +17,7 @@ import SyncApplicationPacket from "./packets/SyncApplicationPacket.js";
 
 class Application {
   static version = 2;
-  static playerViewDistance = 2;
-  static simulationDistance = 40 * 20; // 20 tiles
+  static playerViewDistance = 4;
 
   constructor(context) {
     this._entities = {};
@@ -27,6 +26,9 @@ class Application {
     this._packs = {};
     this.state = 0;
     this.time = 0;
+
+    this.distanceToUpdateEntity = 40 * 10;
+    this.paused = false;
 
     this.setWorld(new World({ id: "spawn" }));
 
@@ -210,7 +212,9 @@ class Application {
   updateServerTick() {
     this.context.serverProfiler.start("update_world");
     for (let worldId in this._worlds) {
-      this._worlds[worldId].updateServerTick();
+      if (!this.paused) {
+        this._worlds[worldId].updateServerTick();
+      }
     }
     this.context.serverProfiler.end("update_world");
 
@@ -222,9 +226,11 @@ class Application {
     for (let uuid in this._entities) {
       if (this._entities[uuid].getFullId() === "core:player_entity") {
         this._entities[uuid].updateServerTick(this, Date.now() - this.lastTickTime);
-        for (let uuidEntity in this._entities) {
-          if (this._entities[uuid].distanceTo(this._entities[uuidEntity]) < 1000) {
-            this._entities[uuidEntity].updateServerTick(this, Date.now() - this.lastTickTime);
+        if (!this.paused) {
+          for (let uuidEntity in this._entities) {
+            if (this._entities[uuid].distanceTo(this._entities[uuidEntity]) < this.distanceToUpdateEntity) {
+              this._entities[uuidEntity].updateServerTick(this, Date.now() - this.lastTickTime);
+            }
           }
         }
       }
@@ -232,8 +238,8 @@ class Application {
     this.context.serverProfiler.end("update_entities");
 
     this.context.serverProfiler.start("update_state");
-    if (Date.now() - this.lastSyncState > 1000) {
-      SyncApplicationPacket.serverSend(this.context, this.context.getPlayersConnections(), { time: this.time, tps: this.context._currentTPS });
+    if (Date.now() - this.lastSyncState > 200) {
+      SyncApplicationPacket.serverSend(this.context, this.context.getPlayersConnections(), { time: this.time, tps: this.context._currentTPS, paused: this.paused });
       this.lastSyncState = Date.now();
     }
 

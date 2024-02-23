@@ -28,7 +28,10 @@ class ProjectileEntity extends Entity {
 
   updateServerTick(application, deltaTick) {
     super.updateServerTick(application, deltaTick);
-    let newPosition = [this.getPosition()[0] + this.getDirection()[0] * this.move_speed.getValue(), this.getPosition()[1] + this.getDirection()[1] * this.move_speed.getValue()];
+    let newPosition = [
+      this.getPosition()[0] + this.getDirection()[0] * this.move_speed.getValue() * (deltaTick / 1000),
+      this.getPosition()[1] + this.getDirection()[1] * this.move_speed.getValue() * (deltaTick / 1000)
+    ];
     
     if (!this.canBeMovedTo(newPosition)) {
       this.getWorld().application.removeEntity(this);
@@ -65,6 +68,10 @@ class ProjectileEntity extends Entity {
 
   getDamage() {
     return this.damage.getValue();
+  }
+
+  getMoveSpeed() {
+    return this.move_speed.getValue();
   }
 }
 
