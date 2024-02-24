@@ -122,34 +122,34 @@ class AI {
     let targetPosition = this.currentTargetPos;
     let entityPosition = this.entity.getPosition();
 
-    let moving = [0, 0]
+    let newDirection = [0, 0]
 
     if (entityPosition[1] < targetPosition[1]) {
-      moving[1] = this.entity.move_speed.getValue();
+      newDirection[1] = 1;
     };
 
     if (entityPosition[1] > targetPosition[1]) {
-      moving[1] = -this.entity.move_speed.getValue();
+      newDirection[1] = -1;
     }
 
     if (entityPosition[0] < targetPosition[0]) {
-      moving[0] = this.entity.move_speed.getValue();
+      newDirection[0] = 1;
     }
 
     if (entityPosition[0] > targetPosition[0]) {
-      moving[0] = -this.entity.move_speed.getValue();
+      newDirection[0] = -1;
     }
 
-    if (moving[0] != 0 && moving[1] != 0) {
-      moving[0] /= 2;
-      moving[1] /= 2;
+    if (newDirection[0] != 0 && newDirection[1] != 0) {
+      newDirection[0] /= 2;
+      newDirection[1] /= 2;
     }
 
-    if (moving[0] == this.entity.direction.getValue()[0] && moving[1] == this.entity.direction.getValue()[1]) {
+    if (newDirection[0] == this.entity.getDirection()[0] && newDirection[1] == this.entity.getDirection()[1]) {
       return;
     }
 
-    this.entity.direction.setValue(moving);
+    this.entity.direction.setValue(newDirection);
   }
 
   _updateAttack() {
@@ -216,7 +216,7 @@ class AI {
       return false;
     }
 
-    return MathUtils.distanceBetween([...this.currentTargetPos], [...this.entity.getPosition()]) > this.entity.getMoveSpeed();
+    return MathUtils.distanceBetween([...this.currentTargetPos], [...this.entity.getPosition()]) > (this.entity.getMoveSpeed() / 1000);
   }
 
   clearTarget() {

@@ -41,6 +41,8 @@ class LivingEntity extends Entity {
     this.view_range.setValue(viewRange);
     this.damage.setValue(damage);
 
+    this.lastTimeUpdate = Date.now();
+
     this.ai = ai;
 
     if (this.ai) {
@@ -51,14 +53,18 @@ class LivingEntity extends Entity {
     this.maxHealth = health;
   }
 
-  updateServerTick(application, deltaTick) {
-    this.updateServerState(application, deltaTick);
-    this.updateServerMovement(application, deltaTick);
-    this.updateServerRotation(application, deltaTick);
+  updateServerTick(application, deprecated) {
+    let deltaTick = Date.now() - this.lastTimeUpdate;
 
     if (this.ai) {
       this.ai.updateServerTick(application, deltaTick);
     }
+
+    this.updateServerState(application, deltaTick);
+    this.updateServerMovement(application, deltaTick);
+    this.updateServerRotation(application, deltaTick);
+
+    this.lastTimeUpdate = Date.now();
   }
 
   updateServerMovement(application, deltaTick) {

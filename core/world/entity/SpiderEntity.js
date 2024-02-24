@@ -8,7 +8,7 @@ class SpiderEntity extends LivingEntity {
   constructor({ worldId = "core:spawn", position = [0, 0] } = {}) {
     super({
       position,
-      viewRange: 100,
+      viewRange: 1000,
       health: 200,
       ai: new MeleeAI({
         targetId: "core:player_entity",
@@ -16,7 +16,7 @@ class SpiderEntity extends LivingEntity {
       }),
       damage: 10,
       attackRange: 50,
-      moveSpeed: 2,
+      moveSpeed: 40 * 5,
       worldId,
       states: ["idle", "walk", "hurt", "attack", "dead"],
       tags: ["hostile"]
