@@ -53,16 +53,16 @@ class LivingEntity extends Entity {
     this.maxHealth = health;
   }
 
-  updateServerTick(application, deprecated) {
-    let deltaTick = Date.now() - this.lastTimeUpdate;
+  updateServerTick(application, deltaTime) {
+    deltaTime = Math.min(deltaTime, Date.now() - this.lastTimeUpdate);
 
     if (this.ai) {
-      this.ai.updateServerTick(application, deltaTick);
+      this.ai.updateServerTick(application, deltaTime);
     }
 
-    this.updateServerState(application, deltaTick);
-    this.updateServerMovement(application, deltaTick);
-    this.updateServerRotation(application, deltaTick);
+    this.updateServerState(application, deltaTime);
+    this.updateServerMovement(application, deltaTime);
+    this.updateServerRotation(application, deltaTime);
 
     this.lastTimeUpdate = Date.now();
   }
