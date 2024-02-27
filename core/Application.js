@@ -30,6 +30,8 @@ class Application {
     this.distanceToUpdateEntity = 40 * 10;
     this.paused = false;
 
+    this.debugMode = false;
+
     this.setWorld(new World({ id: "spawn" }));
 
     this.context = context;

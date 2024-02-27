@@ -102,7 +102,7 @@ class Screen {
 
     // Chunks
     this.profiler.start("chunks_render");
-    this.chunkRenderer.render({ bRenderChunkGrid: true });
+    this.chunkRenderer.render({ bRenderChunkGrid: this.client.application.debugMode });
     this.profiler.stop("chunks_render");
 
     // Entities
@@ -110,12 +110,12 @@ class Screen {
     this.entitiesToRender = this.entitiesToRender.sort((a, b) => (a.getPosition()[1] - b.getPosition()[1]));
     this.entitiesToRender.forEach((entity, i) => {
       if (!EntityRendererRegistry[entity.getFullId()]) {
-        EntityRenderer.render(ctx, entity);
+        EntityRenderer.render({ ctx, entity, debugMode: this.client.application.debugMode });
         console.error(`No Renderer file for [${entity.getFullId()}] entity.`);
         return false;
       }
 
-      EntityRendererRegistry[entity.getFullId()].render({ ctx, entity });
+      EntityRendererRegistry[entity.getFullId()].render({ ctx, entity, debugMode: this.client.application.debugMode });
       EntityRendererRegistry[entity.getFullId()].updateEntity({ entity, deltaTime });
       EntityRendererRegistry[entity.getFullId()].endUpdateEntity({ entity, deltaTime });
     })

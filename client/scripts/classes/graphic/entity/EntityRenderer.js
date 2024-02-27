@@ -4,9 +4,11 @@ import MathUtils from "../../../../../core/utils/MathUtils.js";
 class EntityRenderer {
   static Entity = null;
 
-  static render({ctx, entity}) {
+  static render({ctx, entity, debugMode = false}) {
     this.renderMain({ctx, entity});
-    this.renderDebug({ctx, entity});
+
+    if (debugMode)
+      this.renderDebug({ctx, entity});
   }
 
   static renderMain({ctx, entity}) {

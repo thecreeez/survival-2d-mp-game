@@ -92,6 +92,11 @@ class ControlsHandler {
       EventInvokePacket.clientSend(this.client.connectionHandler.getSocket(), "pause");
     }
 
+    if (this.keys["KeyO"] && !this.prevKeys["KeyO"]) {
+      this.client.application.debugMode = !this.client.application.debugMode;
+      this.client.screen.profiler.set("debugMode", this.client.application.debugMode);
+    }
+
     this.deltaMousePos[0] = this.mousePos[0] - this.prevMousePos[0];
     this.deltaMousePos[1] = this.mousePos[1] - this.prevMousePos[1];
 
